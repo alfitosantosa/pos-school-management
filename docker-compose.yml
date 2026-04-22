@@ -7,13 +7,13 @@ services:
         - NODE_ENV=production
       # PENTING: Tambahkan ini untuk cleanup build cache
       cache_from:
-        - smkfajarsentosa-web:latest
+        - rahmaniyah-web:latest
       # Batasi build context
       labels:
-        - "com.docker.compose.project=smkfajarsentosa-web"
+        - "com.docker.compose.project=rahmaniyah-web"
 
-    image: smkfajarsentosa-web:latest
-    container_name: smkfajarsentosa-web-app
+    image: rahmaniyah-web:latest
+    container_name: rahmaniyah-web-app
     restart: unless-stopped
 
     ports:
@@ -60,8 +60,8 @@ services:
       - no-new-privileges:true
 
     labels:
-      - "com.smkfajarsentosa-web.service=app"
-      - "com.smkfajarsentosa-web.environment=production"
+      - "com.rahmaniyah-web.service=app"
+      - "com.rahmaniyah-web.environment=production"
 
   # ==========================================
   # CLEANUP SERVICE - Otomatis bersihkan unused images/containers
