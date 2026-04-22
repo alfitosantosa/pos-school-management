@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "POS Yayasan Rahmaniyah Al-Islamy",
+  title: "Yayasan Rahmaniyah Al-Islamy",
   description: "Sistem Informasi Sekolah",
 };
 
