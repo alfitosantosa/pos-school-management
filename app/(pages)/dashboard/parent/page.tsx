@@ -302,7 +302,7 @@ export default function ParentPage() {
           {/* Header */}
           <div className="space-y-2">
             <h1 className="text-3xl font-bold">Dashboard Orang Tua</h1>
-            <p className="text-muted-foreground">Pantau perkembangan anak Anda di SMK Fajar Sentosa</p>
+            <p className="text-muted-foreground">Pantau perkembangan anak Anda di Rahmaniyah</p>
           </div>
 
           {/* Parent Info */}

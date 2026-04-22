@@ -113,7 +113,7 @@ export default function ReportsModule() {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <FileText className="h-6 w-6 text-blue-600" />
-            <span>Sistem Laporan SMK Fajar Sentosa</span>
+            <span>Sistem Laporan Rahmaniyah</span>
           </CardTitle>
           <CardDescription>Generate dan download laporan untuk semua modul administrasi sekolah</CardDescription>
         </CardHeader>
@@ -263,7 +263,9 @@ export default function ReportsModule() {
                     <div className="flex space-x-2">
                       {report.format.map((format) => (
                         <Button key={format} size="sm" variant="outline" onClick={() => handleDownload(report.name, format)} className="flex items-center space-x-1">
-                          {format === "Excel" ? <FileSpreadsheet className="h-4 w-4 text-green-600" /> : <FileText className="h-4 w-4 text-red-600" />}
+                          {format === "Excel" ?
+                            <FileSpreadsheet className="h-4 w-4 text-green-600" />
+                          : <FileText className="h-4 w-4 text-red-600" />}
                           <Download className="h-3 w-3" />
                           <span>{format}</span>
                         </Button>
