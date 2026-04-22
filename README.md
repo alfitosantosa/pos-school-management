@@ -207,7 +207,7 @@ npm start
 ✅ Always run `npm run build` before deploying  
 ✅ Start with `npm start` (sets NODE_ENV=production)  
 ✅ Verify cache headers before going live  
-✅ Use Docker: `docker build -t app . && docker run -p 3000:3000 app`
+✅ Use Docker: `docker build -t app . && docker run -p 8788:8788 app`
 
 ---
 
