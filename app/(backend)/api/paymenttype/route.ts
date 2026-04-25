@@ -1,15 +1,18 @@
 // model PaymentType {
-//   id          String    @id @default(cuid())
-//   name        String    @unique
-//   description String
-//   amount      Decimal
-//   isMonthly   Boolean   @default(false)
-//   isActive    Boolean   @default(true)
+//   id              String         @id @default(cuid())
+//   name            String         @unique
+//   owner           String
+//   description     String
+//   amount          Decimal
+//   quantity        Decimal
+//   subtotal        Decimal
+//   isMonthly       Boolean        @default(false)
+//   isActive        Boolean        @default(true)
+//   isFixedAmount   Boolean
+//   isFixedQuantity Boolean
 
-//   createdAt   DateTime? @default(now())
-//   updatedAt   DateTime? @updatedAt
-
-//   payments    Payment[]
+//   paymentItems    PaymentItems[]
+//   payments        Payment[]
 
 //   @@map("payment_types")
 // }
@@ -29,15 +32,20 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, description, amount, isMonthly, isActive } = await request.json();
+    const { name, owner, description, amount, quantity, subtotal, isMonthly, isActive, isFixedAmount, isFixedQuantity } = await request.json();
 
     const newPaymentType = await prisma.paymentType.create({
       data: {
         name,
         description,
         amount: parseFloat(amount),
-        isMonthly: isMonthly === "true",
-        isActive: isActive === "true",
+        quantity: parseFloat(quantity),
+        subtotal: parseFloat(subtotal),
+        isMonthly: typeof isMonthly === "boolean" ? isMonthly : isMonthly === "true",
+        isActive: typeof isActive === "boolean" ? isActive : isActive === "true",
+        isFixedAmount: typeof isFixedAmount === "boolean" ? isFixedAmount : isFixedAmount === "true",
+        isFixedQuantity: typeof isFixedQuantity === "boolean" ? isFixedQuantity : isFixedQuantity === "true",
+        owner,
       },
     });
 
@@ -50,16 +58,21 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, name, description, amount, isMonthly, isActive } = await request.json();
+    const { id, name, owner, description, amount, quantity, subtotal, isMonthly, isActive, isFixedAmount, isFixedQuantity } = await request.json();
 
     const updatedPaymentType = await prisma.paymentType.update({
       where: { id },
       data: {
         name,
         description,
+        owner,
         amount: parseFloat(amount),
-        isMonthly: isMonthly === "true",
-        isActive: isActive === "true",
+        quantity: parseFloat(quantity),
+        subtotal: parseFloat(subtotal),
+        isMonthly: typeof isMonthly === "boolean" ? isMonthly : isMonthly === "true",
+        isActive: typeof isActive === "boolean" ? isActive : isActive === "true",
+        isFixedAmount: typeof isFixedAmount === "boolean" ? isFixedAmount : isFixedAmount === "true",
+        isFixedQuantity: typeof isFixedQuantity === "boolean" ? isFixedQuantity : isFixedQuantity === "true",
       },
     });
 
@@ -78,7 +91,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     await prisma.paymentType.delete({
-      where: { id },
+      where: { id: id },
     });
 
     return NextResponse.json({ message: "Payment type deleted successfully" });

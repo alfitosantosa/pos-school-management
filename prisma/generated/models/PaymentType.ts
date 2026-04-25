@@ -28,10 +28,14 @@ export type AggregatePaymentType = {
 
 export type PaymentTypeAvgAggregateOutputType = {
   amount: runtime.Decimal | null
+  quantity: runtime.Decimal | null
+  subtotal: runtime.Decimal | null
 }
 
 export type PaymentTypeSumAggregateOutputType = {
   amount: runtime.Decimal | null
+  quantity: runtime.Decimal | null
+  subtotal: runtime.Decimal | null
 }
 
 export type PaymentTypeMinAggregateOutputType = {
@@ -41,6 +45,11 @@ export type PaymentTypeMinAggregateOutputType = {
   amount: runtime.Decimal | null
   isMonthly: boolean | null
   isActive: boolean | null
+  isFixedAmount: boolean | null
+  isFixedQuantity: boolean | null
+  quantity: runtime.Decimal | null
+  subtotal: runtime.Decimal | null
+  owner: string | null
 }
 
 export type PaymentTypeMaxAggregateOutputType = {
@@ -50,6 +59,11 @@ export type PaymentTypeMaxAggregateOutputType = {
   amount: runtime.Decimal | null
   isMonthly: boolean | null
   isActive: boolean | null
+  isFixedAmount: boolean | null
+  isFixedQuantity: boolean | null
+  quantity: runtime.Decimal | null
+  subtotal: runtime.Decimal | null
+  owner: string | null
 }
 
 export type PaymentTypeCountAggregateOutputType = {
@@ -59,16 +73,25 @@ export type PaymentTypeCountAggregateOutputType = {
   amount: number
   isMonthly: number
   isActive: number
+  isFixedAmount: number
+  isFixedQuantity: number
+  quantity: number
+  subtotal: number
+  owner: number
   _all: number
 }
 
 
 export type PaymentTypeAvgAggregateInputType = {
   amount?: true
+  quantity?: true
+  subtotal?: true
 }
 
 export type PaymentTypeSumAggregateInputType = {
   amount?: true
+  quantity?: true
+  subtotal?: true
 }
 
 export type PaymentTypeMinAggregateInputType = {
@@ -78,6 +101,11 @@ export type PaymentTypeMinAggregateInputType = {
   amount?: true
   isMonthly?: true
   isActive?: true
+  isFixedAmount?: true
+  isFixedQuantity?: true
+  quantity?: true
+  subtotal?: true
+  owner?: true
 }
 
 export type PaymentTypeMaxAggregateInputType = {
@@ -87,6 +115,11 @@ export type PaymentTypeMaxAggregateInputType = {
   amount?: true
   isMonthly?: true
   isActive?: true
+  isFixedAmount?: true
+  isFixedQuantity?: true
+  quantity?: true
+  subtotal?: true
+  owner?: true
 }
 
 export type PaymentTypeCountAggregateInputType = {
@@ -96,6 +129,11 @@ export type PaymentTypeCountAggregateInputType = {
   amount?: true
   isMonthly?: true
   isActive?: true
+  isFixedAmount?: true
+  isFixedQuantity?: true
+  quantity?: true
+  subtotal?: true
+  owner?: true
   _all?: true
 }
 
@@ -192,6 +230,11 @@ export type PaymentTypeGroupByOutputType = {
   amount: runtime.Decimal
   isMonthly: boolean
   isActive: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  quantity: runtime.Decimal
+  subtotal: runtime.Decimal
+  owner: string
   _count: PaymentTypeCountAggregateOutputType | null
   _avg: PaymentTypeAvgAggregateOutputType | null
   _sum: PaymentTypeSumAggregateOutputType | null
@@ -199,7 +242,7 @@ export type PaymentTypeGroupByOutputType = {
   _max: PaymentTypeMaxAggregateOutputType | null
 }
 
-type GetPaymentTypeGroupByPayload<T extends PaymentTypeGroupByArgs> = Prisma.PrismaPromise<
+export type GetPaymentTypeGroupByPayload<T extends PaymentTypeGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<PaymentTypeGroupByOutputType, T['by']> &
       {
@@ -224,6 +267,12 @@ export type PaymentTypeWhereInput = {
   amount?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolFilter<"PaymentType"> | boolean
   isActive?: Prisma.BoolFilter<"PaymentType"> | boolean
+  isFixedAmount?: Prisma.BoolFilter<"PaymentType"> | boolean
+  isFixedQuantity?: Prisma.BoolFilter<"PaymentType"> | boolean
+  quantity?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFilter<"PaymentType"> | string
+  paymentItems?: Prisma.PaymentItemsListRelationFilter
   payments?: Prisma.PaymentListRelationFilter
 }
 
@@ -234,6 +283,12 @@ export type PaymentTypeOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   isMonthly?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
+  paymentItems?: Prisma.PaymentItemsOrderByRelationAggregateInput
   payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
@@ -247,6 +302,12 @@ export type PaymentTypeWhereUniqueInput = Prisma.AtLeast<{
   amount?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolFilter<"PaymentType"> | boolean
   isActive?: Prisma.BoolFilter<"PaymentType"> | boolean
+  isFixedAmount?: Prisma.BoolFilter<"PaymentType"> | boolean
+  isFixedQuantity?: Prisma.BoolFilter<"PaymentType"> | boolean
+  quantity?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFilter<"PaymentType"> | string
+  paymentItems?: Prisma.PaymentItemsListRelationFilter
   payments?: Prisma.PaymentListRelationFilter
 }, "id" | "name">
 
@@ -257,6 +318,11 @@ export type PaymentTypeOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   isMonthly?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
   _count?: Prisma.PaymentTypeCountOrderByAggregateInput
   _avg?: Prisma.PaymentTypeAvgOrderByAggregateInput
   _max?: Prisma.PaymentTypeMaxOrderByAggregateInput
@@ -274,6 +340,11 @@ export type PaymentTypeScalarWhereWithAggregatesInput = {
   amount?: Prisma.DecimalWithAggregatesFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolWithAggregatesFilter<"PaymentType"> | boolean
   isActive?: Prisma.BoolWithAggregatesFilter<"PaymentType"> | boolean
+  isFixedAmount?: Prisma.BoolWithAggregatesFilter<"PaymentType"> | boolean
+  isFixedQuantity?: Prisma.BoolWithAggregatesFilter<"PaymentType"> | boolean
+  quantity?: Prisma.DecimalWithAggregatesFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalWithAggregatesFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringWithAggregatesFilter<"PaymentType"> | string
 }
 
 export type PaymentTypeCreateInput = {
@@ -283,6 +354,12 @@ export type PaymentTypeCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: boolean
   isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner: string
+  paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutPaymentTypeInput
   payments?: Prisma.PaymentCreateNestedManyWithoutPaymentTypeInput
 }
 
@@ -293,6 +370,12 @@ export type PaymentTypeUncheckedCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: boolean
   isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner: string
+  paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutPaymentTypeInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutPaymentTypeInput
 }
 
@@ -303,6 +386,12 @@ export type PaymentTypeUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentItems?: Prisma.PaymentItemsUpdateManyWithoutPaymentTypeNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutPaymentTypeNestedInput
 }
 
@@ -313,6 +402,12 @@ export type PaymentTypeUncheckedUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutPaymentTypeNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutPaymentTypeNestedInput
 }
 
@@ -323,6 +418,11 @@ export type PaymentTypeCreateManyInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: boolean
   isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner: string
 }
 
 export type PaymentTypeUpdateManyMutationInput = {
@@ -332,6 +432,11 @@ export type PaymentTypeUpdateManyMutationInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PaymentTypeUncheckedUpdateManyInput = {
@@ -341,6 +446,11 @@ export type PaymentTypeUncheckedUpdateManyInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PaymentTypeCountOrderByAggregateInput = {
@@ -350,10 +460,17 @@ export type PaymentTypeCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   isMonthly?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
 }
 
 export type PaymentTypeAvgOrderByAggregateInput = {
   amount?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
 }
 
 export type PaymentTypeMaxOrderByAggregateInput = {
@@ -363,6 +480,11 @@ export type PaymentTypeMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   isMonthly?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
 }
 
 export type PaymentTypeMinOrderByAggregateInput = {
@@ -372,10 +494,17 @@ export type PaymentTypeMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   isMonthly?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
 }
 
 export type PaymentTypeSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  subtotal?: Prisma.SortOrder
 }
 
 export type PaymentTypeScalarRelationFilter = {
@@ -389,6 +518,20 @@ export type DecimalFieldUpdateOperationsInput = {
   decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
   multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type PaymentTypeCreateNestedOneWithoutPaymentItemsInput = {
+  create?: Prisma.XOR<Prisma.PaymentTypeCreateWithoutPaymentItemsInput, Prisma.PaymentTypeUncheckedCreateWithoutPaymentItemsInput>
+  connectOrCreate?: Prisma.PaymentTypeCreateOrConnectWithoutPaymentItemsInput
+  connect?: Prisma.PaymentTypeWhereUniqueInput
+}
+
+export type PaymentTypeUpdateOneRequiredWithoutPaymentItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentTypeCreateWithoutPaymentItemsInput, Prisma.PaymentTypeUncheckedCreateWithoutPaymentItemsInput>
+  connectOrCreate?: Prisma.PaymentTypeCreateOrConnectWithoutPaymentItemsInput
+  upsert?: Prisma.PaymentTypeUpsertWithoutPaymentItemsInput
+  connect?: Prisma.PaymentTypeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentTypeUpdateToOneWithWhereWithoutPaymentItemsInput, Prisma.PaymentTypeUpdateWithoutPaymentItemsInput>, Prisma.PaymentTypeUncheckedUpdateWithoutPaymentItemsInput>
 }
 
 export type PaymentTypeCreateNestedOneWithoutPaymentsInput = {
@@ -405,6 +548,82 @@ export type PaymentTypeUpdateOneRequiredWithoutPaymentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentTypeUpdateToOneWithWhereWithoutPaymentsInput, Prisma.PaymentTypeUpdateWithoutPaymentsInput>, Prisma.PaymentTypeUncheckedUpdateWithoutPaymentsInput>
 }
 
+export type PaymentTypeCreateWithoutPaymentItemsInput = {
+  id?: string
+  name: string
+  description: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isMonthly?: boolean
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner: string
+  payments?: Prisma.PaymentCreateNestedManyWithoutPaymentTypeInput
+}
+
+export type PaymentTypeUncheckedCreateWithoutPaymentItemsInput = {
+  id?: string
+  name: string
+  description: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isMonthly?: boolean
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner: string
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutPaymentTypeInput
+}
+
+export type PaymentTypeCreateOrConnectWithoutPaymentItemsInput = {
+  where: Prisma.PaymentTypeWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentTypeCreateWithoutPaymentItemsInput, Prisma.PaymentTypeUncheckedCreateWithoutPaymentItemsInput>
+}
+
+export type PaymentTypeUpsertWithoutPaymentItemsInput = {
+  update: Prisma.XOR<Prisma.PaymentTypeUpdateWithoutPaymentItemsInput, Prisma.PaymentTypeUncheckedUpdateWithoutPaymentItemsInput>
+  create: Prisma.XOR<Prisma.PaymentTypeCreateWithoutPaymentItemsInput, Prisma.PaymentTypeUncheckedCreateWithoutPaymentItemsInput>
+  where?: Prisma.PaymentTypeWhereInput
+}
+
+export type PaymentTypeUpdateToOneWithWhereWithoutPaymentItemsInput = {
+  where?: Prisma.PaymentTypeWhereInput
+  data: Prisma.XOR<Prisma.PaymentTypeUpdateWithoutPaymentItemsInput, Prisma.PaymentTypeUncheckedUpdateWithoutPaymentItemsInput>
+}
+
+export type PaymentTypeUpdateWithoutPaymentItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  payments?: Prisma.PaymentUpdateManyWithoutPaymentTypeNestedInput
+}
+
+export type PaymentTypeUncheckedUpdateWithoutPaymentItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutPaymentTypeNestedInput
+}
+
 export type PaymentTypeCreateWithoutPaymentsInput = {
   id?: string
   name: string
@@ -412,6 +631,12 @@ export type PaymentTypeCreateWithoutPaymentsInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: boolean
   isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner: string
+  paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutPaymentTypeInput
 }
 
 export type PaymentTypeUncheckedCreateWithoutPaymentsInput = {
@@ -421,6 +646,12 @@ export type PaymentTypeUncheckedCreateWithoutPaymentsInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: boolean
   isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner: string
+  paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutPaymentTypeInput
 }
 
 export type PaymentTypeCreateOrConnectWithoutPaymentsInput = {
@@ -446,6 +677,12 @@ export type PaymentTypeUpdateWithoutPaymentsInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentItems?: Prisma.PaymentItemsUpdateManyWithoutPaymentTypeNestedInput
 }
 
 export type PaymentTypeUncheckedUpdateWithoutPaymentsInput = {
@@ -455,6 +692,12 @@ export type PaymentTypeUncheckedUpdateWithoutPaymentsInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  owner?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutPaymentTypeNestedInput
 }
 
 
@@ -463,10 +706,12 @@ export type PaymentTypeUncheckedUpdateWithoutPaymentsInput = {
  */
 
 export type PaymentTypeCountOutputType = {
+  paymentItems: number
   payments: number
 }
 
 export type PaymentTypeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  paymentItems?: boolean | PaymentTypeCountOutputTypeCountPaymentItemsArgs
   payments?: boolean | PaymentTypeCountOutputTypeCountPaymentsArgs
 }
 
@@ -478,6 +723,13 @@ export type PaymentTypeCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.
    * Select specific fields to fetch from the PaymentTypeCountOutputType
    */
   select?: Prisma.PaymentTypeCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * PaymentTypeCountOutputType without action
+ */
+export type PaymentTypeCountOutputTypeCountPaymentItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentItemsWhereInput
 }
 
 /**
@@ -495,6 +747,12 @@ export type PaymentTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   amount?: boolean
   isMonthly?: boolean
   isActive?: boolean
+  isFixedAmount?: boolean
+  isFixedQuantity?: boolean
+  quantity?: boolean
+  subtotal?: boolean
+  owner?: boolean
+  paymentItems?: boolean | Prisma.PaymentType$paymentItemsArgs<ExtArgs>
   payments?: boolean | Prisma.PaymentType$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentTypeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentType"]>
@@ -506,6 +764,11 @@ export type PaymentTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   amount?: boolean
   isMonthly?: boolean
   isActive?: boolean
+  isFixedAmount?: boolean
+  isFixedQuantity?: boolean
+  quantity?: boolean
+  subtotal?: boolean
+  owner?: boolean
 }, ExtArgs["result"]["paymentType"]>
 
 export type PaymentTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -515,6 +778,11 @@ export type PaymentTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   amount?: boolean
   isMonthly?: boolean
   isActive?: boolean
+  isFixedAmount?: boolean
+  isFixedQuantity?: boolean
+  quantity?: boolean
+  subtotal?: boolean
+  owner?: boolean
 }, ExtArgs["result"]["paymentType"]>
 
 export type PaymentTypeSelectScalar = {
@@ -524,10 +792,16 @@ export type PaymentTypeSelectScalar = {
   amount?: boolean
   isMonthly?: boolean
   isActive?: boolean
+  isFixedAmount?: boolean
+  isFixedQuantity?: boolean
+  quantity?: boolean
+  subtotal?: boolean
+  owner?: boolean
 }
 
-export type PaymentTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "amount" | "isMonthly" | "isActive", ExtArgs["result"]["paymentType"]>
+export type PaymentTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "amount" | "isMonthly" | "isActive" | "isFixedAmount" | "isFixedQuantity" | "quantity" | "subtotal" | "owner", ExtArgs["result"]["paymentType"]>
 export type PaymentTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  paymentItems?: boolean | Prisma.PaymentType$paymentItemsArgs<ExtArgs>
   payments?: boolean | Prisma.PaymentType$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentTypeCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -537,6 +811,7 @@ export type PaymentTypeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type $PaymentTypePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PaymentType"
   objects: {
+    paymentItems: Prisma.$PaymentItemsPayload<ExtArgs>[]
     payments: Prisma.$PaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -546,6 +821,11 @@ export type $PaymentTypePayload<ExtArgs extends runtime.Types.Extensions.Interna
     amount: runtime.Decimal
     isMonthly: boolean
     isActive: boolean
+    isFixedAmount: boolean
+    isFixedQuantity: boolean
+    quantity: runtime.Decimal
+    subtotal: runtime.Decimal
+    owner: string
   }, ExtArgs["result"]["paymentType"]>
   composites: {}
 }
@@ -940,6 +1220,7 @@ readonly fields: PaymentTypeFieldRefs;
  */
 export interface Prisma__PaymentTypeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  paymentItems<T extends Prisma.PaymentType$paymentItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentType$paymentItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentItemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payments<T extends Prisma.PaymentType$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentType$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -976,6 +1257,11 @@ export interface PaymentTypeFieldRefs {
   readonly amount: Prisma.FieldRef<"PaymentType", 'Decimal'>
   readonly isMonthly: Prisma.FieldRef<"PaymentType", 'Boolean'>
   readonly isActive: Prisma.FieldRef<"PaymentType", 'Boolean'>
+  readonly isFixedAmount: Prisma.FieldRef<"PaymentType", 'Boolean'>
+  readonly isFixedQuantity: Prisma.FieldRef<"PaymentType", 'Boolean'>
+  readonly quantity: Prisma.FieldRef<"PaymentType", 'Decimal'>
+  readonly subtotal: Prisma.FieldRef<"PaymentType", 'Decimal'>
+  readonly owner: Prisma.FieldRef<"PaymentType", 'String'>
 }
     
 
@@ -1172,6 +1458,11 @@ export type PaymentTypeFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Skip the first `n` PaymentTypes.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of PaymentTypes.
+   */
   distinct?: Prisma.PaymentTypeScalarFieldEnum | Prisma.PaymentTypeScalarFieldEnum[]
 }
 
@@ -1361,6 +1652,30 @@ export type PaymentTypeDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many PaymentTypes to delete.
    */
   limit?: number
+}
+
+/**
+ * PaymentType.paymentItems
+ */
+export type PaymentType$paymentItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentItems
+   */
+  select?: Prisma.PaymentItemsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentItems
+   */
+  omit?: Prisma.PaymentItemsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentItemsInclude<ExtArgs> | null
+  where?: Prisma.PaymentItemsWhereInput
+  orderBy?: Prisma.PaymentItemsOrderByWithRelationInput | Prisma.PaymentItemsOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentItemsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentItemsScalarFieldEnum | Prisma.PaymentItemsScalarFieldEnum[]
 }
 
 /**

@@ -193,7 +193,7 @@ export type TeacherAttendanceGroupByOutputType = {
   _max: TeacherAttendanceMaxAggregateOutputType | null
 }
 
-type GetTeacherAttendanceGroupByPayload<T extends TeacherAttendanceGroupByArgs> = Prisma.PrismaPromise<
+export type GetTeacherAttendanceGroupByPayload<T extends TeacherAttendanceGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TeacherAttendanceGroupByOutputType, T['by']> &
       {
@@ -1453,6 +1453,11 @@ export type TeacherAttendanceFindManyArgs<ExtArgs extends runtime.Types.Extensio
    * Skip the first `n` TeacherAttendances.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of TeacherAttendances.
+   */
   distinct?: Prisma.TeacherAttendanceScalarFieldEnum | Prisma.TeacherAttendanceScalarFieldEnum[]
 }
 

@@ -66,8 +66,10 @@ export const ModelName = {
   ViolationType: 'ViolationType',
   Violation: 'Violation',
   PaymentType: 'PaymentType',
+  PaymentItems: 'PaymentItems',
   Payment: 'Payment',
   PaymentTransaction: 'PaymentTransaction',
+  AccountBank: 'AccountBank',
   CalendarEvent: 'CalendarEvent',
   GradeType: 'GradeType',
   GradeConfiguration: 'GradeConfiguration',
@@ -325,10 +327,30 @@ export const PaymentTypeScalarFieldEnum = {
   description: 'description',
   amount: 'amount',
   isMonthly: 'isMonthly',
-  isActive: 'isActive'
+  isActive: 'isActive',
+  isFixedAmount: 'isFixedAmount',
+  isFixedQuantity: 'isFixedQuantity',
+  quantity: 'quantity',
+  subtotal: 'subtotal',
+  owner: 'owner'
 } as const
 
 export type PaymentTypeScalarFieldEnum = (typeof PaymentTypeScalarFieldEnum)[keyof typeof PaymentTypeScalarFieldEnum]
+
+
+export const PaymentItemsScalarFieldEnum = {
+  id: 'id',
+  paymentId: 'paymentId',
+  studentId: 'studentId',
+  studentName: 'studentName',
+  paymentTypeId: 'paymentTypeId',
+  skuName: 'skuName',
+  quantity: 'quantity',
+  amount: 'amount',
+  subtotal: 'subtotal'
+} as const
+
+export type PaymentItemsScalarFieldEnum = (typeof PaymentItemsScalarFieldEnum)[keyof typeof PaymentItemsScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -362,6 +384,17 @@ export const PaymentTransactionScalarFieldEnum = {
 } as const
 
 export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalarFieldEnum)[keyof typeof PaymentTransactionScalarFieldEnum]
+
+
+export const AccountBankScalarFieldEnum = {
+  id: 'id',
+  accountName: 'accountName',
+  accountBank: 'accountBank',
+  accountNumber: 'accountNumber',
+  createdAt: 'createdAt'
+} as const
+
+export type AccountBankScalarFieldEnum = (typeof AccountBankScalarFieldEnum)[keyof typeof AccountBankScalarFieldEnum]
 
 
 export const CalendarEventScalarFieldEnum = {

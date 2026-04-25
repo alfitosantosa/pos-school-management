@@ -172,7 +172,7 @@ export type AttendanceGroupByOutputType = {
   _max: AttendanceMaxAggregateOutputType | null
 }
 
-type GetAttendanceGroupByPayload<T extends AttendanceGroupByArgs> = Prisma.PrismaPromise<
+export type GetAttendanceGroupByPayload<T extends AttendanceGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AttendanceGroupByOutputType, T['by']> &
       {
@@ -1331,6 +1331,11 @@ export type AttendanceFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` Attendances.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Attendances.
+   */
   distinct?: Prisma.AttendanceScalarFieldEnum | Prisma.AttendanceScalarFieldEnum[]
 }
 

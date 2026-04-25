@@ -192,7 +192,7 @@ export type SurahQuranGroupByOutputType = {
   _max: SurahQuranMaxAggregateOutputType | null
 }
 
-type GetSurahQuranGroupByPayload<T extends SurahQuranGroupByArgs> = Prisma.PrismaPromise<
+export type GetSurahQuranGroupByPayload<T extends SurahQuranGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SurahQuranGroupByOutputType, T['by']> &
       {
@@ -1134,6 +1134,11 @@ export type SurahQuranFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` SurahQurans.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of SurahQurans.
+   */
   distinct?: Prisma.SurahQuranScalarFieldEnum | Prisma.SurahQuranScalarFieldEnum[]
 }
 

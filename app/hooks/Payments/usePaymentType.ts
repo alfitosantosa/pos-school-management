@@ -45,12 +45,21 @@ export const useUpdatePaymentType = () => {
 export const useDeletePaymentType = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
-      const res = await apiDelete("/api/paymenttype", data);
-      return res.data;
+    mutationFn: async (id: string) => {
+      const response = await apiDelete(`/api/paymenttype/`, {
+        body: JSON.stringify({ id }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["paymentTypes"] });
+      queryClient.invalidateQueries({ queryKey: ["paymentType"] });
+    },
+    onError: (error: any) => {
+      console.error("Error deleting payment type:", error);
+      throw new Error(error?.response?.data?.message || "Failed to delete payment type");
     },
   });
 };

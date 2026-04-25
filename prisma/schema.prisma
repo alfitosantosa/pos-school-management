@@ -113,6 +113,7 @@ model UserData {
   DashboardContents       DashboardContent[]
   grades                  Grade[]                @relation("StudentGrade")
   notifications           Notification[]
+  paymentItems            PaymentItems[]
   payments                Payment[]              @relation("StudentPayment")
   reportCards             ReportCard[]           @relation("StudentReportCard")
   schedules               Schedule[]             @relation("TeacherSchedule")
@@ -287,15 +288,38 @@ model Violation {
 }
 
 model PaymentType {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  description String
-  amount      Decimal
-  isMonthly   Boolean   @default(false)
-  isActive    Boolean   @default(true)
-  payments    Payment[]
+  id              String         @id @default(cuid())
+  name            String         @unique
+  description     String
+  amount          Decimal
+  isMonthly       Boolean        @default(false)
+  isActive        Boolean        @default(true)
+  isFixedAmount   Boolean
+  isFixedQuantity Boolean
+  quantity        Decimal
+  subtotal        Decimal
+  owner           String
+  paymentItems    PaymentItems[]
+  payments        Payment[]
 
   @@map("payment_types")
+}
+
+model PaymentItems {
+  id            String      @id @default(uuid())
+  paymentId     String
+  studentId     String
+  studentName   String
+  paymentTypeId String
+  skuName       String
+  quantity      Int
+  amount        Int
+  subtotal      Int
+  payment       Payment     @relation(fields: [paymentId], references: [id])
+  PaymentType   PaymentType @relation(fields: [paymentTypeId], references: [id])
+  student       UserData    @relation(fields: [studentId], references: [id])
+
+  @@map("payment_items")
 }
 
 model Payment {
@@ -309,9 +333,11 @@ model Payment {
   createdAt          DateTime            @default(now())
   paymentDate        DateTime
   receiptNumber      String              @unique
+  paymentItems       PaymentItems[]
   paymentTransaction PaymentTransaction?
   paymentType        PaymentType         @relation(fields: [paymentTypeId], references: [id])
   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
+  accountBanks       AccountBank[]       @relation("AccountBankToPayment")
 
   @@map("payments")
 }
@@ -331,6 +357,15 @@ model PaymentTransaction {
   payment           Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 
   @@map("payment_transactions")
+}
+
+model AccountBank {
+  id            String    @id @default(uuid())
+  accountName   String
+  accountBank   String
+  accountNumber String
+  createdAt     DateTime  @default(now())
+  payments      Payment[] @relation("AccountBankToPayment")
 }
 
 model CalendarEvent {

@@ -328,7 +328,7 @@ export type ReportCardGroupByOutputType = {
   _max: ReportCardMaxAggregateOutputType | null
 }
 
-type GetReportCardGroupByPayload<T extends ReportCardGroupByArgs> = Prisma.PrismaPromise<
+export type GetReportCardGroupByPayload<T extends ReportCardGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ReportCardGroupByOutputType, T['by']> &
       {
@@ -2418,6 +2418,11 @@ export type ReportCardFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` ReportCards.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ReportCards.
+   */
   distinct?: Prisma.ReportCardScalarFieldEnum | Prisma.ReportCardScalarFieldEnum[]
 }
 

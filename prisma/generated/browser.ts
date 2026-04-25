@@ -93,6 +93,11 @@ export type Violation = Prisma.ViolationModel
  */
 export type PaymentType = Prisma.PaymentTypeModel
 /**
+ * Model PaymentItems
+ * 
+ */
+export type PaymentItems = Prisma.PaymentItemsModel
+/**
  * Model Payment
  * 
  */
@@ -102,6 +107,11 @@ export type Payment = Prisma.PaymentModel
  * 
  */
 export type PaymentTransaction = Prisma.PaymentTransactionModel
+/**
+ * Model AccountBank
+ * 
+ */
+export type AccountBank = Prisma.AccountBankModel
 /**
  * Model CalendarEvent
  * 

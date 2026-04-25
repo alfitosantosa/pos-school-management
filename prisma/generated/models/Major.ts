@@ -158,7 +158,7 @@ export type MajorGroupByOutputType = {
   _max: MajorMaxAggregateOutputType | null
 }
 
-type GetMajorGroupByPayload<T extends MajorGroupByArgs> = Prisma.PrismaPromise<
+export type GetMajorGroupByPayload<T extends MajorGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<MajorGroupByOutputType, T['by']> &
       {
@@ -1285,6 +1285,11 @@ export type MajorFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Skip the first `n` Majors.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Majors.
+   */
   distinct?: Prisma.MajorScalarFieldEnum | Prisma.MajorScalarFieldEnum[]
 }
 

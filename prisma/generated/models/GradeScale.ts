@@ -217,7 +217,7 @@ export type GradeScaleGroupByOutputType = {
   _max: GradeScaleMaxAggregateOutputType | null
 }
 
-type GetGradeScaleGroupByPayload<T extends GradeScaleGroupByArgs> = Prisma.PrismaPromise<
+export type GetGradeScaleGroupByPayload<T extends GradeScaleGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<GradeScaleGroupByOutputType, T['by']> &
       {
@@ -1277,6 +1277,11 @@ export type GradeScaleFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` GradeScales.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of GradeScales.
+   */
   distinct?: Prisma.GradeScaleScalarFieldEnum | Prisma.GradeScaleScalarFieldEnum[]
 }
 

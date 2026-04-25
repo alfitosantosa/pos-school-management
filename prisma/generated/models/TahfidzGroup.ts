@@ -196,7 +196,7 @@ export type TahfidzGroupGroupByOutputType = {
   _max: TahfidzGroupMaxAggregateOutputType | null
 }
 
-type GetTahfidzGroupGroupByPayload<T extends TahfidzGroupGroupByArgs> = Prisma.PrismaPromise<
+export type GetTahfidzGroupGroupByPayload<T extends TahfidzGroupGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TahfidzGroupGroupByOutputType, T['by']> &
       {
@@ -1232,6 +1232,11 @@ export type TahfidzGroupFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Skip the first `n` TahfidzGroups.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of TahfidzGroups.
+   */
   distinct?: Prisma.TahfidzGroupScalarFieldEnum | Prisma.TahfidzGroupScalarFieldEnum[]
 }
 

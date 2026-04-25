@@ -186,7 +186,7 @@ export type CalendarEventGroupByOutputType = {
   _max: CalendarEventMaxAggregateOutputType | null
 }
 
-type GetCalendarEventGroupByPayload<T extends CalendarEventGroupByArgs> = Prisma.PrismaPromise<
+export type GetCalendarEventGroupByPayload<T extends CalendarEventGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<CalendarEventGroupByOutputType, T['by']> &
       {
@@ -1262,6 +1262,11 @@ export type CalendarEventFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` CalendarEvents.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of CalendarEvents.
+   */
   distinct?: Prisma.CalendarEventScalarFieldEnum | Prisma.CalendarEventScalarFieldEnum[]
 }
 

@@ -210,7 +210,7 @@ export type ClassGroupByOutputType = {
   _max: ClassMaxAggregateOutputType | null
 }
 
-type GetClassGroupByPayload<T extends ClassGroupByArgs> = Prisma.PrismaPromise<
+export type GetClassGroupByPayload<T extends ClassGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ClassGroupByOutputType, T['by']> &
       {
@@ -2134,6 +2134,11 @@ export type ClassFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Skip the first `n` Classes.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Classes.
+   */
   distinct?: Prisma.ClassScalarFieldEnum | Prisma.ClassScalarFieldEnum[]
 }
 

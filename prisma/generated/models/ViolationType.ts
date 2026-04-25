@@ -199,7 +199,7 @@ export type ViolationTypeGroupByOutputType = {
   _max: ViolationTypeMaxAggregateOutputType | null
 }
 
-type GetViolationTypeGroupByPayload<T extends ViolationTypeGroupByArgs> = Prisma.PrismaPromise<
+export type GetViolationTypeGroupByPayload<T extends ViolationTypeGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ViolationTypeGroupByOutputType, T['by']> &
       {
@@ -1318,6 +1318,11 @@ export type ViolationTypeFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` ViolationTypes.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ViolationTypes.
+   */
   distinct?: Prisma.ViolationTypeScalarFieldEnum | Prisma.ViolationTypeScalarFieldEnum[]
 }
 
