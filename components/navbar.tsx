@@ -19,7 +19,7 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/roles": "Roles Management",
   "/dashboard/users": "Users Management",
   "/dashboard/academicyear": "Tahun Ajaran Management",
-  "/dashboard/majors": "Jurusan Management",
+  "/dashboard/majors": "Branch Management",
   "/dashboard/classes": "Kelas Management",
   "/dashboard/subjects": "Mata Pelajaran Management",
   "/dashboard/schedules": "Jadwal Management",
@@ -52,6 +52,11 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/tahfidzrecord": "Setoran Tahfidz Management",
   "/dashboard/student/tahfidzrecord": "Setoran Tahfidz untuk Siswa",
   "/dashboard/profile": "Profile",
+  //for bendahara
+  "/dashboard/bendahara/payment": "Pembayaran",
+  "/dashboard/bendahara/users": "Data Murid",
+  "/dashboard/bendahara/class": "Data Kelas",
+  "/dashboard/bendahara/paymenttype": "Jenis Pembayaran",
 };
 
 export default function Navbar() {

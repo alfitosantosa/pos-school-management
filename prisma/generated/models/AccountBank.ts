@@ -29,6 +29,7 @@ export type AccountBankMinAggregateOutputType = {
   accountName: string | null
   accountBank: string | null
   accountNumber: string | null
+  majorId: string | null
   createdAt: Date | null
 }
 
@@ -37,6 +38,7 @@ export type AccountBankMaxAggregateOutputType = {
   accountName: string | null
   accountBank: string | null
   accountNumber: string | null
+  majorId: string | null
   createdAt: Date | null
 }
 
@@ -45,6 +47,7 @@ export type AccountBankCountAggregateOutputType = {
   accountName: number
   accountBank: number
   accountNumber: number
+  majorId: number
   createdAt: number
   _all: number
 }
@@ -55,6 +58,7 @@ export type AccountBankMinAggregateInputType = {
   accountName?: true
   accountBank?: true
   accountNumber?: true
+  majorId?: true
   createdAt?: true
 }
 
@@ -63,6 +67,7 @@ export type AccountBankMaxAggregateInputType = {
   accountName?: true
   accountBank?: true
   accountNumber?: true
+  majorId?: true
   createdAt?: true
 }
 
@@ -71,6 +76,7 @@ export type AccountBankCountAggregateInputType = {
   accountName?: true
   accountBank?: true
   accountNumber?: true
+  majorId?: true
   createdAt?: true
   _all?: true
 }
@@ -152,6 +158,7 @@ export type AccountBankGroupByOutputType = {
   accountName: string
   accountBank: string
   accountNumber: string
+  majorId: string
   createdAt: Date
   _count: AccountBankCountAggregateOutputType | null
   _min: AccountBankMinAggregateOutputType | null
@@ -181,7 +188,9 @@ export type AccountBankWhereInput = {
   accountName?: Prisma.StringFilter<"AccountBank"> | string
   accountBank?: Prisma.StringFilter<"AccountBank"> | string
   accountNumber?: Prisma.StringFilter<"AccountBank"> | string
+  majorId?: Prisma.StringFilter<"AccountBank"> | string
   createdAt?: Prisma.DateTimeFilter<"AccountBank"> | Date | string
+  majors?: Prisma.XOR<Prisma.MajorScalarRelationFilter, Prisma.MajorWhereInput>
   payments?: Prisma.PaymentListRelationFilter
 }
 
@@ -190,7 +199,9 @@ export type AccountBankOrderByWithRelationInput = {
   accountName?: Prisma.SortOrder
   accountBank?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  majorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  majors?: Prisma.MajorOrderByWithRelationInput
   payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
@@ -202,7 +213,9 @@ export type AccountBankWhereUniqueInput = Prisma.AtLeast<{
   accountName?: Prisma.StringFilter<"AccountBank"> | string
   accountBank?: Prisma.StringFilter<"AccountBank"> | string
   accountNumber?: Prisma.StringFilter<"AccountBank"> | string
+  majorId?: Prisma.StringFilter<"AccountBank"> | string
   createdAt?: Prisma.DateTimeFilter<"AccountBank"> | Date | string
+  majors?: Prisma.XOR<Prisma.MajorScalarRelationFilter, Prisma.MajorWhereInput>
   payments?: Prisma.PaymentListRelationFilter
 }, "id">
 
@@ -211,6 +224,7 @@ export type AccountBankOrderByWithAggregationInput = {
   accountName?: Prisma.SortOrder
   accountBank?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  majorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.AccountBankCountOrderByAggregateInput
   _max?: Prisma.AccountBankMaxOrderByAggregateInput
@@ -225,6 +239,7 @@ export type AccountBankScalarWhereWithAggregatesInput = {
   accountName?: Prisma.StringWithAggregatesFilter<"AccountBank"> | string
   accountBank?: Prisma.StringWithAggregatesFilter<"AccountBank"> | string
   accountNumber?: Prisma.StringWithAggregatesFilter<"AccountBank"> | string
+  majorId?: Prisma.StringWithAggregatesFilter<"AccountBank"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AccountBank"> | Date | string
 }
 
@@ -234,7 +249,8 @@ export type AccountBankCreateInput = {
   accountBank: string
   accountNumber: string
   createdAt?: Date | string
-  payments?: Prisma.PaymentCreateNestedManyWithoutAccountBanksInput
+  majors: Prisma.MajorCreateNestedOneWithoutAccountBankInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutAccountBankInput
 }
 
 export type AccountBankUncheckedCreateInput = {
@@ -242,8 +258,9 @@ export type AccountBankUncheckedCreateInput = {
   accountName: string
   accountBank: string
   accountNumber: string
+  majorId: string
   createdAt?: Date | string
-  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutAccountBanksInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutAccountBankInput
 }
 
 export type AccountBankUpdateInput = {
@@ -252,7 +269,8 @@ export type AccountBankUpdateInput = {
   accountBank?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payments?: Prisma.PaymentUpdateManyWithoutAccountBanksNestedInput
+  majors?: Prisma.MajorUpdateOneRequiredWithoutAccountBankNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutAccountBankNestedInput
 }
 
 export type AccountBankUncheckedUpdateInput = {
@@ -260,8 +278,9 @@ export type AccountBankUncheckedUpdateInput = {
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountBank?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  majorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payments?: Prisma.PaymentUncheckedUpdateManyWithoutAccountBanksNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutAccountBankNestedInput
 }
 
 export type AccountBankCreateManyInput = {
@@ -269,6 +288,7 @@ export type AccountBankCreateManyInput = {
   accountName: string
   accountBank: string
   accountNumber: string
+  majorId: string
   createdAt?: Date | string
 }
 
@@ -285,6 +305,7 @@ export type AccountBankUncheckedUpdateManyInput = {
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountBank?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  majorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -298,11 +319,17 @@ export type AccountBankOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type AccountBankScalarRelationFilter = {
+  is?: Prisma.AccountBankWhereInput
+  isNot?: Prisma.AccountBankWhereInput
+}
+
 export type AccountBankCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   accountName?: Prisma.SortOrder
   accountBank?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  majorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -311,6 +338,7 @@ export type AccountBankMaxOrderByAggregateInput = {
   accountName?: Prisma.SortOrder
   accountBank?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  majorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -319,82 +347,108 @@ export type AccountBankMinOrderByAggregateInput = {
   accountName?: Prisma.SortOrder
   accountBank?: Prisma.SortOrder
   accountNumber?: Prisma.SortOrder
+  majorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
-export type AccountBankCreateNestedManyWithoutPaymentsInput = {
-  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput> | Prisma.AccountBankCreateWithoutPaymentsInput[] | Prisma.AccountBankUncheckedCreateWithoutPaymentsInput[]
-  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutPaymentsInput | Prisma.AccountBankCreateOrConnectWithoutPaymentsInput[]
+export type AccountBankCreateNestedManyWithoutMajorsInput = {
+  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutMajorsInput, Prisma.AccountBankUncheckedCreateWithoutMajorsInput> | Prisma.AccountBankCreateWithoutMajorsInput[] | Prisma.AccountBankUncheckedCreateWithoutMajorsInput[]
+  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutMajorsInput | Prisma.AccountBankCreateOrConnectWithoutMajorsInput[]
+  createMany?: Prisma.AccountBankCreateManyMajorsInputEnvelope
   connect?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
 }
 
-export type AccountBankUncheckedCreateNestedManyWithoutPaymentsInput = {
-  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput> | Prisma.AccountBankCreateWithoutPaymentsInput[] | Prisma.AccountBankUncheckedCreateWithoutPaymentsInput[]
-  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutPaymentsInput | Prisma.AccountBankCreateOrConnectWithoutPaymentsInput[]
+export type AccountBankUncheckedCreateNestedManyWithoutMajorsInput = {
+  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutMajorsInput, Prisma.AccountBankUncheckedCreateWithoutMajorsInput> | Prisma.AccountBankCreateWithoutMajorsInput[] | Prisma.AccountBankUncheckedCreateWithoutMajorsInput[]
+  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutMajorsInput | Prisma.AccountBankCreateOrConnectWithoutMajorsInput[]
+  createMany?: Prisma.AccountBankCreateManyMajorsInputEnvelope
   connect?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
 }
 
-export type AccountBankUpdateManyWithoutPaymentsNestedInput = {
-  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput> | Prisma.AccountBankCreateWithoutPaymentsInput[] | Prisma.AccountBankUncheckedCreateWithoutPaymentsInput[]
-  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutPaymentsInput | Prisma.AccountBankCreateOrConnectWithoutPaymentsInput[]
-  upsert?: Prisma.AccountBankUpsertWithWhereUniqueWithoutPaymentsInput | Prisma.AccountBankUpsertWithWhereUniqueWithoutPaymentsInput[]
+export type AccountBankUpdateManyWithoutMajorsNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutMajorsInput, Prisma.AccountBankUncheckedCreateWithoutMajorsInput> | Prisma.AccountBankCreateWithoutMajorsInput[] | Prisma.AccountBankUncheckedCreateWithoutMajorsInput[]
+  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutMajorsInput | Prisma.AccountBankCreateOrConnectWithoutMajorsInput[]
+  upsert?: Prisma.AccountBankUpsertWithWhereUniqueWithoutMajorsInput | Prisma.AccountBankUpsertWithWhereUniqueWithoutMajorsInput[]
+  createMany?: Prisma.AccountBankCreateManyMajorsInputEnvelope
   set?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
   disconnect?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
   delete?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
   connect?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
-  update?: Prisma.AccountBankUpdateWithWhereUniqueWithoutPaymentsInput | Prisma.AccountBankUpdateWithWhereUniqueWithoutPaymentsInput[]
-  updateMany?: Prisma.AccountBankUpdateManyWithWhereWithoutPaymentsInput | Prisma.AccountBankUpdateManyWithWhereWithoutPaymentsInput[]
+  update?: Prisma.AccountBankUpdateWithWhereUniqueWithoutMajorsInput | Prisma.AccountBankUpdateWithWhereUniqueWithoutMajorsInput[]
+  updateMany?: Prisma.AccountBankUpdateManyWithWhereWithoutMajorsInput | Prisma.AccountBankUpdateManyWithWhereWithoutMajorsInput[]
   deleteMany?: Prisma.AccountBankScalarWhereInput | Prisma.AccountBankScalarWhereInput[]
 }
 
-export type AccountBankUncheckedUpdateManyWithoutPaymentsNestedInput = {
-  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput> | Prisma.AccountBankCreateWithoutPaymentsInput[] | Prisma.AccountBankUncheckedCreateWithoutPaymentsInput[]
-  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutPaymentsInput | Prisma.AccountBankCreateOrConnectWithoutPaymentsInput[]
-  upsert?: Prisma.AccountBankUpsertWithWhereUniqueWithoutPaymentsInput | Prisma.AccountBankUpsertWithWhereUniqueWithoutPaymentsInput[]
+export type AccountBankUncheckedUpdateManyWithoutMajorsNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutMajorsInput, Prisma.AccountBankUncheckedCreateWithoutMajorsInput> | Prisma.AccountBankCreateWithoutMajorsInput[] | Prisma.AccountBankUncheckedCreateWithoutMajorsInput[]
+  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutMajorsInput | Prisma.AccountBankCreateOrConnectWithoutMajorsInput[]
+  upsert?: Prisma.AccountBankUpsertWithWhereUniqueWithoutMajorsInput | Prisma.AccountBankUpsertWithWhereUniqueWithoutMajorsInput[]
+  createMany?: Prisma.AccountBankCreateManyMajorsInputEnvelope
   set?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
   disconnect?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
   delete?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
   connect?: Prisma.AccountBankWhereUniqueInput | Prisma.AccountBankWhereUniqueInput[]
-  update?: Prisma.AccountBankUpdateWithWhereUniqueWithoutPaymentsInput | Prisma.AccountBankUpdateWithWhereUniqueWithoutPaymentsInput[]
-  updateMany?: Prisma.AccountBankUpdateManyWithWhereWithoutPaymentsInput | Prisma.AccountBankUpdateManyWithWhereWithoutPaymentsInput[]
+  update?: Prisma.AccountBankUpdateWithWhereUniqueWithoutMajorsInput | Prisma.AccountBankUpdateWithWhereUniqueWithoutMajorsInput[]
+  updateMany?: Prisma.AccountBankUpdateManyWithWhereWithoutMajorsInput | Prisma.AccountBankUpdateManyWithWhereWithoutMajorsInput[]
   deleteMany?: Prisma.AccountBankScalarWhereInput | Prisma.AccountBankScalarWhereInput[]
 }
 
-export type AccountBankCreateWithoutPaymentsInput = {
+export type AccountBankCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.AccountBankWhereUniqueInput
+}
+
+export type AccountBankUpdateOneRequiredWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.AccountBankCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.AccountBankUpsertWithoutPaymentsInput
+  connect?: Prisma.AccountBankWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountBankUpdateToOneWithWhereWithoutPaymentsInput, Prisma.AccountBankUpdateWithoutPaymentsInput>, Prisma.AccountBankUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type AccountBankCreateWithoutMajorsInput = {
   id?: string
   accountName: string
   accountBank: string
   accountNumber: string
   createdAt?: Date | string
+  payments?: Prisma.PaymentCreateNestedManyWithoutAccountBankInput
 }
 
-export type AccountBankUncheckedCreateWithoutPaymentsInput = {
+export type AccountBankUncheckedCreateWithoutMajorsInput = {
   id?: string
   accountName: string
   accountBank: string
   accountNumber: string
   createdAt?: Date | string
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutAccountBankInput
 }
 
-export type AccountBankCreateOrConnectWithoutPaymentsInput = {
+export type AccountBankCreateOrConnectWithoutMajorsInput = {
   where: Prisma.AccountBankWhereUniqueInput
-  create: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.AccountBankCreateWithoutMajorsInput, Prisma.AccountBankUncheckedCreateWithoutMajorsInput>
 }
 
-export type AccountBankUpsertWithWhereUniqueWithoutPaymentsInput = {
+export type AccountBankCreateManyMajorsInputEnvelope = {
+  data: Prisma.AccountBankCreateManyMajorsInput | Prisma.AccountBankCreateManyMajorsInput[]
+  skipDuplicates?: boolean
+}
+
+export type AccountBankUpsertWithWhereUniqueWithoutMajorsInput = {
   where: Prisma.AccountBankWhereUniqueInput
-  update: Prisma.XOR<Prisma.AccountBankUpdateWithoutPaymentsInput, Prisma.AccountBankUncheckedUpdateWithoutPaymentsInput>
-  create: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput>
+  update: Prisma.XOR<Prisma.AccountBankUpdateWithoutMajorsInput, Prisma.AccountBankUncheckedUpdateWithoutMajorsInput>
+  create: Prisma.XOR<Prisma.AccountBankCreateWithoutMajorsInput, Prisma.AccountBankUncheckedCreateWithoutMajorsInput>
 }
 
-export type AccountBankUpdateWithWhereUniqueWithoutPaymentsInput = {
+export type AccountBankUpdateWithWhereUniqueWithoutMajorsInput = {
   where: Prisma.AccountBankWhereUniqueInput
-  data: Prisma.XOR<Prisma.AccountBankUpdateWithoutPaymentsInput, Prisma.AccountBankUncheckedUpdateWithoutPaymentsInput>
+  data: Prisma.XOR<Prisma.AccountBankUpdateWithoutMajorsInput, Prisma.AccountBankUncheckedUpdateWithoutMajorsInput>
 }
 
-export type AccountBankUpdateManyWithWhereWithoutPaymentsInput = {
+export type AccountBankUpdateManyWithWhereWithoutMajorsInput = {
   where: Prisma.AccountBankScalarWhereInput
-  data: Prisma.XOR<Prisma.AccountBankUpdateManyMutationInput, Prisma.AccountBankUncheckedUpdateManyWithoutPaymentsInput>
+  data: Prisma.XOR<Prisma.AccountBankUpdateManyMutationInput, Prisma.AccountBankUncheckedUpdateManyWithoutMajorsInput>
 }
 
 export type AccountBankScalarWhereInput = {
@@ -405,7 +459,42 @@ export type AccountBankScalarWhereInput = {
   accountName?: Prisma.StringFilter<"AccountBank"> | string
   accountBank?: Prisma.StringFilter<"AccountBank"> | string
   accountNumber?: Prisma.StringFilter<"AccountBank"> | string
+  majorId?: Prisma.StringFilter<"AccountBank"> | string
   createdAt?: Prisma.DateTimeFilter<"AccountBank"> | Date | string
+}
+
+export type AccountBankCreateWithoutPaymentsInput = {
+  id?: string
+  accountName: string
+  accountBank: string
+  accountNumber: string
+  createdAt?: Date | string
+  majors: Prisma.MajorCreateNestedOneWithoutAccountBankInput
+}
+
+export type AccountBankUncheckedCreateWithoutPaymentsInput = {
+  id?: string
+  accountName: string
+  accountBank: string
+  accountNumber: string
+  majorId: string
+  createdAt?: Date | string
+}
+
+export type AccountBankCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.AccountBankWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput>
+}
+
+export type AccountBankUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.AccountBankUpdateWithoutPaymentsInput, Prisma.AccountBankUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.AccountBankCreateWithoutPaymentsInput, Prisma.AccountBankUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.AccountBankWhereInput
+}
+
+export type AccountBankUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.AccountBankWhereInput
+  data: Prisma.XOR<Prisma.AccountBankUpdateWithoutPaymentsInput, Prisma.AccountBankUncheckedUpdateWithoutPaymentsInput>
 }
 
 export type AccountBankUpdateWithoutPaymentsInput = {
@@ -414,6 +503,7 @@ export type AccountBankUpdateWithoutPaymentsInput = {
   accountBank?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  majors?: Prisma.MajorUpdateOneRequiredWithoutAccountBankNestedInput
 }
 
 export type AccountBankUncheckedUpdateWithoutPaymentsInput = {
@@ -421,10 +511,37 @@ export type AccountBankUncheckedUpdateWithoutPaymentsInput = {
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountBank?: Prisma.StringFieldUpdateOperationsInput | string
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  majorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type AccountBankUncheckedUpdateManyWithoutPaymentsInput = {
+export type AccountBankCreateManyMajorsInput = {
+  id?: string
+  accountName: string
+  accountBank: string
+  accountNumber: string
+  createdAt?: Date | string
+}
+
+export type AccountBankUpdateWithoutMajorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountName?: Prisma.StringFieldUpdateOperationsInput | string
+  accountBank?: Prisma.StringFieldUpdateOperationsInput | string
+  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUpdateManyWithoutAccountBankNestedInput
+}
+
+export type AccountBankUncheckedUpdateWithoutMajorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountName?: Prisma.StringFieldUpdateOperationsInput | string
+  accountBank?: Prisma.StringFieldUpdateOperationsInput | string
+  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutAccountBankNestedInput
+}
+
+export type AccountBankUncheckedUpdateManyWithoutMajorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   accountName?: Prisma.StringFieldUpdateOperationsInput | string
   accountBank?: Prisma.StringFieldUpdateOperationsInput | string
@@ -468,7 +585,9 @@ export type AccountBankSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   accountName?: boolean
   accountBank?: boolean
   accountNumber?: boolean
+  majorId?: boolean
   createdAt?: boolean
+  majors?: boolean | Prisma.MajorDefaultArgs<ExtArgs>
   payments?: boolean | Prisma.AccountBank$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.AccountBankCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["accountBank"]>
@@ -478,7 +597,9 @@ export type AccountBankSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   accountName?: boolean
   accountBank?: boolean
   accountNumber?: boolean
+  majorId?: boolean
   createdAt?: boolean
+  majors?: boolean | Prisma.MajorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["accountBank"]>
 
 export type AccountBankSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -486,7 +607,9 @@ export type AccountBankSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   accountName?: boolean
   accountBank?: boolean
   accountNumber?: boolean
+  majorId?: boolean
   createdAt?: boolean
+  majors?: boolean | Prisma.MajorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["accountBank"]>
 
 export type AccountBankSelectScalar = {
@@ -494,20 +617,27 @@ export type AccountBankSelectScalar = {
   accountName?: boolean
   accountBank?: boolean
   accountNumber?: boolean
+  majorId?: boolean
   createdAt?: boolean
 }
 
-export type AccountBankOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountName" | "accountBank" | "accountNumber" | "createdAt", ExtArgs["result"]["accountBank"]>
+export type AccountBankOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountName" | "accountBank" | "accountNumber" | "majorId" | "createdAt", ExtArgs["result"]["accountBank"]>
 export type AccountBankInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  majors?: boolean | Prisma.MajorDefaultArgs<ExtArgs>
   payments?: boolean | Prisma.AccountBank$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.AccountBankCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type AccountBankIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type AccountBankIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type AccountBankIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  majors?: boolean | Prisma.MajorDefaultArgs<ExtArgs>
+}
+export type AccountBankIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  majors?: boolean | Prisma.MajorDefaultArgs<ExtArgs>
+}
 
 export type $AccountBankPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AccountBank"
   objects: {
+    majors: Prisma.$MajorPayload<ExtArgs>
     payments: Prisma.$PaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -515,6 +645,7 @@ export type $AccountBankPayload<ExtArgs extends runtime.Types.Extensions.Interna
     accountName: string
     accountBank: string
     accountNumber: string
+    majorId: string
     createdAt: Date
   }, ExtArgs["result"]["accountBank"]>
   composites: {}
@@ -910,6 +1041,7 @@ readonly fields: AccountBankFieldRefs;
  */
 export interface Prisma__AccountBankClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  majors<T extends Prisma.MajorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MajorDefaultArgs<ExtArgs>>): Prisma.Prisma__MajorClient<runtime.Types.Result.GetResult<Prisma.$MajorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   payments<T extends Prisma.AccountBank$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountBank$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -944,6 +1076,7 @@ export interface AccountBankFieldRefs {
   readonly accountName: Prisma.FieldRef<"AccountBank", 'String'>
   readonly accountBank: Prisma.FieldRef<"AccountBank", 'String'>
   readonly accountNumber: Prisma.FieldRef<"AccountBank", 'String'>
+  readonly majorId: Prisma.FieldRef<"AccountBank", 'String'>
   readonly createdAt: Prisma.FieldRef<"AccountBank", 'DateTime'>
 }
     
@@ -1199,6 +1332,10 @@ export type AccountBankCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    */
   data: Prisma.AccountBankCreateManyInput | Prisma.AccountBankCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountBankIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1269,6 +1406,10 @@ export type AccountBankUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * Limit how many AccountBanks to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountBankIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

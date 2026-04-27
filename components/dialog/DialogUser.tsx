@@ -516,7 +516,7 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
   const { data: majors = [], isLoading: majorsLoading } = useGetMajors();
 
   const students = React.useMemo(() => {
-    return users.filter((user: any) => user.role?.name === "Student");
+    return users.filter((user: any) => user.role?.name.trim() === "Student");
   }, [users]);
 
   const {
@@ -604,25 +604,30 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
       };
 
       // Add role-specific fields
-      if (selectedRole?.name === "Student") {
+      if (selectedRole?.name.trim() === "Student") {
         submitData.nisn = data.nisn || null;
         submitData.birthPlace = data.birthPlace || null;
         submitData.nik = data.nik || null;
         submitData.address = data.address || null;
         submitData.parentPhone = data.parentPhone || null;
         submitData.enrollmentDate = new Date();
-      } else if (selectedRole?.name === "Teacher") {
+      } else if (selectedRole?.name.trim() === "Teacher") {
         submitData.employeeId = data.employeeId || null;
         submitData.position = data.position || null;
         submitData.birthPlace = data.birthPlace || null;
         submitData.address = data.address || null;
         submitData.parentPhone = data.parentPhone || null;
         submitData.startDate = new Date();
-      } else if (selectedRole?.name === "Parent") {
+      } else if (selectedRole?.name.trim() === "Parent") {
         submitData.studentIds = data.studentIds || [];
         submitData.relation = data.relation || null;
         submitData.address = data.address || null;
         submitData.parentPhone = data.parentPhone || null;
+      } else if (selectedRole?.name.trim() === "Bendahara") {
+        submitData.employeeId = data.employeeId || null;
+        submitData.address = data.address || null;
+        submitData.parentPhone = data.parentPhone || null;
+        submitData.nik = data.nik || null;
       }
 
       // Handle Better Auth User connection
@@ -653,7 +658,7 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
   const renderRoleSpecificFields = () => {
     if (!selectedRole) return null;
 
-    switch (selectedRole.name.toLowerCase()) {
+    switch (selectedRole.name.trim().toLowerCase()) {
       case "student":
         return (
           <>
@@ -735,10 +740,10 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Jurusan *</Label>
+                <Label>Branch *</Label>
                 <Select onValueChange={(value) => setValue("majorId", value)} value={watch("majorId")}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih jurusan" />
+                    <SelectValue placeholder="Pilih Branch" />
                   </SelectTrigger>
                   <SelectContent>
                     {majorsLoading ?
@@ -857,6 +862,70 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
               <div className="space-y-2">
                 <Label htmlFor="parentPhone">No. Hanphone</Label>
                 <Input id="parentPhone" placeholder="08123456789" {...register("parentPhone")} />
+              </div>
+            </div>
+          </>
+        );
+
+      case "bendahara":
+        return (
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="employeeId">ID Pegawai *</Label>
+                <Input id="employeeId" placeholder="EMP001" {...register("employeeId")} />
+                {errors.employeeId && <p className="text-sm text-red-500">{errors.employeeId.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="position">Jabatan</Label>
+                <Input id="position" placeholder="Guru Matematika" {...register("position")} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="birthPlace">Tempat Lahir *</Label>
+                <Input id="birthPlace" placeholder="Jakarta" {...register("birthPlace")} />
+                {errors.birthPlace && <p className="text-sm text-red-500">{errors.birthPlace.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="birthDate">Tanggal Lahir *</Label>
+                <Input id="birthDate" type="date" {...register("birthDate")} />
+                {errors.birthDate && <p className="text-sm text-red-500">{errors.birthDate.message}</p>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="address">Alamat *</Label>
+                <Textarea id="address" placeholder="Alamat lengkap guru" {...register("address")} />
+                {errors.address && <p className="text-sm text-red-500">{errors.address.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="parentPhone">No. Hanphone</Label>
+                <Input id="parentPhone" placeholder="08123456789" {...register("parentPhone")} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Branch *</Label>
+                <Select onValueChange={(value) => setValue("majorId", value)} value={watch("majorId")}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {majorsLoading ?
+                      <SelectItem value="" disabled>
+                        Loading...
+                      </SelectItem>
+                    : majors.map((major: any) => (
+                        <SelectItem key={major.id} value={major.id}>
+                          {major.name}
+                        </SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </>

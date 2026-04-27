@@ -111,6 +111,24 @@ const availablePermissions = [
   { id: "/dashboard/violations", label: "Violation Management" },
   { id: "/dashboard/violations/teacher", label: "Violation for Teacher" },
   { id: "/dashboard/violations/student", label: "Violation for Student" },
+
+  // for bendahara
+  {
+    id: "/dashboard/bendahara/users",
+    label: "Data Murid (Bendahara)",
+  },
+  {
+    id: "/dashboard/bendahara/class",
+    label: "Data kelas (Bendahara)",
+  },
+  {
+    id: "/dashboard/bendahara/paymenttype",
+    label: "Jenis Pembayaran (Bendahara)",
+  },
+  {
+    id: "/dashboard/bendahara/payment",
+    label: "Pembayaran (Bendahara)",
+  },
 ];
 
 // Create/Edit Dialog Component

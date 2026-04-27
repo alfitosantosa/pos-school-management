@@ -16,3 +16,18 @@ export const useGetStudentById = (id: string) => {
     enabled: !!id,
   });
 };
+
+export const useGetStudentByIdMajor = (id: string) => {
+  return useQuery({
+    queryKey: ["students", id],
+    queryFn: async () => {
+      try {
+        const res = await apiGet(`/api/students/major/${id}`);
+        return res.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    enabled: !!id,
+  });
+};

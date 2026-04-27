@@ -24,9 +24,10 @@ import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAu
 import { unauthorized } from "next/navigation";
 import { useGetClasses } from "@/app/hooks/Classes/useClass";
 import { useGetTahfidzGroup } from "@/app/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetStudentByIdMajor } from "@/app/hooks/Users/useGetStudentById";
 
 // Dashboard Component - Only rendered after role verification
-function UserDashboard() {
+function UserDashboard({ id }: { id: string }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -46,7 +47,7 @@ function UserDashboard() {
   const [selectedUser, setSelectedUser] = React.useState<UserData | null>(null);
 
   // Fetch data with proper error handling
-  const { data: usersData = [], isLoading, refetch, error } = useGetUsers();
+  const { data: usersData = [], isLoading, refetch, error } = useGetStudentByIdMajor(id);
   const { data: betterAuthUsers = [] } = useGetBetterAuth();
 
   // Helper function to get betterAuth user info
@@ -685,6 +686,7 @@ export default function UserDataTable() {
 
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
+  const userIdMajor = userData?.major?.id;
 
   // Show loading while checking authorization
   if (isPending || isLoadingUserData) {
@@ -692,11 +694,13 @@ export default function UserDataTable() {
   }
 
   // Check if user is Admin
-  // if (userRole !== "Admin") {
-  //   unauthorized();
-  //   return null;
-  // }
+  if (userRole !== "Admin") {
+    if (userRole !== "Bendahara") {
+      unauthorized();
+      return null;
+    }
+  }
 
   // Render dashboard only after authorization is confirmed
-  return <UserDashboard />;
+  return <UserDashboard id={userIdMajor} />;
 }

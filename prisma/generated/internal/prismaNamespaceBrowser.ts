@@ -357,6 +357,8 @@ export const PaymentScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
   paymentTypeId: 'paymentTypeId',
+  majorId: 'majorId',
+  accountBankId: 'accountBankId',
   amount: 'amount',
   dueDate: 'dueDate',
   status: 'status',
@@ -391,6 +393,7 @@ export const AccountBankScalarFieldEnum = {
   accountName: 'accountName',
   accountBank: 'accountBank',
   accountNumber: 'accountNumber',
+  majorId: 'majorId',
   createdAt: 'createdAt'
 } as const
 

@@ -169,8 +169,11 @@ model Major {
   name        String
   description String?
   isActive    Boolean    @default(true)
+  accountBank AccountBank[]
+  paymenttype PaymentType[]
   classes     Class[]
   subjects    Subject[]
+  payments    Payment[] 
   students    UserData[] @relation("UserMajor")
 
   @@map("majors")
@@ -289,6 +292,7 @@ model Violation {
 
 model PaymentType {
   id              String         @id @default(cuid())
+  majorId        String 
   name            String         @unique
   description     String
   amount          Decimal
@@ -299,6 +303,7 @@ model PaymentType {
   quantity        Decimal
   subtotal        Decimal
   owner           String
+  major           Major         @relation(fields:[majorId], references:[id])
   paymentItems    PaymentItems[]
   payments        Payment[]
 
@@ -326,6 +331,8 @@ model Payment {
   id                 String              @id @default(cuid())
   studentId          String
   paymentTypeId      String
+  majorId            String
+  accountBankId      String
   amount             Decimal
   dueDate            DateTime?
   status             String              @default("pending")
@@ -335,10 +342,10 @@ model Payment {
   receiptNumber      String              @unique
   paymentItems       PaymentItems[]
   paymentTransaction PaymentTransaction?
-  paymentType        PaymentType         @relation(fields: [paymentTypeId], references: [id])
   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
-  accountBanks       AccountBank[]       @relation("AccountBankToPayment")
-
+  paymentType        PaymentType         @relation(fields: [paymentTypeId], references: [id])
+  major              Major               @relation(fields:[majorId], references:[id])
+  accountBank        AccountBank         @relation(fields:[accountBankId], references:[id])
   @@map("payments")
 }
 
@@ -364,8 +371,12 @@ model AccountBank {
   accountName   String
   accountBank   String
   accountNumber String
+  majorId       String
   createdAt     DateTime  @default(now())
-  payments      Payment[] @relation("AccountBankToPayment")
+  majors        Major     @relation(fields: [majorId], references:[id])
+  payments      Payment[]
+
+  @@map("account_bank")
 }
 
 model CalendarEvent {

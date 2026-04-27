@@ -38,13 +38,13 @@ export type MajorData = {
     classes: number;
     students: number;
     subjects: number;
-  };  
+  };
 };
 
 // Form schema - Fixed to make isActive required boolean
 const majorSchema = z.object({
-  code: z.string().min(1, "Kode jurusan wajib diisi").max(10, "Kode maksimal 10 karakter"),
-  name: z.string().min(1, "Nama jurusan wajib diisi").max(100, "Nama maksimal 100 karakter"),
+  code: z.string().min(1, "Kode Branch wajib diisi").max(10, "Kode maksimal 10 karakter"),
+  name: z.string().min(1, "Nama Branch wajib diisi").max(100, "Nama maksimal 100 karakter"),
   description: z.string().optional(),
   isActive: z.boolean(), // Removed .default(true) to make it required
 });
@@ -95,10 +95,10 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
     try {
       if (editData) {
         await updateMajor.mutateAsync({ id: editData.id, ...data });
-        toast.success("Jurusan berhasil diperbarui!");
+        toast.success("Branch berhasil diperbarui!");
       } else {
         await createMajor.mutateAsync(data);
-        toast.success("Jurusan berhasil dibuat!");
+        toast.success("Branch berhasil dibuat!");
       }
       reset();
       onOpenChange(false);
@@ -112,31 +112,31 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{editData ? "Edit Jurusan" : "Tambah Jurusan Baru"}</DialogTitle>
+          <DialogTitle>{editData ? "Edit Branch" : "Tambah Branch Baru"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="code">Kode Jurusan</Label>
-            <Input id="code" placeholder="Contoh: IPA, IPS, TKJ" {...register("code")} />
+            <Label htmlFor="code">Kode Branch</Label>
+            <Input id="code" placeholder="Contoh: SMAIT001, SMPIT002, SDIT03" {...register("code")} />
             {errors.code && <p className="text-sm text-red-500">{errors.code.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="name">Nama Jurusan</Label>
+            <Label htmlFor="name">Nama Branch</Label>
             <Input id="name" placeholder="Contoh: Ilmu Pengetahuan Alam" {...register("name")} />
             {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Deskripsi (Opsional)</Label>
-            <Textarea id="description" placeholder="Deskripsi singkat tentang jurusan..." rows={3} {...register("description")} />
+            <Textarea id="description" placeholder="Deskripsi singkat tentang Branch..." rows={3} {...register("description")} />
             {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
           </div>
 
           <div className="flex items-center space-x-2">
             <Switch id="isActive" checked={isActive} onCheckedChange={(checked) => setValue("isActive", checked)} />
-            <Label htmlFor="isActive">Jurusan Aktif</Label>
+            <Label htmlFor="isActive">Branch Aktif</Label>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
@@ -144,7 +144,11 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
               Batal
             </Button>
             <Button type="submit" disabled={createMajor.isPending || updateMajor.isPending}>
-              {createMajor.isPending || updateMajor.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createMajor.isPending || updateMajor.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -161,13 +165,13 @@ function MajorDetailDialog({ open, onOpenChange, majorData }: { open: boolean; o
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Detail Jurusan</DialogTitle>
+          <DialogTitle>Detail Branch</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Kode Jurusan</Label>
+              <Label className="text-sm font-medium text-muted-foreground">Kode Branch</Label>
               <p className="text-lg font-semibold">{majorData.code}</p>
             </div>
             <div>
@@ -179,7 +183,7 @@ function MajorDetailDialog({ open, onOpenChange, majorData }: { open: boolean; o
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Nama Jurusan</Label>
+            <Label className="text-sm font-medium text-muted-foreground">Nama Branch</Label>
             <p className="text-lg">{majorData.name}</p>
           </div>
 
@@ -223,11 +227,11 @@ function DeleteMajorDialog({ open, onOpenChange, majorData, onSuccess }: { open:
 
     try {
       await deleteMajor.mutateAsync(majorData.id);
-      toast.success("Jurusan berhasil dihapus!");
+      toast.success("Branch berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus jurusan");
+      toast.error(error.message || "Gagal menghapus Branch");
     }
   };
 
@@ -237,25 +241,30 @@ function DeleteMajorDialog({ open, onOpenChange, majorData, onSuccess }: { open:
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Hapus Jurusan</AlertDialogTitle>
+          <AlertDialogTitle>Hapus Branch</AlertDialogTitle>
           <AlertDialogDescription>
-            {hasRelatedData ? (
+            {hasRelatedData ?
               <div className="space-y-2">
                 <p>
-                  Jurusan <strong>{majorData?.name}</strong> memiliki data terkait:
+                  Brnach <strong>{majorData?.name}</strong> memiliki data terkait:
                 </p>
                 <ul className="list-disc list-inside text-sm space-y-1">
-                  {majorData?._count?.classes ? <li>{majorData._count.classes} kelas</li> : null}
-                  {majorData?._count?.students ? <li>{majorData._count.students} siswa</li> : null}
-                  {majorData?._count?.subjects ? <li>{majorData._count.subjects} mata pelajaran</li> : null}
+                  {majorData?._count?.classes ?
+                    <li>{majorData._count.classes} kelas</li>
+                  : null}
+                  {majorData?._count?.students ?
+                    <li>{majorData._count.students} siswa</li>
+                  : null}
+                  {majorData?._count?.subjects ?
+                    <li>{majorData._count.subjects} mata pelajaran</li>
+                  : null}
                 </ul>
-                <p className="text-red-600 font-medium">Menghapus jurusan akan menghapus semua data terkait. Tindakan ini tidak dapat dibatalkan.</p>
+                <p className="text-red-600 font-medium">Menghapus Branch akan menghapus semua data terkait. Tindakan ini tidak dapat dibatalkan.</p>
               </div>
-            ) : (
-              <p>
-                Apakah Anda yakin ingin menghapus jurusan <strong>{majorData?.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+            : <p>
+                Apakah Anda yakin ingin menghapus branch <strong>{majorData?.name}</strong>? Tindakan ini tidak dapat dibatalkan.
               </p>
-            )}
+            }
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -314,7 +323,7 @@ function MajorDataTable() {
       header: ({ column }) => {
         return (
           <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Nama Jurusan
+            Nama Branch
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -381,7 +390,7 @@ function MajorDataTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(majorData.id)}>Copy ID Jurusan</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(majorData.id)}>Copy ID Branch</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
@@ -444,14 +453,14 @@ function MajorDataTable() {
   return (
     <>
       <div className="max-w-7xl mx-auto my-8 p-6 min-h-screen">
-        <div className="font-bold text-3xl">Jurusan</div>
+        <div className="font-bold text-3xl">Branch</div>
         <div className="max-w-7xl justify-center mx-auto">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Cari nama atau kode jurusan..."
+                  placeholder="Cari nama atau kode Branch..."
                   value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                   onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
                   className="max-w-sm pl-10"
@@ -482,7 +491,7 @@ function MajorDataTable() {
 
               <Button onClick={() => setCreateDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
-                Tambah Jurusan
+                Tambah Branch
               </Button>
             </div>
           </div>
@@ -499,7 +508,7 @@ function MajorDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length ?
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -507,13 +516,12 @@ function MajorDataTable() {
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
+                : <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
-                      Tidak ada data jurusan.
+                      Tidak ada data Brnach.
                     </TableCell>
                   </TableRow>
-                )}
+                }
               </TableBody>
             </Table>
           </div>

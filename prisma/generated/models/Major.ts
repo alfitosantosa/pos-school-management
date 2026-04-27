@@ -182,8 +182,10 @@ export type MajorWhereInput = {
   name?: Prisma.StringFilter<"Major"> | string
   description?: Prisma.StringNullableFilter<"Major"> | string | null
   isActive?: Prisma.BoolFilter<"Major"> | boolean
+  accountBank?: Prisma.AccountBankListRelationFilter
   classes?: Prisma.ClassListRelationFilter
   subjects?: Prisma.SubjectListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
   students?: Prisma.UserDataListRelationFilter
 }
 
@@ -193,8 +195,10 @@ export type MajorOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  accountBank?: Prisma.AccountBankOrderByRelationAggregateInput
   classes?: Prisma.ClassOrderByRelationAggregateInput
   subjects?: Prisma.SubjectOrderByRelationAggregateInput
+  payments?: Prisma.PaymentOrderByRelationAggregateInput
   students?: Prisma.UserDataOrderByRelationAggregateInput
 }
 
@@ -207,8 +211,10 @@ export type MajorWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Major"> | string
   description?: Prisma.StringNullableFilter<"Major"> | string | null
   isActive?: Prisma.BoolFilter<"Major"> | boolean
+  accountBank?: Prisma.AccountBankListRelationFilter
   classes?: Prisma.ClassListRelationFilter
   subjects?: Prisma.SubjectListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
   students?: Prisma.UserDataListRelationFilter
 }, "id" | "code">
 
@@ -240,8 +246,10 @@ export type MajorCreateInput = {
   name: string
   description?: string | null
   isActive?: boolean
+  accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
   subjects?: Prisma.SubjectCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutMajorInput
   students?: Prisma.UserDataCreateNestedManyWithoutMajorInput
 }
 
@@ -251,8 +259,10 @@ export type MajorUncheckedCreateInput = {
   name: string
   description?: string | null
   isActive?: boolean
+  accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
   subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutMajorInput
   students?: Prisma.UserDataUncheckedCreateNestedManyWithoutMajorInput
 }
 
@@ -262,8 +272,10 @@ export type MajorUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
   subjects?: Prisma.SubjectUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutMajorNestedInput
   students?: Prisma.UserDataUpdateManyWithoutMajorNestedInput
 }
 
@@ -273,8 +285,10 @@ export type MajorUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
   subjects?: Prisma.SubjectUncheckedUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutMajorNestedInput
   students?: Prisma.UserDataUncheckedUpdateManyWithoutMajorNestedInput
 }
 
@@ -382,14 +396,44 @@ export type MajorUpdateOneWithoutSubjectsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MajorUpdateToOneWithWhereWithoutSubjectsInput, Prisma.MajorUpdateWithoutSubjectsInput>, Prisma.MajorUncheckedUpdateWithoutSubjectsInput>
 }
 
+export type MajorCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.MajorCreateWithoutPaymentsInput, Prisma.MajorUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.MajorCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.MajorWhereUniqueInput
+}
+
+export type MajorUpdateOneRequiredWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.MajorCreateWithoutPaymentsInput, Prisma.MajorUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.MajorCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.MajorUpsertWithoutPaymentsInput
+  connect?: Prisma.MajorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MajorUpdateToOneWithWhereWithoutPaymentsInput, Prisma.MajorUpdateWithoutPaymentsInput>, Prisma.MajorUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type MajorCreateNestedOneWithoutAccountBankInput = {
+  create?: Prisma.XOR<Prisma.MajorCreateWithoutAccountBankInput, Prisma.MajorUncheckedCreateWithoutAccountBankInput>
+  connectOrCreate?: Prisma.MajorCreateOrConnectWithoutAccountBankInput
+  connect?: Prisma.MajorWhereUniqueInput
+}
+
+export type MajorUpdateOneRequiredWithoutAccountBankNestedInput = {
+  create?: Prisma.XOR<Prisma.MajorCreateWithoutAccountBankInput, Prisma.MajorUncheckedCreateWithoutAccountBankInput>
+  connectOrCreate?: Prisma.MajorCreateOrConnectWithoutAccountBankInput
+  upsert?: Prisma.MajorUpsertWithoutAccountBankInput
+  connect?: Prisma.MajorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MajorUpdateToOneWithWhereWithoutAccountBankInput, Prisma.MajorUpdateWithoutAccountBankInput>, Prisma.MajorUncheckedUpdateWithoutAccountBankInput>
+}
+
 export type MajorCreateWithoutStudentsInput = {
   id?: string
   code: string
   name: string
   description?: string | null
   isActive?: boolean
+  accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
   subjects?: Prisma.SubjectCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutMajorInput
 }
 
 export type MajorUncheckedCreateWithoutStudentsInput = {
@@ -398,8 +442,10 @@ export type MajorUncheckedCreateWithoutStudentsInput = {
   name: string
   description?: string | null
   isActive?: boolean
+  accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
   subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutMajorInput
 }
 
 export type MajorCreateOrConnectWithoutStudentsInput = {
@@ -424,8 +470,10 @@ export type MajorUpdateWithoutStudentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
   subjects?: Prisma.SubjectUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutMajorNestedInput
 }
 
 export type MajorUncheckedUpdateWithoutStudentsInput = {
@@ -434,8 +482,10 @@ export type MajorUncheckedUpdateWithoutStudentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
   subjects?: Prisma.SubjectUncheckedUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutMajorNestedInput
 }
 
 export type MajorCreateWithoutClassesInput = {
@@ -444,7 +494,9 @@ export type MajorCreateWithoutClassesInput = {
   name: string
   description?: string | null
   isActive?: boolean
+  accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   subjects?: Prisma.SubjectCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutMajorInput
   students?: Prisma.UserDataCreateNestedManyWithoutMajorInput
 }
 
@@ -454,7 +506,9 @@ export type MajorUncheckedCreateWithoutClassesInput = {
   name: string
   description?: string | null
   isActive?: boolean
+  accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutMajorInput
   students?: Prisma.UserDataUncheckedCreateNestedManyWithoutMajorInput
 }
 
@@ -480,7 +534,9 @@ export type MajorUpdateWithoutClassesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   subjects?: Prisma.SubjectUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutMajorNestedInput
   students?: Prisma.UserDataUpdateManyWithoutMajorNestedInput
 }
 
@@ -490,7 +546,9 @@ export type MajorUncheckedUpdateWithoutClassesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   subjects?: Prisma.SubjectUncheckedUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutMajorNestedInput
   students?: Prisma.UserDataUncheckedUpdateManyWithoutMajorNestedInput
 }
 
@@ -500,7 +558,9 @@ export type MajorCreateWithoutSubjectsInput = {
   name: string
   description?: string | null
   isActive?: boolean
+  accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutMajorInput
   students?: Prisma.UserDataCreateNestedManyWithoutMajorInput
 }
 
@@ -510,7 +570,9 @@ export type MajorUncheckedCreateWithoutSubjectsInput = {
   name: string
   description?: string | null
   isActive?: boolean
+  accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutMajorInput
   students?: Prisma.UserDataUncheckedCreateNestedManyWithoutMajorInput
 }
 
@@ -536,7 +598,9 @@ export type MajorUpdateWithoutSubjectsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutMajorNestedInput
   students?: Prisma.UserDataUpdateManyWithoutMajorNestedInput
 }
 
@@ -546,7 +610,137 @@ export type MajorUncheckedUpdateWithoutSubjectsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutMajorNestedInput
+  students?: Prisma.UserDataUncheckedUpdateManyWithoutMajorNestedInput
+}
+
+export type MajorCreateWithoutPaymentsInput = {
+  id?: string
+  code: string
+  name: string
+  description?: string | null
+  isActive?: boolean
+  accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
+  classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutMajorInput
+  students?: Prisma.UserDataCreateNestedManyWithoutMajorInput
+}
+
+export type MajorUncheckedCreateWithoutPaymentsInput = {
+  id?: string
+  code: string
+  name: string
+  description?: string | null
+  isActive?: boolean
+  accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
+  classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutMajorInput
+  students?: Prisma.UserDataUncheckedCreateNestedManyWithoutMajorInput
+}
+
+export type MajorCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.MajorWhereUniqueInput
+  create: Prisma.XOR<Prisma.MajorCreateWithoutPaymentsInput, Prisma.MajorUncheckedCreateWithoutPaymentsInput>
+}
+
+export type MajorUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.MajorUpdateWithoutPaymentsInput, Prisma.MajorUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.MajorCreateWithoutPaymentsInput, Prisma.MajorUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.MajorWhereInput
+}
+
+export type MajorUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.MajorWhereInput
+  data: Prisma.XOR<Prisma.MajorUpdateWithoutPaymentsInput, Prisma.MajorUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type MajorUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
+  classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutMajorNestedInput
+  students?: Prisma.UserDataUpdateManyWithoutMajorNestedInput
+}
+
+export type MajorUncheckedUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
+  classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutMajorNestedInput
+  students?: Prisma.UserDataUncheckedUpdateManyWithoutMajorNestedInput
+}
+
+export type MajorCreateWithoutAccountBankInput = {
+  id?: string
+  code: string
+  name: string
+  description?: string | null
+  isActive?: boolean
+  classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutMajorInput
+  students?: Prisma.UserDataCreateNestedManyWithoutMajorInput
+}
+
+export type MajorUncheckedCreateWithoutAccountBankInput = {
+  id?: string
+  code: string
+  name: string
+  description?: string | null
+  isActive?: boolean
+  classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutMajorInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutMajorInput
+  students?: Prisma.UserDataUncheckedCreateNestedManyWithoutMajorInput
+}
+
+export type MajorCreateOrConnectWithoutAccountBankInput = {
+  where: Prisma.MajorWhereUniqueInput
+  create: Prisma.XOR<Prisma.MajorCreateWithoutAccountBankInput, Prisma.MajorUncheckedCreateWithoutAccountBankInput>
+}
+
+export type MajorUpsertWithoutAccountBankInput = {
+  update: Prisma.XOR<Prisma.MajorUpdateWithoutAccountBankInput, Prisma.MajorUncheckedUpdateWithoutAccountBankInput>
+  create: Prisma.XOR<Prisma.MajorCreateWithoutAccountBankInput, Prisma.MajorUncheckedCreateWithoutAccountBankInput>
+  where?: Prisma.MajorWhereInput
+}
+
+export type MajorUpdateToOneWithWhereWithoutAccountBankInput = {
+  where?: Prisma.MajorWhereInput
+  data: Prisma.XOR<Prisma.MajorUpdateWithoutAccountBankInput, Prisma.MajorUncheckedUpdateWithoutAccountBankInput>
+}
+
+export type MajorUpdateWithoutAccountBankInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutMajorNestedInput
+  students?: Prisma.UserDataUpdateManyWithoutMajorNestedInput
+}
+
+export type MajorUncheckedUpdateWithoutAccountBankInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutMajorNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutMajorNestedInput
   students?: Prisma.UserDataUncheckedUpdateManyWithoutMajorNestedInput
 }
 
@@ -556,14 +750,18 @@ export type MajorUncheckedUpdateWithoutSubjectsInput = {
  */
 
 export type MajorCountOutputType = {
+  accountBank: number
   classes: number
   subjects: number
+  payments: number
   students: number
 }
 
 export type MajorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  accountBank?: boolean | MajorCountOutputTypeCountAccountBankArgs
   classes?: boolean | MajorCountOutputTypeCountClassesArgs
   subjects?: boolean | MajorCountOutputTypeCountSubjectsArgs
+  payments?: boolean | MajorCountOutputTypeCountPaymentsArgs
   students?: boolean | MajorCountOutputTypeCountStudentsArgs
 }
 
@@ -575,6 +773,13 @@ export type MajorCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
    * Select specific fields to fetch from the MajorCountOutputType
    */
   select?: Prisma.MajorCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * MajorCountOutputType without action
+ */
+export type MajorCountOutputTypeCountAccountBankArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AccountBankWhereInput
 }
 
 /**
@@ -594,6 +799,13 @@ export type MajorCountOutputTypeCountSubjectsArgs<ExtArgs extends runtime.Types.
 /**
  * MajorCountOutputType without action
  */
+export type MajorCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentWhereInput
+}
+
+/**
+ * MajorCountOutputType without action
+ */
 export type MajorCountOutputTypeCountStudentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.UserDataWhereInput
 }
@@ -605,8 +817,10 @@ export type MajorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   name?: boolean
   description?: boolean
   isActive?: boolean
+  accountBank?: boolean | Prisma.Major$accountBankArgs<ExtArgs>
   classes?: boolean | Prisma.Major$classesArgs<ExtArgs>
   subjects?: boolean | Prisma.Major$subjectsArgs<ExtArgs>
+  payments?: boolean | Prisma.Major$paymentsArgs<ExtArgs>
   students?: boolean | Prisma.Major$studentsArgs<ExtArgs>
   _count?: boolean | Prisma.MajorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["major"]>
@@ -637,8 +851,10 @@ export type MajorSelectScalar = {
 
 export type MajorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "description" | "isActive", ExtArgs["result"]["major"]>
 export type MajorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  accountBank?: boolean | Prisma.Major$accountBankArgs<ExtArgs>
   classes?: boolean | Prisma.Major$classesArgs<ExtArgs>
   subjects?: boolean | Prisma.Major$subjectsArgs<ExtArgs>
+  payments?: boolean | Prisma.Major$paymentsArgs<ExtArgs>
   students?: boolean | Prisma.Major$studentsArgs<ExtArgs>
   _count?: boolean | Prisma.MajorCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -648,8 +864,10 @@ export type MajorIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $MajorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Major"
   objects: {
+    accountBank: Prisma.$AccountBankPayload<ExtArgs>[]
     classes: Prisma.$ClassPayload<ExtArgs>[]
     subjects: Prisma.$SubjectPayload<ExtArgs>[]
+    payments: Prisma.$PaymentPayload<ExtArgs>[]
     students: Prisma.$UserDataPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1052,8 +1270,10 @@ readonly fields: MajorFieldRefs;
  */
 export interface Prisma__MajorClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  accountBank<T extends Prisma.Major$accountBankArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Major$accountBankArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountBankPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   classes<T extends Prisma.Major$classesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Major$classesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   subjects<T extends Prisma.Major$subjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Major$subjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  payments<T extends Prisma.Major$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Major$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   students<T extends Prisma.Major$studentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Major$studentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserDataPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1482,6 +1702,30 @@ export type MajorDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
+ * Major.accountBank
+ */
+export type Major$accountBankArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AccountBank
+   */
+  select?: Prisma.AccountBankSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AccountBank
+   */
+  omit?: Prisma.AccountBankOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountBankInclude<ExtArgs> | null
+  where?: Prisma.AccountBankWhereInput
+  orderBy?: Prisma.AccountBankOrderByWithRelationInput | Prisma.AccountBankOrderByWithRelationInput[]
+  cursor?: Prisma.AccountBankWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AccountBankScalarFieldEnum | Prisma.AccountBankScalarFieldEnum[]
+}
+
+/**
  * Major.classes
  */
 export type Major$classesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1527,6 +1771,30 @@ export type Major$subjectsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.SubjectScalarFieldEnum | Prisma.SubjectScalarFieldEnum[]
+}
+
+/**
+ * Major.payments
+ */
+export type Major$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
+  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
 }
 
 /**
