@@ -38,6 +38,7 @@ export type MajorData = {
     classes: number;
     students: number;
     subjects: number;
+    paymenttype: number;
   };
 };
 
@@ -361,15 +362,17 @@ function MajorDataTable() {
         const classCount = major._count?.classes || 0;
         const studentCount = major._count?.students || 0;
         const subjectCount = major._count?.subjects || 0;
+        const paymenttypeCount = major._count?.paymenttype || 0;
 
         return (
-          <div className="text-sm text-center">
+          <div className="text-sm justify-center text-center">
             <div className="flex space-x-2">
               <span className="text-blue-600 font-medium">{classCount}K</span>
               <span className="text-green-600 font-medium">{studentCount}S</span>
               <span className="text-purple-600 font-medium">{subjectCount}MP</span>
+              <span className="text-red-600 font-medium">{paymenttypeCount}TP</span>
             </div>
-            <div className="text-xs text-muted-foreground">Kelas • Siswa • MaPel</div>
+            <div className="text-xs text-muted-foreground">Kelas • Siswa • MaPel • TiPem </div>
           </div>
         );
       },
@@ -518,7 +521,7 @@ function MajorDataTable() {
                   ))
                 : <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
-                      Tidak ada data Brnach.
+                      Tidak ada data Branch.
                     </TableCell>
                   </TableRow>
                 }

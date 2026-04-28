@@ -3212,6 +3212,7 @@ export type ViolationScalarFieldEnum = (typeof ViolationScalarFieldEnum)[keyof t
 
 export const PaymentTypeScalarFieldEnum = {
   id: 'id',
+  majorId: 'majorId',
   name: 'name',
   description: 'description',
   amount: 'amount',
@@ -3245,9 +3246,9 @@ export type PaymentItemsScalarFieldEnum = (typeof PaymentItemsScalarFieldEnum)[k
 export const PaymentScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
-  paymentTypeId: 'paymentTypeId',
   majorId: 'majorId',
   accountBankId: 'accountBankId',
+  month: 'month',
   amount: 'amount',
   dueDate: 'dueDate',
   status: 'status',

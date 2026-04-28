@@ -7,6 +7,7 @@
 //   classes     Class[]
 //   students    Student[]
 //   subjects    Subject[]
+//   paymenttype   // Paymenttype[]
 
 //   @@map("majors")
 // }
@@ -23,6 +24,7 @@ export async function GET() {
             classes: true,
             students: true,
             subjects: true,
+            paymenttype: true,
           },
         },
       },

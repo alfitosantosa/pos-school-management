@@ -4,10 +4,10 @@ import { randomUUID } from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
-    const { classId, paymentTypeId, amount, dueDate, status, notes, paymentDate } = await request.json();
+    const { classId, paymentTypeId, amount, dueDate, status, notes, paymentDate, majorId, accountBankId, month } = await request.json();
 
-    if (!classId || !paymentTypeId || !amount || !paymentDate) {
-      return NextResponse.json({ error: "classId, paymentTypeId, amount, and paymentDate are required" }, { status: 400 });
+    if (!classId || !paymentTypeId || !amount || !paymentDate || !accountBankId || !month) {
+      return NextResponse.json({ error: "classId, paymentTypeId, amount, paymentDate, accountBankId, and month are required" }, { status: 400 });
     }
 
     const parsedPaymentDate = new Date(paymentDate);
@@ -38,8 +38,10 @@ export async function POST(request: NextRequest) {
 
     const newPaymentBulk = await prisma.payment.createMany({
       data: students.map((student) => ({
-        paymentTypeId,
+        majorId,
         studentId: student.id,
+        accountBankId,
+        month,
         amount: parseFloat(amount),
         dueDate: dueDate ? new Date(dueDate) : null,
         status: status || "Unpaid",

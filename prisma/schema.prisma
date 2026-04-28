@@ -292,7 +292,7 @@ model Violation {
 
 model PaymentType {
   id              String         @id @default(cuid())
-  majorId        String 
+  majorId         String 
   name            String         @unique
   description     String
   amount          Decimal
@@ -305,7 +305,6 @@ model PaymentType {
   owner           String
   major           Major         @relation(fields:[majorId], references:[id])
   paymentItems    PaymentItems[]
-  payments        Payment[]
 
   @@map("payment_types")
 }
@@ -330,9 +329,9 @@ model PaymentItems {
 model Payment {
   id                 String              @id @default(cuid())
   studentId          String
-  paymentTypeId      String
   majorId            String
   accountBankId      String
+  month              String
   amount             Decimal
   dueDate            DateTime?
   status             String              @default("pending")
@@ -343,7 +342,6 @@ model Payment {
   paymentItems       PaymentItems[]
   paymentTransaction PaymentTransaction?
   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
-  paymentType        PaymentType         @relation(fields: [paymentTypeId], references: [id])
   major              Major               @relation(fields:[majorId], references:[id])
   accountBank        AccountBank         @relation(fields:[accountBankId], references:[id])
   @@map("payments")

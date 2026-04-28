@@ -1,18 +1,18 @@
 // model PaymentType {
 //   id              String         @id @default(cuid())
+//   majorId         String
 //   name            String         @unique
-//   owner           String
 //   description     String
 //   amount          Decimal
-//   quantity        Decimal
-//   subtotal        Decimal
 //   isMonthly       Boolean        @default(false)
 //   isActive        Boolean        @default(true)
 //   isFixedAmount   Boolean
 //   isFixedQuantity Boolean
-
+//   quantity        Decimal
+//   subtotal        Decimal
+//   owner           String
+//   major           Major         @relation(fields:[majorId], references:[id])
 //   paymentItems    PaymentItems[]
-//   payments        Payment[]
 
 //   @@map("payment_types")
 // }
@@ -32,12 +32,13 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, owner, description, amount, quantity, subtotal, isMonthly, isActive, isFixedAmount, isFixedQuantity } = await request.json();
+    const { name, owner, description, amount, quantity, subtotal, isMonthly, isActive, isFixedAmount, isFixedQuantity, majorId } = await request.json();
 
     const newPaymentType = await prisma.paymentType.create({
       data: {
         name,
         description,
+        majorId,
         amount: parseFloat(amount),
         quantity: parseFloat(quantity),
         subtotal: parseFloat(subtotal),
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, name, owner, description, amount, quantity, subtotal, isMonthly, isActive, isFixedAmount, isFixedQuantity } = await request.json();
+    const { id, name, owner, description, amount, quantity, subtotal, isMonthly, isActive, isFixedAmount, isFixedQuantity, majorId } = await request.json();
 
     const updatedPaymentType = await prisma.paymentType.update({
       where: { id },
@@ -66,6 +67,7 @@ export async function PUT(request: NextRequest) {
         name,
         description,
         owner,
+        majorId,
         amount: parseFloat(amount),
         quantity: parseFloat(quantity),
         subtotal: parseFloat(subtotal),

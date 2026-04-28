@@ -1,18 +1,23 @@
 // model Payment {
-//   id            String      @id @default(cuid())
-//   studentId     String
-//   paymentTypeId String
-//   amount        Decimal
-//   dueDate       DateTime?
-//   status        String      @default("pending")
-//   notes         String?
-//   createdAt     DateTime    @default(now())
-//   updatedAt     DateTime    @updatedAt
-//   paymentDate   DateTime
-//   receiptNumber String?
-//   paymentType   PaymentType @relation(fields: [paymentTypeId], references: [id])
-//   student       UserData    @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
+//   id                 String              @id @default(cuid())
 
+//   studentId          String
+//   paymentTypeId      String
+//   majorId            String
+//   accountBankId      String
+//   amount             Decimal
+//   dueDate            DateTime?
+//   status             String              @default("pending")
+//   notes              String?
+//   createdAt          DateTime            @default(now())
+//   paymentDate        DateTime
+//   receiptNumber      String              @unique
+//   paymentTransaction PaymentTransaction?
+//   paymentItems       PaymentItems[]
+//   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
+//   paymentType        PaymentType         @relation(fields: [paymentTypeId], references: [id])
+//   major              Major               @relation(fields:[majorId], references:[id])
+//   accountBank        AccountBank         @relation(fields:[accountBankId], references:[id])
 //   @@map("payments")
 // }
 
@@ -24,8 +29,6 @@ export async function GET() {
     const payments = await prisma.payment.findMany({
       include: {
         student: true,
-        paymentType: true,
-        paymentTransaction: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -40,13 +43,15 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { studentId, paymentTypeId, amount, dueDate, status, notes, paymentDate, receiptNumber } = await request.json();
+    const { studentId, majorId, accountBankId, month, amount, dueDate, status, notes, paymentDate, receiptNumber } = await request.json();
 
     const newPayment = await prisma.payment.create({
       data: {
         studentId,
-        paymentTypeId,
         amount: parseFloat(amount),
+        accountBankId,
+        majorId,
+        month,
         dueDate: dueDate ? new Date(dueDate) : undefined,
         status,
         notes,
@@ -55,7 +60,6 @@ export async function POST(request: NextRequest) {
       },
       include: {
         student: true,
-        paymentType: true,
       },
     });
 
@@ -68,13 +72,14 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, studentId, paymentTypeId, amount, dueDate, status, notes, paymentDate, receiptNumber } = await request.json();
+    const { id, studentId, majorId, month, amount, dueDate, status, notes, paymentDate, receiptNumber } = await request.json();
 
     const updatedPayment = await prisma.payment.update({
       where: { id },
       data: {
         studentId,
-        paymentTypeId,
+        majorId,
+        month,
         amount: parseFloat(amount),
         dueDate: dueDate ? new Date(dueDate) : undefined,
         status,
@@ -84,7 +89,6 @@ export async function PUT(request: NextRequest) {
       },
       include: {
         student: true,
-        paymentType: true,
       },
     });
 

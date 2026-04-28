@@ -13,7 +13,6 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ studen
       where: { studentId: studentId },
       include: {
         student: true,
-        paymentType: true,
         paymentTransaction: true,
       },
       orderBy: { dueDate: "asc" },
