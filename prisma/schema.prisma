@@ -164,17 +164,17 @@ model AcademicYear {
 }
 
 model Major {
-  id          String     @id @default(cuid())
-  code        String     @unique
+  id          String        @id @default(cuid())
+  code        String        @unique
   name        String
   description String?
-  isActive    Boolean    @default(true)
+  isActive    Boolean       @default(true)
   accountBank AccountBank[]
-  paymenttype PaymentType[]
   classes     Class[]
+  paymenttype PaymentType[]
+  payments    Payment[]
   subjects    Subject[]
-  payments    Payment[] 
-  students    UserData[] @relation("UserMajor")
+  students    UserData[]    @relation("UserMajor")
 
   @@map("majors")
 }
@@ -292,7 +292,6 @@ model Violation {
 
 model PaymentType {
   id              String         @id @default(cuid())
-  majorId         String 
   name            String         @unique
   description     String
   amount          Decimal
@@ -303,8 +302,9 @@ model PaymentType {
   quantity        Decimal
   subtotal        Decimal
   owner           String
-  major           Major         @relation(fields:[majorId], references:[id])
+  majorId         String
   paymentItems    PaymentItems[]
+  major           Major          @relation(fields: [majorId], references: [id])
 
   @@map("payment_types")
 }
@@ -329,9 +329,6 @@ model PaymentItems {
 model Payment {
   id                 String              @id @default(cuid())
   studentId          String
-  majorId            String
-  accountBankId      String
-  month              String
   amount             Decimal
   dueDate            DateTime?
   status             String              @default("pending")
@@ -339,11 +336,15 @@ model Payment {
   createdAt          DateTime            @default(now())
   paymentDate        DateTime
   receiptNumber      String              @unique
+  accountBankId      String
+  majorId            String
+  month              String
   paymentItems       PaymentItems[]
   paymentTransaction PaymentTransaction?
+  accountBank        AccountBank         @relation(fields: [accountBankId], references: [id])
+  major              Major               @relation(fields: [majorId], references: [id])
   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
-  major              Major               @relation(fields:[majorId], references:[id])
-  accountBank        AccountBank         @relation(fields:[accountBankId], references:[id])
+
   @@map("payments")
 }
 
@@ -371,7 +372,7 @@ model AccountBank {
   accountNumber String
   majorId       String
   createdAt     DateTime  @default(now())
-  majors        Major     @relation(fields: [majorId], references:[id])
+  majors        Major     @relation(fields: [majorId], references: [id])
   payments      Payment[]
 
   @@map("account_bank")

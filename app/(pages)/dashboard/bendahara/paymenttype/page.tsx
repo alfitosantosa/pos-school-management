@@ -21,7 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 
-import { useGetPaymentTypes, useCreatePaymentType, useUpdatePaymentType, useDeletePaymentType } from "@/app/hooks/Payments/usePaymentType";
+import { useGetPaymentTypes, useCreatePaymentType, useUpdatePaymentType, useDeletePaymentType, useGetPaymentTypeByIdMajor } from "@/app/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
@@ -41,6 +41,7 @@ export type PaymentTypeData = {
   isFixedAmount: boolean;
   isFixedQuantity: boolean;
   owner: string;
+  majorId: string;
   isMonthly: boolean;
   isActive: boolean;
   createdAt?: Date;
@@ -81,6 +82,7 @@ const paymentTypeSchema = z.object({
   isFixedAmount: z.boolean(),
   isFixedQuantity: z.boolean(),
   owner: z.string(),
+  majorId: z.string(),
 });
 
 const DEFAULT_FORM_VALUES: Partial<PaymentTypeFormValues> = {
@@ -130,7 +132,7 @@ const FixedBadge = ({ isFixed }: { isFixed: boolean }) => <Badge className={`tex
 // Form Dialog Component
 // ============================================================================
 
-function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: PaymentTypeData | null; onSuccess: () => void }) {
+function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: { id: String; open: boolean; onOpenChange: (open: boolean) => void; editData?: PaymentTypeData | null; onSuccess: () => void }) {
   const createPaymentType = useCreatePaymentType();
   const updatePaymentType = useUpdatePaymentType();
 
@@ -155,9 +157,10 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
     setValue("subtotal", a * q);
   }, [amount, quantity, setValue]);
 
-  // Populate form when editing
+  // Populate form when editing or auto-assign majorId
   React.useEffect(() => {
     if (editData) {
+      setValue("majorId", editData.majorId);
       setValue("name", editData.name);
       setValue("description", editData.description);
       setValue("amount", parseToFloat(editData.amount));
@@ -170,8 +173,12 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
       setValue("subtotal", parseToFloat(editData.subtotal));
     } else {
       reset(DEFAULT_FORM_VALUES);
+      // Auto-assign majorId from props
+      if (id) {
+        setValue("majorId", id as string);
+      }
     }
-  }, [editData, setValue, reset]);
+  }, [editData, setValue, reset, id]);
 
   const onSubmit = async (data: PaymentTypeFormValues) => {
     try {
@@ -203,6 +210,9 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Hidden majorId field - auto-assigned */}
+          <input type="hidden" {...register("majorId")} />
+
           {/* Owner Selection */}
           <div className="space-y-2">
             <Label htmlFor="owner">Jenis Peruntukan</Label>
@@ -246,7 +256,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
 
           <div className="space-y-2">
             <Label htmlFor="amount">Jumlah Pembayaran (Rp)</Label>
-            <Input id="amount" type="number" placeholder="0" disabled={!isFixedAmount} {...register("amount", { valueAsNumber: true })} />
+            <Input id="amount" type="number" placeholder="0" {...register("amount", { valueAsNumber: true })} />
             {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
           </div>
 
@@ -261,7 +271,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
 
           <div className="space-y-2">
             <Label htmlFor="quantity">Jumlah Quantity</Label>
-            <Input id="quantity" type="number" placeholder="0" disabled={!isFixedQuantity} {...register("quantity", { valueAsNumber: true })} />
+            <Input id="quantity" type="number" placeholder="0" {...register("quantity", { valueAsNumber: true })} />
             {errors.quantity && <p className="text-sm text-red-500">{errors.quantity.message}</p>}
           </div>
 
@@ -465,18 +475,33 @@ const createColumns = (onEdit: (data: PaymentTypeData) => void, onDelete: (data:
 // Main DataTable Component
 // ============================================================================
 
-function PaymentTypeDataTable() {
+function PaymentTypeDataTable({ id }: { id: string }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [isReady, setIsReady] = React.useState(false);
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedPaymentType, setSelectedPaymentType] = React.useState<PaymentTypeData | null>(null);
 
-  const { data: paymentTypes = [], isLoading, refetch } = useGetPaymentTypes();
+  // Fetch payment types for the specific branch
+  const { data: paymentTypes = [], isLoading, refetch } = useGetPaymentTypeByIdMajor(id);
+
+  // Wait for async data to load before rendering
+  React.useEffect(() => {
+    if (!isLoading && id) {
+      setIsReady(true);
+    }
+  }, [isLoading, id]);
+
+  // Filter by branch ID - only after data is ready
+  const filteredPaymentTypes = React.useMemo(() => {
+    if (!id || !isReady) return [];
+    return paymentTypes;
+  }, [paymentTypes, id, isReady]);
 
   const handleSuccess = () => {
     refetch();
@@ -495,7 +520,7 @@ function PaymentTypeDataTable() {
   const columns = React.useMemo(() => createColumns(handleEdit, handleDelete), [handleEdit, handleDelete]);
 
   const table = useReactTable({
-    data: paymentTypes,
+    data: filteredPaymentTypes,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -513,7 +538,7 @@ function PaymentTypeDataTable() {
     },
   });
 
-  if (isLoading) {
+  if (isLoading || !isReady) {
     return <Loading />;
   }
 
@@ -600,9 +625,9 @@ function PaymentTypeDataTable() {
       </div>
 
       {/* Dialogs */}
-      <PaymentTypeFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} />
+      <PaymentTypeFormDialog open={createDialogOpen} id={id} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} />
 
-      <PaymentTypeFormDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedPaymentType} onSuccess={handleSuccess} />
+      <PaymentTypeFormDialog open={editDialogOpen} id={id} onOpenChange={setEditDialogOpen} editData={selectedPaymentType} onSuccess={handleSuccess} />
 
       <DeletePaymentTypeDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} paymentTypeData={selectedPaymentType} onSuccess={handleSuccess} />
     </div>
@@ -619,17 +644,29 @@ export default function PaymentTypeTable() {
 
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
+  const userIdMajor = userData?.major?.id;
 
+  // Wait for all data to load before rendering
   if (isPending || isLoadingUserData) {
     return <Loading />;
   }
 
-  if (userRole !== "Admin") {
-    if (userRole !== "Bendahara") {
-      unauthorized();
-      return null;
-    }
+  // Check authorization
+  if (userRole !== "Admin" && userRole !== "Bendahara") {
+    unauthorized();
+    return null;
   }
 
-  return <PaymentTypeDataTable />;
+  // Check if bendahara has a major assigned
+  if (!userIdMajor) {
+    return (
+      <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
+        <div className="text-center text-red-600">
+          <p>Bendahara belum memiliki branch yang ditugaskan.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <PaymentTypeDataTable id={userIdMajor} />;
 }

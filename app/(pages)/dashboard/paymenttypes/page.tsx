@@ -22,6 +22,7 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 import { useGetPaymentTypes, useCreatePaymentType, useUpdatePaymentType, useDeletePaymentType } from "@/app/hooks/Payments/usePaymentType";
+import { useGetMajors } from "@/app/hooks/Majors/useMajors";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
@@ -45,6 +46,10 @@ export type PaymentTypeData = {
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  majorId: string;
+  major: {
+    name: string;
+  };
 };
 
 type PaymentTypeFormValues = z.infer<typeof paymentTypeSchema>;
@@ -81,6 +86,7 @@ const paymentTypeSchema = z.object({
   isFixedAmount: z.boolean(),
   isFixedQuantity: z.boolean(),
   owner: z.string(),
+  majorId: z.string().min(1, "Branch wajib dipilih"),
 });
 
 const DEFAULT_FORM_VALUES: Partial<PaymentTypeFormValues> = {
@@ -94,6 +100,7 @@ const DEFAULT_FORM_VALUES: Partial<PaymentTypeFormValues> = {
   owner: "",
   name: "",
   description: "",
+  majorId: "",
 };
 
 // ============================================================================
@@ -133,6 +140,7 @@ const FixedBadge = ({ isFixed }: { isFixed: boolean }) => <Badge className={`tex
 function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: PaymentTypeData | null; onSuccess: () => void }) {
   const createPaymentType = useCreatePaymentType();
   const updatePaymentType = useUpdatePaymentType();
+  const { data: majors = [], isLoading: majorsLoading } = useGetMajors();
 
   const {
     register,
@@ -158,6 +166,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
   // Populate form when editing
   React.useEffect(() => {
     if (editData) {
+      setValue("majorId", editData.majorId);
       setValue("name", editData.name);
       setValue("description", editData.description);
       setValue("amount", parseToFloat(editData.amount));
@@ -203,6 +212,29 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Major/Branch Selection */}
+          <div className="space-y-2">
+            <Label htmlFor="majorId">Branch *</Label>
+            <Select value={watch("majorId")} onValueChange={(value) => setValue("majorId", value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih branch" />
+              </SelectTrigger>
+              <SelectContent>
+                {majorsLoading ?
+                  <SelectItem value="" disabled>
+                    Loading...
+                  </SelectItem>
+                : majors.map((major: any) => (
+                    <SelectItem key={major.id} value={major.id}>
+                      {major.name}
+                    </SelectItem>
+                  ))
+                }
+              </SelectContent>
+            </Select>
+            {errors.majorId && <p className="text-sm text-red-500">{errors.majorId.message}</p>}
+          </div>
+
           {/* Owner Selection */}
           <div className="space-y-2">
             <Label htmlFor="owner">Jenis Peruntukan</Label>
@@ -239,14 +271,14 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
           <div className="flex items-center justify-between space-x-2">
             <div className="space-y-0.5">
               <Label htmlFor="isFixedAmount">Edit Amount</Label>
-              <p className="text-sm text-muted-foreground">Aktifkan untuk mengubah jumlah pembayaran</p>
+              <p className="text-sm text-muted-foreground">Jika Aktif maka tidak bisa di ubah pada saat pembayaran</p>
             </div>
             <Switch id="isFixedAmount" checked={isFixedAmount} onCheckedChange={(checked) => setValue("isFixedAmount", checked)} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="amount">Jumlah Pembayaran (Rp)</Label>
-            <Input id="amount" type="number" placeholder="0" disabled={!isFixedAmount} {...register("amount", { valueAsNumber: true })} />
+            <Input id="amount" type="number" placeholder="0" {...register("amount", { valueAsNumber: true })} />
             {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
           </div>
 
@@ -254,14 +286,14 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
           <div className="flex items-center justify-between space-x-2">
             <div className="space-y-0.5">
               <Label htmlFor="isFixedQuantity">Edit Quantity</Label>
-              <p className="text-sm text-muted-foreground">Aktifkan untuk mengubah jumlah quantity</p>
+              <p className="text-sm text-muted-foreground">Jika Aktif maka tidak bisa di ubah saat pembayaran</p>
             </div>
             <Switch id="isFixedQuantity" checked={isFixedQuantity} onCheckedChange={(checked) => setValue("isFixedQuantity", checked)} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="quantity">Jumlah Quantity</Label>
-            <Input id="quantity" type="number" placeholder="0" disabled={!isFixedQuantity} {...register("quantity", { valueAsNumber: true })} />
+            <Input id="quantity" type="number" placeholder="0" {...register("quantity", { valueAsNumber: true })} />
             {errors.quantity && <p className="text-sm text-red-500">{errors.quantity.message}</p>}
           </div>
 
@@ -373,6 +405,29 @@ const createColumns = (onEdit: (data: PaymentTypeData) => void, onDelete: (data:
     cell: ({ row }) => <div className="font-medium max-w-xs">{row.getValue("name")}</div>,
   },
   {
+    accessorKey: "owner",
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Jenis Peruntukan
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => <div className="font-medium max-w-xs">{row.getValue("owner")}</div>,
+  },
+  {
+    accessorKey: "major.name",
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Branch
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const major = row.original.major;
+      return <div className="font-medium">{major?.name || "-"}</div>;
+    },
+  },
+  {
     accessorKey: "description",
     header: "Deskripsi",
     cell: ({ row }) => (
@@ -470,6 +525,7 @@ function PaymentTypeDataTable() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [majorSelection, setMajorSelection] = React.useState<string | null>(null);
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
@@ -477,6 +533,13 @@ function PaymentTypeDataTable() {
   const [selectedPaymentType, setSelectedPaymentType] = React.useState<PaymentTypeData | null>(null);
 
   const { data: paymentTypes = [], isLoading, refetch } = useGetPaymentTypes();
+  const { data: majors = [] } = useGetMajors();
+
+  // Filter payment types by selected major
+  const filteredPaymentTypes = React.useMemo(() => {
+    if (!majorSelection) return paymentTypes;
+    return paymentTypes.filter((pt: PaymentTypeData) => pt.majorId === majorSelection);
+  }, [paymentTypes, majorSelection]);
 
   const handleSuccess = () => {
     refetch();
@@ -495,7 +558,7 @@ function PaymentTypeDataTable() {
   const columns = React.useMemo(() => createColumns(handleEdit, handleDelete), [handleEdit, handleDelete]);
 
   const table = useReactTable({
-    data: paymentTypes,
+    data: filteredPaymentTypes,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -523,7 +586,28 @@ function PaymentTypeDataTable() {
 
       {/* Filter and Actions Bar */}
       <div className="flex items-center justify-between py-4">
-        <Input placeholder="Cari nama pembayaran..." value={(table.getColumn("name")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)} className="max-w-sm" />
+        <div className="flex items-center gap-2 flex-wrap">
+          <Input placeholder="Cari nama pembayaran..." value={(table.getColumn("name")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)} className="max-w-sm" />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                {majorSelection ? majors.find((m: any) => m.id === majorSelection)?.name : "Filter Branch"}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setMajorSelection(null)}>Semua Branch</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {majors.map((major: any) => (
+                <DropdownMenuItem key={major.id} onClick={() => setMajorSelection(major.id)}>
+                  {major.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        {/* //filter branch */}
 
         <div className="flex items-center space-x-2">
           {/* Column Visibility Dropdown */}
@@ -619,6 +703,7 @@ export default function PaymentTypeTable() {
 
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
+  console.log(userData);
 
   if (isPending || isLoadingUserData) {
     return <Loading />;

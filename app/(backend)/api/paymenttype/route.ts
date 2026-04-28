@@ -22,7 +22,11 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const paymentTypes = await prisma.paymentType.findMany();
+    const paymentTypes = await prisma.paymentType.findMany({
+      include: {
+        major: true,
+      },
+    });
     return NextResponse.json(paymentTypes);
   } catch (error) {
     console.error("Error fetching payment types:", error);
@@ -47,6 +51,9 @@ export async function POST(request: NextRequest) {
         isFixedAmount: typeof isFixedAmount === "boolean" ? isFixedAmount : isFixedAmount === "true",
         isFixedQuantity: typeof isFixedQuantity === "boolean" ? isFixedQuantity : isFixedQuantity === "true",
         owner,
+      },
+      include: {
+        major: true,
       },
     });
 
@@ -75,6 +82,9 @@ export async function PUT(request: NextRequest) {
         isActive: typeof isActive === "boolean" ? isActive : isActive === "true",
         isFixedAmount: typeof isFixedAmount === "boolean" ? isFixedAmount : isFixedAmount === "true",
         isFixedQuantity: typeof isFixedQuantity === "boolean" ? isFixedQuantity : isFixedQuantity === "true",
+      },
+      include: {
+        major: true,
       },
     });
 

@@ -77,3 +77,17 @@ export const useGetPaymentTypeById = (id: string) => {
     },
   });
 };
+
+export const useGetPaymentTypeByIdMajor = (id: string) => {
+  return useQuery({
+    queryKey: ["paymentType", id],
+    queryFn: async () => {
+      try {
+        const res = await apiGet(`/api/paymenttype/major/${id}`);
+        return res.data;
+      } catch (error: any) {
+        throw new Error(error?.response?.data?.message || "Failed to fetch payment type");
+      }
+    },
+  });
+};

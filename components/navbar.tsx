@@ -74,8 +74,8 @@ export default function Navbar() {
   };
 
   const handleSignOut = async () => {
+    signOut();
     router.push("/auth/sign-in");
-    await signOut();
   };
 
   const navigationItems = (userData?.role?.permissions || []).map((permission: string) => ({
