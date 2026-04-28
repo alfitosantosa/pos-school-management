@@ -53,10 +53,10 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/student/tahfidzrecord": "Setoran Tahfidz untuk Siswa",
   "/dashboard/profile": "Profile",
   //for bendahara
-  "/dashboard/bendahara/payment": "Pembayaran",
+  "/dashboard/bendahara/payment": "Data Pembayaran",
   "/dashboard/bendahara/users": "Data Murid",
   "/dashboard/bendahara/class": "Data Kelas",
-  "/dashboard/bendahara/paymenttype": "Jenis Pembayaran",
+  "/dashboard/bendahara/paymenttype": "Data Jenis Pembayaran",
 };
 
 export default function Navbar() {

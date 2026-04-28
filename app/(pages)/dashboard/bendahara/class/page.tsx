@@ -111,7 +111,7 @@ function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
           </div>
 
           <div className="space-y-2">
-            <Label>Jurusan</Label>
+            <Label>Branch</Label>
             <Select value={selectedMajorId} onValueChange={(value) => setValue("majorId", value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Pilih Jurusan" />
@@ -268,7 +268,7 @@ function ClassDataTable(id: any) {
     },
     {
       accessorKey: "major",
-      header: "Jurusan",
+      header: "Branch",
       cell: ({ row }) => {
         const major = row.getValue("major") as ClassDataTypes["major"];
         return <div>{major.name}</div>;
