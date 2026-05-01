@@ -19,8 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetClasses, useCreateClass, useUpdateClass, useDeleteClass } from "@/app/hooks/Classes/useClass";
-import { useGetMajors } from "@/app/hooks/Majors/useMajors";
+import { useCreateClass, useUpdateClass, useDeleteClass } from "@/app/hooks/Classes/useClass";
 import { useGetAcademicYears } from "@/app/hooks/AcademicYears/useAcademicYear";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
@@ -28,16 +27,13 @@ import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
 import { ClassDataTypes, ClassFormValues, classSchemaForm } from "@/app/types/class-types";
 import { z } from "zod";
-import { MajorDataTypes } from "@/app/types/majors-types";
 import { AcademicYearDataTypes } from "@/app/types/academicyear-types";
-import { useGetStudentByIdMajor } from "@/app/hooks/Users/useGetStudentById";
 import { useGetClassByIdMajor } from "@/app/hooks/Classes/useGetClassById";
 
 // Create/Edit Dialog Component
-function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: ClassDataTypes | null; onSuccess: () => void }) {
+function ClassFormDialog({ id, open, onOpenChange, editData, onSuccess }: { id: string; open: boolean; onOpenChange: (open: boolean) => void; editData?: ClassDataTypes | null; onSuccess: () => void }) {
   const createClass = useCreateClass();
   const updateClass = useUpdateClass();
-  const { data: majors } = useGetMajors();
   const { data: academicYears } = useGetAcademicYears();
 
   const {
@@ -54,22 +50,23 @@ function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
     },
   });
 
-  const selectedMajorId = watch("majorId");
   const selectedAcademicYearId = watch("academicYearId");
 
   useEffect(() => {
     if (editData) {
       setValue("name", editData.name);
       setValue("grade", editData.grade);
-      setValue("majorId", editData.majorId);
       setValue("academicYearId", editData.academicYearId);
       setValue("capacity", editData.capacity);
     } else {
       reset({
         capacity: 36,
       });
+      if (id) {
+        setValue("majorId", id);
+      }
     }
-  }, [editData, setValue, reset]);
+  }, [editData, setValue, reset, id]);
 
   const onSubmit = async (data: ClassFormValues) => {
     try {
@@ -110,7 +107,7 @@ function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
             {errors.grade && <p className="text-sm text-red-500">{errors.grade.message}</p>}
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label>Branch</Label>
             <Select value={selectedMajorId} onValueChange={(value) => setValue("majorId", value)}>
               <SelectTrigger>
@@ -125,7 +122,7 @@ function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
               </SelectContent>
             </Select>
             {errors.majorId && <p className="text-sm text-red-500">{errors.majorId.message}</p>}
-          </div>
+          </div> */}
 
           <div className="space-y-2">
             <Label>Tahun Ajaran</Label>
@@ -208,7 +205,7 @@ function DeleteClassDialog({ open, onOpenChange, classData, onSuccess }: { open:
 }
 
 // Main DataTable Component
-function ClassDataTable(id: any) {
+function ClassDataTable({ id }: { id: string }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -223,7 +220,7 @@ function ClassDataTable(id: any) {
   // Filter states
   const [academicYearFilter, setAcademicYearFilter] = useState<string>("all");
 
-  const { data: classes = [], isLoading, refetch } = useGetClassByIdMajor(id.id as any);
+  const { data: classes = [], isLoading, refetch } = useGetClassByIdMajor(id);
   const { data: academicYears = [] } = useGetAcademicYears();
 
   const handleSuccess = () => {
@@ -497,9 +494,9 @@ function ClassDataTable(id: any) {
         </div>
 
         {/* Dialogs */}
-        <ClassFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} />
+        <ClassFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} id={id} onSuccess={handleSuccess} />
 
-        <ClassFormDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedClass} onSuccess={handleSuccess} />
+        <ClassFormDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} id={id} editData={selectedClass} onSuccess={handleSuccess} />
 
         <DeleteClassDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} classData={selectedClass} onSuccess={handleSuccess} />
       </div>

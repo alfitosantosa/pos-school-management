@@ -52,6 +52,7 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/tahfidzrecord": "Setoran Tahfidz Management",
   "/dashboard/student/tahfidzrecord": "Setoran Tahfidz untuk Siswa",
   "/dashboard/profile": "Profile",
+  "/dashboard/accountbank": "Account Bank Management",
   //for bendahara
   "/dashboard/bendahara/payment": "Data Pembayaran",
   "/dashboard/bendahara/users": "Data Murid",

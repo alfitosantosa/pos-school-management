@@ -129,6 +129,10 @@ const availablePermissions = [
     id: "/dashboard/bendahara/payment",
     label: "Pembayaran (Bendahara)",
   },
+  {
+    id: "/dashboard/accountbank",
+    label: "Akun Bank Management",
+  },
 ];
 
 // Create/Edit Dialog Component
