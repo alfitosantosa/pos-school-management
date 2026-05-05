@@ -99,6 +99,7 @@ const paymentSchema = z.object({
   bendaharaId: z.string().min(1, "Bendahara ID wajib diisi"),
   majorId: z.string().min(1, "Branch wajib dipilih"),
   accountBankId: z.string().min(1, "Rekening bank wajib dipilih"),
+  paymentTypeId: z.string().optional(),
   month: z.string().min(1, "Bulan wajib dipilih"),
   amount: z.string().min(1, "Jumlah wajib diisi"),
   status: z.string().min(1, "Status wajib dipilih"),
@@ -118,6 +119,7 @@ function PaymentFormDialog({
   allStudents,
   allMajors,
   allAccountBanks,
+  allPaymentTypes,
   userDataId,
 }: {
   open: boolean;
@@ -136,6 +138,27 @@ function PaymentFormDialog({
     };
   }[];
   userDataId?: string;
+  allPaymentTypes: {
+    id: string;
+    name: string;
+    description: string;
+    amount: string;
+    isMonthly: boolean;
+    isActive: boolean;
+    isFixedAmount: boolean;
+    isFixedQuantity: boolean;
+    quantity: string;
+    subtotal: string;
+    owner: string;
+    majorId: string;
+    major: {
+      id: string;
+      code: string;
+      name: string;
+      description: string;
+      isActive: boolean;
+    };
+  }[];
 }) {
   const createPayment = useCreatePayment();
   const updatePayment = useUpdatePayment();
@@ -224,6 +247,9 @@ function PaymentFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Hidden field for bendaharaId */}
+          <input type="hidden" {...register("bendaharaId")} />
+
           {/* Student & Major */}
 
           <div className="grid grid-cols-2 gap-4">
@@ -426,13 +452,8 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
   const { data: payments = [], isLoading, refetch } = useGetPayments();
   const { data: allStudents = [] } = useGetStudents();
   const { data: allMajors = [] } = useGetMajors();
-  const { data: allPaymentType = [] } = useGetPaymentTypes();
   const { data: allAccountBanks = [] } = useGetAccountBank();
-
-  // console.log(allAccountBanks);
-  console.log("major:", major);
-  console.log("Bendhara id ", userDataId);
-  console.log(allPaymentType);
+  const { data: allPaymentTypes = [] } = useGetPaymentTypes();
 
   const handleSuccess = () => refetch();
 
@@ -875,7 +896,16 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
       </div>
 
       {/* Dialogs */}
-      <PaymentFormDialog userDataId={userDataId} open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allMajors={allMajors} allAccountBanks={allAccountBanks} />
+      <PaymentFormDialog
+        userDataId={userDataId}
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={handleSuccess}
+        allStudents={allStudents}
+        allMajors={allMajors}
+        allAccountBanks={allAccountBanks}
+        allPaymentTypes={allPaymentTypes}
+      />
       <PaymentFormDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
@@ -885,6 +915,7 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
         allStudents={allStudents}
         allMajors={allMajors}
         allAccountBanks={allAccountBanks}
+        allPaymentTypes={allPaymentTypes}
       />
       <DeletePaymentDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} paymentData={selectedPayment} onSuccess={handleSuccess} />
     </div>
