@@ -1,0 +1,69 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+
+export const useGetViolations = () => {
+  return useQuery({
+    queryKey: ["violations"],
+    queryFn: async () => {
+      try {
+        const response = await apiGet("/api/violations");
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+  });
+};
+
+export const useCreateViolation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiPost("/api/violations", data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["violations"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+};
+
+export const useUpdateViolation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiPut("/api/violations", data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["violations"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+};
+
+export const useDeleteViolation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiDelete("/api/violations", {
+        body: JSON.stringify({ id }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["violations"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+};
