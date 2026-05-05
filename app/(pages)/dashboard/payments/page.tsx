@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, DollarSign, CheckCircle, Clock, XCircle, TrendingUp, Users, Calendar } from "lucide-react";
-
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, Receipt, Building2, BadgeCheck, Clock, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -15,147 +14,131 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import base64id from "base64id";
+import { format } from "date-fns";
+import { id as localeId } from "date-fns/locale";
 
-// Import hooks
-import { useGetPayments, useCreatePayment, useUpdatePayment, useDeletePayment, useCreatePaymentBulk } from "@/app/hooks/Payments/usePayment";
-import { useGetPaymentTypes } from "@/app/hooks/Payments/usePaymentType";
-import { useGetUsers } from "@/app/hooks/Users/useUsers";
+import { useGetPayments, useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/hooks/Payments/usePayment";
+import { useGetStudents } from "@/app/hooks/Users/useStudents";
+import { useGetMajors } from "@/app/hooks/Majors/useMajors";
+import { useGetAccountBank } from "@/app/hooks/AccountBank/useAccountBank";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useGetStudents } from "@/app/hooks/Users/useStudents";
-import { useGetClasses } from "@/app/hooks/Classes/useClass";
+import { useGetPaymentTypes } from "@/app/hooks/Payments/usePaymentType";
 
-// Type definitions
+// ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentData = {
   id: string;
   studentId: string;
-  classId?: string;
-  paymentTypeId: string;
-  amount: number;
-  dueDate?: Date | string;
+  bendaharaId: string;
+  amount: number | string;
+  dueDate?: string;
   status: string;
   notes?: string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-  paymentDate: Date | string;
-  receiptNumber?: string;
-  student?: {
-    id: string;
-    name: string;
-    email?: string;
-  };
-  paymentType?: {
-    id: string;
-    name: string;
-    amount: number;
-  };
+  createdAt: string;
+  paymentDate: string;
+  receiptNumber: string;
+  accountBankId: string;
+  majorId: string;
+  month: string;
+  createdBy?: { id: string; name: string };
+  student?: { id: string; name: string };
+  major?: { id: string; name: string };
+  accountBank?: { id: string; name: string; bankName?: string };
 };
 
-// Form schema
-const paymentSchema = z.object({
-  studentId: z.string().optional(),
-  classId: z.string().optional(),
-  paymentTypeId: z.string().min(1, "Jenis pembayaran wajib dipilih"),
-  amount: z.number().min(0, "Jumlah minimal 0"),
-  dueDate: z.string().optional(),
-  status: z.string().min(1, "Status wajib dipilih"),
-  notes: z.string().optional(),
-  paymentDate: z.string().min(1, "Tanggal pembayaran wajib diisi"),
-  receiptNumber: z.string().optional(),
-});
+// ─── Status Config ────────────────────────────────────────────────────────────
+const statusConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
+  paid: {
+    label: "Lunas",
+    className: "bg-green-600 text-white",
+    icon: <BadgeCheck className="h-3 w-3" />,
+  },
+  pending: {
+    label: "Menunggu",
+    className: "bg-yellow-500 text-white",
+    icon: <Clock className="h-3 w-3" />,
+  },
+  overdue: {
+    label: "Terlambat",
+    className: "bg-red-600 text-white",
+    icon: <XCircle className="h-3 w-3" />,
+  },
+};
 
-type PaymentFormValues = z.infer<typeof paymentSchema>;
-
-// Payment status options
-const paymentStatuses = [
-  { value: "pending", label: "Belum Lunas" },
-  { value: "paid", label: "Lunas" },
-  { value: "overdue", label: "Terlambat" },
-  { value: "cancelled", label: "Dibatalkan" },
-];
-
-// Statistics Card Component
-function StatisticsCards({ payments }: { payments: PaymentData[] }) {
-  const totalPayments = payments.length;
-  const paidPayments = payments.filter((p) => p.status === "paid").length;
-  const pendingPayments = payments.filter((p) => p.status === "pending").length;
-  const overduePayments = payments.filter((p) => p.status === "overdue").length;
-
-  const totalRevenue = payments.filter((p) => p.status === "paid").reduce((sum, p) => sum + Number(p.amount), 0);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(amount);
+function StatusBadge({ status }: { status: string }) {
+  const cfg = statusConfig[status] ?? {
+    label: status,
+    className: "bg-gray-500 text-white",
+    icon: null,
   };
-
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Pembayaran</CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{totalPayments}</div>
-          <p className="text-xs text-muted-foreground">Total transaksi pembayaran</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Lunas</CardTitle>
-          <CheckCircle className="h-4 w-4 text-green-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-green-600">{paidPayments}</div>
-          <p className="text-xs text-muted-foreground">{formatCurrency(totalRevenue)}</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Tertunda</CardTitle>
-          <Clock className="h-4 w-4 text-yellow-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-yellow-600">{pendingPayments}</div>
-          <p className="text-xs text-muted-foreground">Menunggu pembayaran</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Terlambat</CardTitle>
-          <XCircle className="h-4 w-4 text-red-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-red-600">{overduePayments}</div>
-          <p className="text-xs text-muted-foreground">Melewati jatuh tempo</p>
-        </CardContent>
-      </Card>
-    </div>
+    <Badge className={`${cfg.className} flex items-center gap-1 w-fit`}>
+      {cfg.icon}
+      {cfg.label}
+    </Badge>
   );
 }
 
-// Create/Edit Dialog Component
-function PaymentFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: PaymentData | null; onSuccess: () => void }) {
+function formatRupiah(value: number | string) {
+  const num = typeof value === "string" ? parseFloat(value) : value;
+  return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(num);
+}
+
+// ─── Month Options ────────────────────────────────────────────────────────────
+const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+// ─── Form Schema ──────────────────────────────────────────────────────────────
+const paymentSchema = z.object({
+  studentId: z.string().min(1, "Siswa wajib dipilih"),
+  bendaharaId: z.string().min(1, "Bendahara ID wajib diisi"),
+  majorId: z.string().min(1, "Branch wajib dipilih"),
+  accountBankId: z.string().min(1, "Rekening bank wajib dipilih"),
+  month: z.string().min(1, "Bulan wajib dipilih"),
+  amount: z.string().min(1, "Jumlah wajib diisi"),
+  status: z.string().min(1, "Status wajib dipilih"),
+  paymentDate: z.string().min(1, "Tanggal bayar wajib diisi"),
+  dueDate: z.string().optional(),
+  receiptNumber: z.string().min(1, "Nomor kwitansi wajib diisi"),
+  notes: z.string().optional(),
+});
+type PaymentFormValues = z.infer<typeof paymentSchema>;
+
+// ─── Form Dialog ──────────────────────────────────────────────────────────────
+function PaymentFormDialog({
+  open,
+  onOpenChange,
+  editData,
+  onSuccess,
+  allStudents,
+  allMajors,
+  allAccountBanks,
+  userDataId,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  editData?: PaymentData | null;
+  onSuccess: () => void;
+  allStudents: { id: string; name: string }[];
+  allMajors: { id: string; name: string }[];
+  allAccountBanks: {
+    id: string;
+    accountName: string;
+    accountBank?: string;
+    accountNumber: string;
+    major: {
+      name: string;
+    };
+  }[];
+  userDataId?: string;
+}) {
   const createPayment = useCreatePayment();
-  const createPaymentBulk = useCreatePaymentBulk();
   const updatePayment = useUpdatePayment();
-  const { data: paymentTypes = [] } = useGetPaymentTypes();
-  const { data: students = [] } = useGetStudents();
-  const { data: classes = [] } = useGetClasses();
 
   const {
     register,
@@ -167,71 +150,68 @@ function PaymentFormDialog({ open, onOpenChange, editData, onSuccess }: { open: 
   } = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
     defaultValues: {
-      amount: 0,
       status: "pending",
       paymentDate: new Date().toISOString().split("T")[0],
+      bendaharaId: userDataId || "",
     },
   });
 
   const selectedStudentId = watch("studentId");
-  const selectedClassId = watch("classId");
-  const selectedPaymentTypeId = watch("paymentTypeId");
+  const selectedMajorId = watch("majorId");
+  const selectedAccountBankId = watch("accountBankId");
+  const selectedMonth = watch("month");
   const selectedStatus = watch("status");
 
   React.useEffect(() => {
     if (editData) {
       setValue("studentId", editData.studentId || "");
-      setValue("classId", editData.classId || "");
-      setValue("paymentTypeId", editData.paymentTypeId);
-      setValue("amount", editData.amount);
+      setValue("majorId", editData.majorId || "");
+      setValue("accountBankId", editData.accountBankId || "");
+      setValue("month", editData.month || "");
+      setValue("amount", String(editData.amount));
+      setValue("status", editData.status || "pending");
+      setValue("paymentDate", editData.paymentDate ? new Date(editData.paymentDate).toISOString().split("T")[0] : "");
       setValue("dueDate", editData.dueDate ? new Date(editData.dueDate).toISOString().split("T")[0] : "");
-      setValue("status", editData.status);
-      setValue("notes", editData.notes || "");
-      setValue("paymentDate", new Date(editData.paymentDate).toISOString().split("T")[0]);
       setValue("receiptNumber", editData.receiptNumber || "");
+      setValue("notes", editData.notes || "");
+      if (userDataId) {
+        setValue("bendaharaId", userDataId);
+      }
     } else {
-      reset({
-        amount: 0,
-        status: "pending",
-        paymentDate: new Date().toISOString().split("T")[0],
-      });
-    }
-  }, [editData, setValue, reset]);
-
-  // Auto-fill amount when payment type is selected
-  React.useEffect(() => {
-    if (selectedPaymentTypeId && !editData) {
-      const selectedType = paymentTypes.find((type: any) => type.id === selectedPaymentTypeId);
-      if (selectedType) {
-        setValue("amount", Number(selectedType.amount));
+      reset({ status: "pending", paymentDate: new Date().toISOString().split("T")[0] });
+      if (userDataId) {
+        setValue("bendaharaId", userDataId);
       }
     }
-  }, [selectedPaymentTypeId, paymentTypes, editData, setValue]);
+  }, [editData, setValue, reset, userDataId]);
 
   const onSubmit = async (data: PaymentFormValues) => {
     try {
-      const payload = {
+      console.log("Form data before submit:", data);
+
+      const submitData = {
         ...data,
-        dueDate: data.dueDate || undefined,
-        notes: data.notes || undefined,
-        receiptNumber: data.receiptNumber || undefined,
+        bendaharaId: data.bendaharaId,
+        amount: parseFloat(data.amount),
+        paymentDate: new Date(data.paymentDate).toISOString(),
+        dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
+        notes: data.notes || null,
       };
 
+      console.log("Submit data:", submitData);
+
       if (editData) {
-        await updatePayment.mutateAsync({ id: editData.id, ...payload } as any);
+        await updatePayment.mutateAsync({ id: editData.id, ...submitData });
         toast.success("Pembayaran berhasil diperbarui!");
       } else {
-        if (payload.classId && !payload.studentId) {
-          await createPaymentBulk.mutateAsync(payload as any);
-        } else {
-          await createPayment.mutateAsync(payload as any);
-        }
+        await createPayment.mutateAsync(submitData);
         toast.success("Pembayaran berhasil dibuat!");
       }
       reset();
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
+      console.error("Submit error:", error);
       toast.error(error.message || "Terjadi kesalahan");
     }
   };
@@ -244,108 +224,134 @@ function PaymentFormDialog({ open, onOpenChange, editData, onSuccess }: { open: 
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Student & Major */}
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Siswa</Label>
-              <Select value={selectedStudentId} onValueChange={(value) => setValue("studentId", value)}>
+              <Select value={selectedStudentId || ""} onValueChange={(v) => setValue("studentId", v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih Siswa" />
                 </SelectTrigger>
-                <SelectContent>
-                  {students.map((student: any) => (
-                    <SelectItem key={student.id} value={student.id}>
-                      {student.name}
+                <SelectContent className="max-h-60">
+                  {allStudents?.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}
             </div>
-            <div className="space-y-2">
-              <Label>Kelas</Label>
-              <Select value={selectedClassId} onValueChange={(value) => setValue("classId", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih Kelas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Kelas</SelectItem>
-                  {classes.map((classItem: any) => (
-                    <SelectItem key={classItem.id} value={classItem.id}>
-                      {classItem.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.classId && <p className="text-sm text-red-500">{errors.classId.message}</p>}
-            </div>
 
             <div className="space-y-2">
-              <Label>Jenis Pembayaran</Label>
-              <Select value={selectedPaymentTypeId} onValueChange={(value) => setValue("paymentTypeId", value)}>
+              <Label>Branch</Label>
+              <Select value={selectedMajorId || ""} onValueChange={(v) => setValue("majorId", v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih Jenis Pembayaran" />
+                  <SelectValue placeholder="Pilih Branch" />
                 </SelectTrigger>
                 <SelectContent>
-                  {paymentTypes.map((type: any) => (
-                    <SelectItem key={type.id} value={type.id}>
-                      {type.name}
+                  {allMajors?.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.paymentTypeId && <p className="text-sm text-red-500">{errors.paymentTypeId.message}</p>}
+              {errors.majorId && <p className="text-sm text-red-500">{errors.majorId.message}</p>}
             </div>
           </div>
 
+          {/* Account Bank & Month */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="amount">Jumlah Pembayaran (Rp)</Label>
-              <Input id="amount" type="number" placeholder="0" {...register("amount", { valueAsNumber: true })} />
+              <Label>Rekening Bank</Label>
+              <Select value={selectedAccountBankId || ""} onValueChange={(v) => setValue("accountBankId", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih Rekening Bank" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allAccountBanks?.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {`${b.accountBank} - ${b.accountName} - ${b.accountNumber} `}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.accountBankId && <p className="text-sm text-red-500">{errors.accountBankId.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Bulan</Label>
+              <Select value={selectedMonth || ""} onValueChange={(v) => setValue("month", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih Bulan" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MONTHS.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.month && <p className="text-sm text-red-500">{errors.month.message}</p>}
+            </div>
+          </div>
+
+          {/* Amount & Status */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="amount">Jumlah (Rp)</Label>
+              <Input id="amount" type="number" min="0" placeholder="Contoh: 500000" {...register("amount")} />
               {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="receiptNumber">Nomor Kwitansi</Label>
-              <Input id="receiptNumber" disabled={true} value={``} {...register("receiptNumber")} />
-              {errors.receiptNumber && <p className="text-sm text-red-500">{errors.receiptNumber.message}</p>}
+              <Label>Status</Label>
+              <Select value={selectedStatus || "pending"} onValueChange={(v) => setValue("status", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Menunggu</SelectItem>
+                  <SelectItem value="paid">Lunas</SelectItem>
+                  <SelectItem value="overdue">Terlambat</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
             </div>
           </div>
 
+          {/* Payment Date & Due Date */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="paymentDate">Tanggal Pembayaran</Label>
+              <Label htmlFor="paymentDate">Tanggal Bayar</Label>
               <Input id="paymentDate" type="date" {...register("paymentDate")} />
               {errors.paymentDate && <p className="text-sm text-red-500">{errors.paymentDate.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dueDate">Jatuh Tempo (Opsional)</Label>
+              <Label htmlFor="dueDate">
+                Jatuh Tempo <span className="text-muted-foreground text-xs">(opsional)</span>
+              </Label>
               <Input id="dueDate" type="date" {...register("dueDate")} />
-              {errors.dueDate && <p className="text-sm text-red-500">{errors.dueDate.message}</p>}
             </div>
           </div>
 
+          {/* Receipt Number */}
           <div className="space-y-2">
-            <Label>Status Pembayaran</Label>
-            <Select value={selectedStatus} onValueChange={(value) => setValue("status", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {paymentStatuses.map((status) => (
-                  <SelectItem key={status.value} value={status.value}>
-                    {status.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
+            <Label htmlFor="receiptNumber">Nomor Kwitansi</Label>
+            <Input id="receiptNumber" placeholder="Contoh: RCP-2024-001" {...register("receiptNumber")} />
+            {errors.receiptNumber && <p className="text-sm text-red-500">{errors.receiptNumber.message}</p>}
           </div>
 
+          {/* Notes */}
           <div className="space-y-2">
-            <Label htmlFor="notes">Catatan (Opsional)</Label>
-            <Textarea id="notes" placeholder="Tambahkan catatan..." rows={3} {...register("notes")} />
-            {errors.notes && <p className="text-sm text-red-500">{errors.notes.message}</p>}
+            <Label htmlFor="notes">
+              Catatan <span className="text-muted-foreground text-xs">(opsional)</span>
+            </Label>
+            <Textarea id="notes" placeholder="Catatan tambahan..." rows={3} {...register("notes")} />
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
@@ -366,13 +372,12 @@ function PaymentFormDialog({ open, onOpenChange, editData, onSuccess }: { open: 
   );
 }
 
-// Delete Confirmation Dialog
+// ─── Delete Dialog ────────────────────────────────────────────────────────────
 function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; paymentData: PaymentData | null; onSuccess: () => void }) {
   const deletePayment = useDeletePayment();
 
   const handleDelete = async () => {
     if (!paymentData) return;
-
     try {
       await deletePayment.mutateAsync(paymentData.id);
       toast.success("Pembayaran berhasil dihapus!");
@@ -389,7 +394,7 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
         <AlertDialogHeader>
           <AlertDialogTitle>Hapus Pembayaran</AlertDialogTitle>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus pembayaran untuk <strong>{paymentData?.student?.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin menghapus pembayaran dengan nomor kwitansi <span className="font-semibold">"{paymentData?.receiptNumber}"</span> milik {paymentData?.student?.name ?? "siswa ini"}? Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -403,170 +408,174 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
   );
 }
 
-// Main DataTable Component
-function PaymentDashboard() {
+// ─── Main DataTable ───────────────────────────────────────────────────────────
+function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?: string }; userDataId?: string }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [globalFilter, setGlobalFilter] = React.useState<string>("");
+  const [statusFilter, setStatusFilter] = React.useState<string>("all");
+  const [monthFilter, setMonthFilter] = React.useState<string>("all");
 
-  // Dialog states
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedPayment, setSelectedPayment] = React.useState<PaymentData | null>(null);
 
   const { data: payments = [], isLoading, refetch } = useGetPayments();
+  const { data: allStudents = [] } = useGetStudents();
+  const { data: allMajors = [] } = useGetMajors();
+  const { data: allPaymentType = [] } = useGetPaymentTypes();
+  const { data: allAccountBanks = [] } = useGetAccountBank();
 
-  const handleSuccess = () => {
-    refetch();
-  };
+  // console.log(allAccountBanks);
+  console.log("major:", major);
+  console.log("Bendhara id ", userDataId);
+  console.log(allPaymentType);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
+  const handleSuccess = () => refetch();
 
-  const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString("id-ID", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "bg-green-600";
-      case "pending":
-        return "bg-yellow-600";
-      case "overdue":
-        return "bg-red-600";
-      case "cancelled":
-        return "bg-gray-600";
-      default:
-        return "bg-blue-600";
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    const found = paymentStatuses.find((s) => s.value === status);
-    return found ? found.label : status;
-  };
+  const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
+    if (!filterValue) return true;
+    const p = row.original as PaymentData;
+    const text = [p.student?.name, p.major?.name, p.accountBank?.name, p.accountBank?.bankName, p.receiptNumber, p.month, p.status, p.notes, formatRupiah(p.amount)].filter(Boolean).join(" ").toLowerCase();
+    return text.includes(filterValue.toLowerCase());
+  }, []);
 
   const columns: ColumnDef<PaymentData>[] = [
     {
       id: "select",
-      header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
-      cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
+      header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)} aria-label="Select all" />,
+      cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(v) => row.toggleSelected(!!v)} aria-label="Select row" />,
       enableSorting: false,
       enableHiding: false,
     },
     {
+      id: "student",
+      accessorFn: (row) => row.student?.name ?? "-",
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <User className="mr-2 h-4 w-4" />
+          Siswa
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div className="font-medium">{row.original.student?.name ?? "-"}</div>,
+    },
+    {
       accessorKey: "receiptNumber",
-      header: "No. Kwitansi",
-      cell: ({ row }) => <div className="font-medium">{row.getValue("receiptNumber") || "-"}</div>,
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Receipt className="mr-2 h-4 w-4" />
+          No. Kwitansi
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div className="font-mono text-sm font-medium">{row.getValue("receiptNumber")}</div>,
     },
     {
-      accessorKey: "student",
-      header: ({ column }) => {
-        return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Nama Siswa
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => {
-        const student = row.getValue("student") as PaymentData["student"];
-        return <div className="font-medium">{student?.name || "-"}</div>;
-      },
-      filterFn: (row, columnId, filterValue) => {
-        const student = row.getValue(columnId) as PaymentData["student"];
-        if (!student?.name) return false;
-        return student.name.toLowerCase().includes(filterValue.toLowerCase());
-      },
-    },
-    {
-      accessorKey: "paymentType",
-      header: "Jenis Pembayaran",
-      cell: ({ row }) => {
-        const paymentType = row.getValue("paymentType") as PaymentData["paymentType"];
-        return <div>{paymentType?.name || "-"}</div>;
+      accessorKey: "month",
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <CalendarDays className="mr-2 h-4 w-4" />
+          Bulan
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <Badge variant="outline">{row.getValue("month")}</Badge>,
+      filterFn: (row, _id, value) => {
+        if (value === "all") return true;
+        return row.original.month === value;
       },
     },
     {
       accessorKey: "amount",
-      header: ({ column }) => {
-        return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Jumlah
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <CreditCard className="mr-2 h-4 w-4" />
+          Jumlah
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div className="font-semibold tabular-nums">{formatRupiah(row.getValue("amount"))}</div>,
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
+      filterFn: (row, _id, value) => {
+        if (value === "all") return true;
+        return row.original.status === value;
       },
+    },
+    {
+      id: "major",
+      accessorFn: (row) => row.major?.name ?? "-",
+      header: "Branch",
+      cell: ({ row }) => <Badge variant="secondary">{row.original.major?.name ?? "-"}</Badge>,
+    },
+    {
+      id: "accountBank",
+      accessorFn: (row) => row.accountBank?.name ?? "-",
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Building2 className="mr-2 h-4 w-4" />
+          Bank
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => {
-        const amount = row.getValue("amount") as number;
-        return <div className="font-medium">{formatCurrency(amount)}</div>;
+        const bank = row.original.accountBank;
+        return (
+          <div>
+            <div className="text-sm font-medium">{bank?.bankName ?? "-"}</div>
+            {bank?.name && <div className="text-xs text-muted-foreground">{bank.name}</div>}
+          </div>
+        );
       },
     },
     {
       accessorKey: "paymentDate",
-      header: ({ column }) => {
-        return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Tgl Bayar
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <CalendarDays className="mr-2 h-4 w-4" />
+          Tgl Bayar
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => {
-        const date = row.getValue("paymentDate") as string;
-        return <div>{formatDate(date)}</div>;
+        const d = row.getValue("paymentDate") as string;
+        if (!d) return <span className="text-muted-foreground">-</span>;
+        return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
       },
     },
     {
       accessorKey: "dueDate",
       header: "Jatuh Tempo",
       cell: ({ row }) => {
-        const date = row.getValue("dueDate") as string;
-        return <div>{date ? formatDate(date) : "-"}</div>;
-      },
-    },
-    {
-      accessorKey: "status",
-      header: ({ column }) => {
-        return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Status
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        return <Badge className={`text-white ${getStatusBadgeColor(status)}`}>{getStatusLabel(status)}</Badge>;
+        const d = row.getValue("dueDate") as string;
+        if (!d) return <span className="text-muted-foreground">-</span>;
+        return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
       },
     },
     {
       accessorKey: "notes",
       header: "Catatan",
-      cell: ({ row }) => (
-        <div className="max-w-xs truncate" title={row.getValue("notes")}>
-          {row.getValue("notes") || "-"}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const notes = row.getValue("notes") as string;
+        return (
+          <div className="max-w-xs truncate text-muted-foreground" title={notes}>
+            {notes || "-"}
+          </div>
+        );
+      },
     },
     {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
-        const paymentData = row.original;
-
+        const p = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -577,11 +586,12 @@ function PaymentDashboard() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(paymentData.id)}>Copy ID Pembayaran</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.id)}>Copy ID Pembayaran</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.receiptNumber)}>Copy No. Kwitansi</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
-                  setSelectedPayment(paymentData);
+                  setSelectedPayment(p);
                   setEditDialogOpen(true);
                 }}
               >
@@ -590,7 +600,7 @@ function PaymentDashboard() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setSelectedPayment(paymentData);
+                  setSelectedPayment(p);
                   setDeleteDialogOpen(true);
                 }}
                 className="text-red-600"
@@ -606,7 +616,7 @@ function PaymentDashboard() {
   ];
 
   const table = useReactTable({
-    data: payments,
+    data: payments as PaymentData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -616,164 +626,285 @@ function PaymentDashboard() {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
+    globalFilterFn,
+    onGlobalFilterChange: setGlobalFilter,
+    state: { sorting, columnFilters, columnVisibility, rowSelection, globalFilter },
   });
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  React.useEffect(() => {
+    table.getColumn("status")?.setFilterValue(statusFilter !== "all" ? statusFilter : undefined);
+  }, [statusFilter, table]);
+
+  React.useEffect(() => {
+    table.getColumn("month")?.setFilterValue(monthFilter !== "all" ? monthFilter : undefined);
+  }, [monthFilter, table]);
+
+  if (isLoading) return <Loading />;
+
+  const filteredRows = table.getFilteredRowModel().rows;
+  const totalPayments = (payments as any[]).length;
+
+  const totalPaid = filteredRows.filter((r) => r.original.status === "paid").reduce((sum, r) => sum + parseFloat(String(r.original.amount)), 0);
+
+  const columnLabels: Record<string, string> = {
+    student: "Siswa",
+    receiptNumber: "No. Kwitansi",
+    month: "Bulan",
+    amount: "Jumlah",
+    status: "Status",
+    major: "Branch",
+    accountBank: "Bank",
+    paymentDate: "Tgl Bayar",
+    dueDate: "Jatuh Tempo",
+    notes: "Catatan",
+  };
+
+  const hasActiveFilter = globalFilter || statusFilter !== "all" || monthFilter !== "all";
 
   return (
-    <>
-      <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
-        <div className="mb-6">
-          <h1 className="font-bold text-3xl mb-2">Dashboard Pembayaran</h1>
-          <p className="text-muted-foreground">Kelola pembayaran SPP dan pembayaran sekolah lainnya</p>
-        </div>
+    <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
+      <div className="font-bold text-3xl mb-6">Data Pembayaran</div>
 
-        {/* Statistics Cards */}
-        <StatisticsCards payments={payments} />
-
-        <div className="mx-auto">
-          <div className="flex  items-center justify-between py-4">
-            <div className="flex flex-wrap items-center gap-2">
-              {/* <Input
-                placeholder="Cari nama siswa atau no. kwitansi..."
-                value={(table.getColumn("receiptNumber")?.getFilterValue() as string) || ""}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  table.getColumn("receiptNumber")?.setFilterValue(value);
-                }}
-                className="max-w-sm"
-              /> */}
-              <Input placeholder="Cari nama murid..." value={(table.getColumn("student")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("student")?.setFilterValue(event.target.value)} className="max-w-sm" />
-              <Select
-                value={(table.getColumn("status")?.getFilterValue() as string) ?? "all"}
-                onValueChange={(value) => {
-                  table.getColumn("status")?.setFilterValue(value === "all" ? "" : value);
-                }}
-              >
-                <SelectTrigger className="w-45">
-                  <SelectValue placeholder="Semua Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Status</SelectItem>
-                  {paymentStatuses.map((status) => (
-                    <SelectItem key={status.value} value={status.value}>
-                      {status.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
-                    Kolom <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {table
-                    .getAllColumns()
-                    .filter((column) => column.getCanHide())
-                    .map((column) => {
-                      return (
-                        <DropdownMenuCheckboxItem key={column.id} className="capitalize" checked={column.getIsVisible()} onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                          {column.id}
-                        </DropdownMenuCheckboxItem>
-                      );
-                    })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button onClick={() => setCreateDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Tambah Pembayaran
-              </Button>
-            </div>
+      {/* Toolbar */}
+      <div className="flex items-center justify-between py-4 flex-wrap gap-y-3">
+        <div className="flex items-center space-x-2 flex-wrap gap-y-2">
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Cari siswa, kwitansi, bulan..." value={globalFilter ?? ""} onChange={(e) => setGlobalFilter(e.target.value)} className="max-w-sm pl-8" />
           </div>
 
-          <div className="rounded-md border w-max-7xl">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return <TableHead key={header.id}>{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}</TableHead>;
-                    })}
-                  </TableRow>
+          {/* Status Filter */}
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Filter Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Status</SelectItem>
+              <SelectItem value="paid">Lunas</SelectItem>
+              <SelectItem value="pending">Menunggu</SelectItem>
+              <SelectItem value="overdue">Terlambat</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Month Filter */}
+          <Select value={monthFilter} onValueChange={setMonthFilter}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Filter Bulan" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Bulan</SelectItem>
+              {MONTHS.map((m) => (
+                <SelectItem key={m} value={m}>
+                  {m}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {hasActiveFilter && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setGlobalFilter("");
+                setStatusFilter("all");
+                setMonthFilter("all");
+                table.resetColumnFilters();
+              }}
+            >
+              <X className="mr-2 h-4 w-4" />
+              Reset Filter
+            </Button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Kolom <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((c) => c.getCanHide())
+                .map((column) => (
+                  <DropdownMenuCheckboxItem key={column.id} className="capitalize" checked={column.getIsVisible()} onCheckedChange={(v) => column.toggleVisibility(!!v)}>
+                    {columnLabels[column.id] ?? column.id}
+                  </DropdownMenuCheckboxItem>
                 ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ?
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                : <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                      Tidak ada data pembayaran.
-                    </TableCell>
-                  </TableRow>
-                }
-              </TableBody>
-            </Table>
-          </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button onClick={() => setCreateDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah Pembayaran
+          </Button>
+        </div>
+      </div>
 
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} dari {table.getFilteredRowModel().rows.length} baris dipilih.
-            </div>
-            <div className="space-x-2">
-              <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                Sebelumnya
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                Selanjutnya
-              </Button>
-            </div>
+      {/* Active filter badges */}
+      {hasActiveFilter && (
+        <div className="flex items-center space-x-2 py-2 flex-wrap gap-y-1">
+          <span className="text-sm text-muted-foreground">Filter aktif:</span>
+          {globalFilter && (
+            <Badge variant="secondary" className="gap-1">
+              Pencarian: {globalFilter}
+              <X className="h-3 w-3 cursor-pointer" onClick={() => setGlobalFilter("")} />
+            </Badge>
+          )}
+          {statusFilter !== "all" && (
+            <Badge variant="secondary" className="gap-1">
+              Status: {statusConfig[statusFilter]?.label ?? statusFilter}
+              <X className="h-3 w-3 cursor-pointer" onClick={() => setStatusFilter("all")} />
+            </Badge>
+          )}
+          {monthFilter !== "all" && (
+            <Badge variant="secondary" className="gap-1">
+              Bulan: {monthFilter}
+              <X className="h-3 w-3 cursor-pointer" onClick={() => setMonthFilter("all")} />
+            </Badge>
+          )}
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="rounded-md border w-full overflow-hidden">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((hg) => (
+              <TableRow key={hg.id}>
+                {hg.headers.map((header) => (
+                  <TableHead key={header.id}>{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}</TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ?
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  ))}
+                </TableRow>
+              ))
+            : <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <FileText className="h-8 w-8 text-muted-foreground" />
+                    <p className="text-muted-foreground">{hasActiveFilter ? "Tidak ada data yang sesuai dengan filter." : "Tidak ada data pembayaran yang ditemukan."}</p>
+                    {hasActiveFilter && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setGlobalFilter("");
+                          setStatusFilter("all");
+                          setMonthFilter("all");
+                          table.resetColumnFilters();
+                        }}
+                      >
+                        Reset Filter
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            }
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} dari {filteredRows.length} baris dipilih.
+          {filteredRows.length !== totalPayments && <span className="ml-2">(difilter dari {totalPayments} total)</span>}
+        </div>
+        <div className="flex items-center space-x-2">
+          <p className="text-sm font-medium">
+            Halaman {table.getState().pagination.pageIndex + 1} dari {table.getPageCount()}
+          </p>
+          <div className="space-x-2">
+            <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+              Sebelumnya
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+              Selanjutnya
+            </Button>
           </div>
         </div>
-
-        {/* Dialogs */}
-        <PaymentFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} />
-
-        <PaymentFormDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedPayment} onSuccess={handleSuccess} />
-
-        <DeletePaymentDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} paymentData={selectedPayment} onSuccess={handleSuccess} />
       </div>
-    </>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+        <div className="bg-card rounded-lg border p-4">
+          <div className="flex items-center space-x-2">
+            <CreditCard className="h-5 w-5 text-blue-500" />
+            <h3 className="font-semibold">Total Transaksi</h3>
+          </div>
+          <p className="text-2xl font-bold mt-2">{totalPayments}</p>
+          {filteredRows.length !== totalPayments && <p className="text-sm text-muted-foreground">({filteredRows.length} terfilter)</p>}
+        </div>
+
+        <div className="bg-card rounded-lg border p-4">
+          <div className="flex items-center space-x-2">
+            <BadgeCheck className="h-5 w-5 text-green-600" />
+            <h3 className="font-semibold">Lunas</h3>
+          </div>
+          <p className="text-2xl font-bold mt-2">{filteredRows.filter((r) => r.original.status === "paid").length}</p>
+        </div>
+
+        <div className="bg-card rounded-lg border p-4">
+          <div className="flex items-center space-x-2">
+            <Clock className="h-5 w-5 text-yellow-500" />
+            <h3 className="font-semibold">Menunggu</h3>
+          </div>
+          <p className="text-2xl font-bold mt-2">{filteredRows.filter((r) => r.original.status === "pending").length}</p>
+        </div>
+
+        <div className="bg-card rounded-lg border p-4">
+          <div className="flex items-center space-x-2">
+            <CreditCard className="h-5 w-5 text-purple-500" />
+            <h3 className="font-semibold">Total Terbayar</h3>
+          </div>
+          <p className="text-xl font-bold mt-2 tabular-nums">{formatRupiah(totalPaid)}</p>
+          <p className="text-xs text-muted-foreground">dari transaksi lunas</p>
+        </div>
+      </div>
+
+      {/* Dialogs */}
+      <PaymentFormDialog userDataId={userDataId} open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allMajors={allMajors} allAccountBanks={allAccountBanks} />
+      <PaymentFormDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        editData={selectedPayment}
+        userDataId={userDataId}
+        onSuccess={handleSuccess}
+        allStudents={allStudents}
+        allMajors={allMajors}
+        allAccountBanks={allAccountBanks}
+      />
+      <DeletePaymentDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} paymentData={selectedPayment} onSuccess={handleSuccess} />
+    </div>
   );
 }
 
-export default function PaymentDashboardPage() {
+// ─── Auth Wrapper ─────────────────────────────────────────────────────────────
+export default function PaymentPage() {
   const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
-
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
+  console.log(userData);
   const userRole = userData?.role?.name;
+  const userDataId = userData?.id;
 
-  // Show loading while checking authorization
-  if (isPending || isLoadingUserData) {
-    return <Loading />;
-  }
-
-  // Check if user is Admin
-  if (userRole !== "Admin") {
-    unauthorized()
+  if (isPending || isLoadingUserData) return <Loading />;
+  if (!userData || userRole !== "Admin") {
+    unauthorized();
     return null;
   }
 
-  // Render dashboard only after authorization is confirmed
-  return <PaymentDashboard />;
+  return <PaymentDataTable userDataId={userDataId} />;
 }

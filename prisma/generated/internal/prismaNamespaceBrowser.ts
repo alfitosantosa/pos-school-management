@@ -357,6 +357,7 @@ export type PaymentItemsScalarFieldEnum = (typeof PaymentItemsScalarFieldEnum)[k
 export const PaymentScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
+  bendaharaId: 'bendaharaId',
   amount: 'amount',
   dueDate: 'dueDate',
   status: 'status',

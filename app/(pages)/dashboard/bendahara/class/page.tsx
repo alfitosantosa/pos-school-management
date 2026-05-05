@@ -107,23 +107,6 @@ function ClassFormDialog({ id, open, onOpenChange, editData, onSuccess }: { id: 
             {errors.grade && <p className="text-sm text-red-500">{errors.grade.message}</p>}
           </div>
 
-          {/* <div className="space-y-2">
-            <Label>Branch</Label>
-            <Select value={selectedMajorId} onValueChange={(value) => setValue("majorId", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih Jurusan" />
-              </SelectTrigger>
-              <SelectContent>
-                {majors?.map((major: MajorDataTypes) => (
-                  <SelectItem key={major.id} value={major.id}>
-                    {major.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.majorId && <p className="text-sm text-red-500">{errors.majorId.message}</p>}
-          </div> */}
-
           <div className="space-y-2">
             <Label>Tahun Ajaran</Label>
             <Select value={selectedAcademicYearId} onValueChange={(value) => setValue("academicYearId", value)}>

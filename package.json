@@ -11,10 +11,7 @@
     "build": "next build",
     "start": "NODE_ENV=production next start",
     "lint": "next lint",
-    "prepare": "husky",
-    "lint-staged": {
-      "*": "prettier --write --ignore-unknown"
-    }
+    "prepare": "husky"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

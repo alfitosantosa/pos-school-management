@@ -106,6 +106,7 @@ model UserData {
   createdAt               DateTime?              @default(now())
   updatedAt               DateTime?              @updatedAt
   tahfidzGroupId          String?
+  PaymentCreated          Payment[]              @relation("CreatedPayment")
   Announcements           Announcement[]
   studentSubmissions      AssignmentSubmission[] @relation("StudentSubmission")
   teacherAssignments      Assignment[]           @relation("TeacherAssignment")
@@ -329,6 +330,7 @@ model PaymentItems {
 model Payment {
   id                 String              @id @default(cuid())
   studentId          String
+  bendaharaId        String
   amount             Decimal
   dueDate            DateTime?
   status             String              @default("pending")
@@ -341,6 +343,7 @@ model Payment {
   month              String
   paymentItems       PaymentItems[]
   paymentTransaction PaymentTransaction?
+  createdBy          UserData            @relation("CreatedPayment", fields:[bendaharaId], references:[id])
   accountBank        AccountBank         @relation(fields: [accountBankId], references: [id])
   major              Major               @relation(fields: [majorId], references: [id])
   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
