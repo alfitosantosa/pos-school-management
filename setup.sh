@@ -1,7 +1,7 @@
 # 
 
 # Hapus image lama
-docker rmi smkfajarsentosa-web:latest
+docker rmi rahmaniyah-web:latest
 
 # Build ulang dengan optimasi
 docker compose build --no-cache
