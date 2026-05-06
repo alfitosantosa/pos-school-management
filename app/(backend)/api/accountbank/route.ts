@@ -23,8 +23,6 @@ export async function GET() {
     return NextResponse.json(getAllAccountBank);
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -43,8 +41,6 @@ export async function POST(Request: NextRequest) {
     return NextResponse.json(createAccountBank);
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -64,8 +60,6 @@ export async function PUT(Request: NextRequest) {
     return NextResponse.json(createAccountBank);
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

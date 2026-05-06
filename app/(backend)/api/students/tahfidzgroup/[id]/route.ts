@@ -17,7 +17,5 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   } catch (error) {
     console.error("Error fetching student:", error);
     return NextResponse.json({ error: "Failed to fetch student" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

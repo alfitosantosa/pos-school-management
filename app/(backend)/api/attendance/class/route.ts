@@ -102,7 +102,5 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching attendance by class:", error);
     return NextResponse.json({ error: "Failed to fetch attendance data" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

@@ -1,0 +1,29 @@
+import { prisma } from "@/lib/prisma";
+import { NextResponse, NextRequest } from "next/server";
+
+export async function GET(_: NextRequest, { params }: { params: Promise<{ majorId: string }> }) {
+  const { majorId } = await params;
+
+  if (!majorId) {
+    return NextResponse.json({ error: "Student ID required" }, { status: 400 });
+  }
+
+  try {
+    const payments = await prisma.payment.findMany({
+      include: {
+        student: true,
+        major: true,
+        accountBank: true,
+        createdBy: true,
+        paymentItems: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return NextResponse.json(payments);
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    return NextResponse.json({ error: "Failed to fetch payments" }, { status: 500 });
+  }
+}

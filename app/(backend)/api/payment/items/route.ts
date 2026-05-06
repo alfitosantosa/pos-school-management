@@ -23,8 +23,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    console.log("Received payment items data:", body);
-
     // Check if body is array (direct payment items) or object with paymentItems property
     let paymentItems: any[];
     let paymentId: string | undefined;

@@ -24,6 +24,7 @@ export const useCreatePayment = () => {
       return res.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payment-by-id-major"] });
       queryClient.invalidateQueries({ queryKey: ["payments"] });
     },
   });
@@ -83,6 +84,20 @@ export const useGetPaymentById = (id: string) => {
     queryFn: async () => {
       try {
         const res = await apiGet(`/api/payment/${id}`);
+        return res.data;
+      } catch (error: any) {
+        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
+      }
+    },
+  });
+};
+
+export const useGetPaymentByIdMajor = (majorId: string) => {
+  return useQuery({
+    queryKey: ["payment-by-id-major"],
+    queryFn: async () => {
+      try {
+        const res = await apiGet(`/api/payment/major/${majorId}`);
         return res.data;
       } catch (error: any) {
         throw new Error(error?.response?.data?.message || "Failed to fetch payment");

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, Receipt, Building2, BadgeCheck, Clock, XCircle, Minus, Package } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, Receipt, Building2, BadgeCheck, Clock, XCircle, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -22,17 +22,16 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
-import { useGetPayments, useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/hooks/Payments/usePayment";
-import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems } from "@/app/hooks/Payments/usePaymentItems";
-import { useGetStudents } from "@/app/hooks/Users/useStudents";
-import { useGetMajors } from "@/app/hooks/Majors/useMajors";
-import { useGetAccountBank } from "@/app/hooks/AccountBank/useAccountBank";
-import { useGetPaymentTypes } from "@/app/hooks/Payments/usePaymentType";
+import { useCreatePayment, useUpdatePayment, useDeletePayment, useGetPaymentByIdMajor } from "@/app/hooks/Payments/usePayment";
+import { useCreatePaymentItems, useDeletePaymentItems } from "@/app/hooks/Payments/usePaymentItems";
+import { useGetAccountBank, useGetAccountBankByIdMajor } from "@/app/hooks/AccountBank/useAccountBank";
+import { useGetPaymentTypeByIdMajor, useGetPaymentTypes } from "@/app/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
 import { v4 as uuidv4 } from "uuid";
+import { useGetStudentByIdMajor } from "@/app/hooks/Users/useGetStudentById";
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
   id: string;
@@ -175,17 +174,17 @@ function PaymentFormDialog({
   editData,
   onSuccess,
   allStudents,
-  allMajors,
   allAccountBanks,
   allPaymentTypes,
   userDataId,
+  userDataMajor,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editData?: PaymentData | null;
   onSuccess: () => void;
   allStudents: { id: string; name: string }[];
-  allMajors: { id: string; name: string }[];
+
   allAccountBanks: {
     id: string;
     accountName: string;
@@ -195,6 +194,9 @@ function PaymentFormDialog({
   }[];
   allPaymentTypes: PaymentTypeData[];
   userDataId?: string;
+  userDataMajor?: {
+    id?: string;
+  };
 }) {
   const createPayment = useCreatePayment();
   const updatePayment = useUpdatePayment();
@@ -221,11 +223,6 @@ function PaymentFormDialog({
 
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
   const watchedItems = watch("items");
-  const selectedStudentId = watch("studentId");
-  const selectedMajorId = watch("majorId");
-  const selectedAccountBankId = watch("accountBankId");
-  const selectedMonth = watch("month");
-  const selectedStatus = watch("status");
 
   // Compute grand total from items - recalculate on every render
   const grandTotal = watchedItems?.reduce((sum, item) => sum + (item.subtotal || 0), 0) ?? 0;
@@ -268,6 +265,7 @@ function PaymentFormDialog({
       setValue("receiptNumber", editData.receiptNumber || "");
       setValue("notes", editData.notes || "");
       if (userDataId) setValue("bendaharaId", userDataId);
+      if (userDataMajor) setValue("majorId", userDataMajor?.id as string);
 
       // Populate items from existing payment items
       if (editData.paymentItems?.length) {
@@ -290,6 +288,7 @@ function PaymentFormDialog({
         status: "pending",
         paymentDate: new Date().toISOString().split("T")[0],
         bendaharaId: userDataId || "",
+        majorId: userDataMajor?.id as string,
         items: [{ paymentTypeId: "", name: "", amount: 0, quantity: 1, subtotal: 0 }],
       });
     }
@@ -400,29 +399,6 @@ function PaymentFormDialog({
                 )}
               />
               {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Branch</Label>
-              <Controller
-                name="majorId"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih Branch" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {allMajors?.map((m) => (
-                        <SelectItem key={m.id} value={m.id}>
-                          {m.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.majorId && <p className="text-sm text-red-500">{errors.majorId.message}</p>}
             </div>
           </div>
 
@@ -707,11 +683,12 @@ function PaymentDataTable({
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedPayment, setSelectedPayment] = React.useState<PaymentData | null>(null);
 
-  const { data: payments = [], isLoading, refetch } = useGetPayments();
-  const { data: allStudents = [] } = useGetStudents();
-  const { data: allMajors = [] } = useGetMajors();
-  const { data: allAccountBanks = [] } = useGetAccountBank();
-  const { data: allPaymentTypes = [] } = useGetPaymentTypes();
+  const majorId = userDataMajor.id;
+
+  const { data: payments = [], isLoading, refetch } = useGetPaymentByIdMajor(majorId as string);
+  const { data: allStudents = [] } = useGetStudentByIdMajor(majorId as string);
+  const { data: allAccountBanks = [] } = useGetAccountBankByIdMajor(majorId as string);
+  const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorId as string);
 
   const handleSuccess = () => refetch();
 
@@ -1175,10 +1152,10 @@ function PaymentDataTable({
         onOpenChange={setCreateDialogOpen}
         onSuccess={handleSuccess}
         allStudents={allStudents}
-        allMajors={allMajors}
         allAccountBanks={allAccountBanks}
         allPaymentTypes={allPaymentTypes}
         userDataId={userDataId}
+        userDataMajor={userDataMajor}
       />
       <PaymentFormDialog
         open={editDialogOpen}
@@ -1186,10 +1163,10 @@ function PaymentDataTable({
         editData={selectedPayment}
         onSuccess={handleSuccess}
         allStudents={allStudents}
-        allMajors={allMajors}
         allAccountBanks={allAccountBanks}
         allPaymentTypes={allPaymentTypes}
         userDataId={userDataId}
+        userDataMajor={userDataMajor}
       />
       <DeletePaymentDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} paymentData={selectedPayment} onSuccess={handleSuccess} />
     </div>

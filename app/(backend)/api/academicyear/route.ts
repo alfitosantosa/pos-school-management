@@ -30,8 +30,6 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching academic years:", error);
     return NextResponse.json({ error: "Failed to fetch academic years" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect;
   }
 }
 
@@ -55,8 +53,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating academic year:", error);
     return NextResponse.json({ error: "Failed to create academic year" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect;
   }
 }
 
@@ -81,8 +77,6 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error("Error updating academic year:", error);
     return NextResponse.json({ error: "Failed to update academic year" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect;
   }
 }
 
@@ -101,7 +95,5 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error("Error deleting academic year:", error);
     return NextResponse.json({ error: "Failed to delete academic year" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect;
   }
 }
