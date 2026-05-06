@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, Receipt, Building2, BadgeCheck, Clock, XCircle } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, Receipt, Building2, BadgeCheck, Clock, XCircle, Minus, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -14,7 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
+import { Separator } from "@/components/ui/separator";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
@@ -22,19 +23,54 @@ import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
 import { useGetPayments, useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/hooks/Payments/usePayment";
+import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems } from "@/app/hooks/Payments/usePaymentItems";
 import { useGetStudents } from "@/app/hooks/Users/useStudents";
 import { useGetMajors } from "@/app/hooks/Majors/useMajors";
 import { useGetAccountBank } from "@/app/hooks/AccountBank/useAccountBank";
+import { useGetPaymentTypes } from "@/app/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useGetPaymentTypes } from "@/app/hooks/Payments/usePaymentType";
-
+import { v4 as uuidv4 } from "uuid";
 // ─── Types ────────────────────────────────────────────────────────────────────
+export type PaymentTypeData = {
+  id: string;
+  name: string;
+  description: string;
+  amount: string;
+  isMonthly: boolean;
+  isActive: boolean;
+  isFixedAmount: boolean;
+  isFixedQuantity: boolean;
+  quantity: string;
+  subtotal: string;
+  owner: string;
+  majorId: string;
+  major: {
+    id: string;
+    code: string;
+    name: string;
+    description: string;
+    isActive: boolean;
+  };
+};
+
+export type PaymentItemData = {
+  id: string;
+  paymentId: string;
+  paymentTypeId: string;
+  skuName: string;
+  amount: number | string;
+  quantity: number;
+  subtotal: number | string;
+  paymentType?: PaymentTypeData;
+};
+
 export type PaymentData = {
   id: string;
   studentId: string;
+  bendaharaId: string;
   amount: number | string;
   dueDate?: string;
   status: string;
@@ -47,34 +83,19 @@ export type PaymentData = {
   month: string;
   student?: { id: string; name: string };
   major?: { id: string; name: string };
-  accountBank?: { id: string; name: string; bankName?: string };
+  accountBank?: { id: string; accountName: string; accountBank?: string; accountNumber: string };
+  paymentItems?: PaymentItemData[];
 };
 
 // ─── Status Config ────────────────────────────────────────────────────────────
 const statusConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
-  paid: {
-    label: "Lunas",
-    className: "bg-green-600 text-white",
-    icon: <BadgeCheck className="h-3 w-3" />,
-  },
-  pending: {
-    label: "Menunggu",
-    className: "bg-yellow-500 text-white",
-    icon: <Clock className="h-3 w-3" />,
-  },
-  overdue: {
-    label: "Terlambat",
-    className: "bg-red-600 text-white",
-    icon: <XCircle className="h-3 w-3" />,
-  },
+  paid: { label: "Lunas", className: "bg-green-600 text-white", icon: <BadgeCheck className="h-3 w-3" /> },
+  pending: { label: "Menunggu", className: "bg-yellow-500 text-white", icon: <Clock className="h-3 w-3" /> },
+  overdue: { label: "Terlambat", className: "bg-red-600 text-white", icon: <XCircle className="h-3 w-3" /> },
 };
 
 function StatusBadge({ status }: { status: string }) {
-  const cfg = statusConfig[status] ?? {
-    label: status,
-    className: "bg-gray-500 text-white",
-    icon: null,
-  };
+  const cfg = statusConfig[status] ?? { label: status, className: "bg-gray-500 text-white", icon: null };
   return (
     <Badge className={`${cfg.className} flex items-center gap-1 w-fit`}>
       {cfg.icon}
@@ -85,26 +106,67 @@ function StatusBadge({ status }: { status: string }) {
 
 function formatRupiah(value: number | string) {
   const num = typeof value === "string" ? parseFloat(value) : value;
+  if (isNaN(num)) return "Rp 0";
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(num);
 }
 
-// ─── Month Options ────────────────────────────────────────────────────────────
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 // ─── Form Schema ──────────────────────────────────────────────────────────────
+const paymentItemSchema = z.object({
+  paymentTypeId: z.string().min(1, "Jenis pembayaran wajib dipilih"),
+  name: z.string().optional(),
+  amount: z.number().min(0, "Nominal tidak boleh negatif"),
+  quantity: z.number().min(1, "Jumlah minimal 1"),
+  subtotal: z.number(),
+});
+
 const paymentSchema = z.object({
   studentId: z.string().min(1, "Siswa wajib dipilih"),
+  bendaharaId: z.string().min(1, "Bendahara ID wajib diisi"),
   majorId: z.string().min(1, "Branch wajib dipilih"),
   accountBankId: z.string().min(1, "Rekening bank wajib dipilih"),
   month: z.string().min(1, "Bulan wajib dipilih"),
-  amount: z.string().min(1, "Jumlah wajib diisi"),
   status: z.string().min(1, "Status wajib dipilih"),
   paymentDate: z.string().min(1, "Tanggal bayar wajib diisi"),
   dueDate: z.string().optional(),
   receiptNumber: z.string().min(1, "Nomor kwitansi wajib diisi"),
   notes: z.string().optional(),
+  items: z.array(paymentItemSchema).min(1, "Minimal satu item pembayaran"),
 });
+
 type PaymentFormValues = z.infer<typeof paymentSchema>;
+
+// ─── Expanded Items Row ───────────────────────────────────────────────────────
+function ExpandedItemsRow({ items }: { items: PaymentItemData[] }) {
+  if (!items?.length) {
+    return <div className="px-8 py-3 text-sm text-muted-foreground">Tidak ada item pembayaran.</div>;
+  }
+  return (
+    <div className="px-8 py-3 bg-muted/20">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-xs text-muted-foreground border-b">
+            <th className="text-left pb-2 font-medium">Jenis Pembayaran</th>
+            <th className="text-right pb-2 font-medium">Nominal</th>
+            <th className="text-center pb-2 font-medium">Qty</th>
+            <th className="text-right pb-2 font-medium">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, i) => (
+            <tr key={item.id ?? i} className="border-b last:border-0">
+              <td className="py-2 font-medium">{item.paymentType?.name ?? item.skuName ?? "-"}</td>
+              <td className="py-2 text-right">{formatRupiah(item.amount)}</td>
+              <td className="py-2 text-center">{item.quantity}</td>
+              <td className="py-2 text-right font-medium">{formatRupiah(item.subtotal)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 // ─── Form Dialog ──────────────────────────────────────────────────────────────
 function PaymentFormDialog({
@@ -115,6 +177,8 @@ function PaymentFormDialog({
   allStudents,
   allMajors,
   allAccountBanks,
+  allPaymentTypes,
+  userDataId,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -127,19 +191,22 @@ function PaymentFormDialog({
     accountName: string;
     accountBank?: string;
     accountNumber: string;
-    major: {
-      name: string;
-    };
+    major: { name: string };
   }[];
+  allPaymentTypes: PaymentTypeData[];
+  userDataId?: string;
 }) {
   const createPayment = useCreatePayment();
   const updatePayment = useUpdatePayment();
+  const createItems = useCreatePaymentItems();
+  const deleteItems = useDeletePaymentItems();
 
   const {
     register,
     handleSubmit,
-    setValue,
+    control,
     watch,
+    setValue,
     formState: { errors },
     reset,
   } = useForm<PaymentFormValues>({
@@ -147,14 +214,47 @@ function PaymentFormDialog({
     defaultValues: {
       status: "pending",
       paymentDate: new Date().toISOString().split("T")[0],
+      bendaharaId: userDataId || "",
+      items: [{ paymentTypeId: "", name: "", amount: 0, quantity: 1, subtotal: 0 }],
     },
   });
 
+  const { fields, append, remove } = useFieldArray({ control, name: "items" });
+  const watchedItems = watch("items");
   const selectedStudentId = watch("studentId");
   const selectedMajorId = watch("majorId");
   const selectedAccountBankId = watch("accountBankId");
   const selectedMonth = watch("month");
   const selectedStatus = watch("status");
+
+  // Compute grand total from items - recalculate on every render
+  const grandTotal = watchedItems?.reduce((sum, item) => sum + (item.subtotal || 0), 0) ?? 0;
+
+  // Auto-populate amount when payment type selected
+  const handlePaymentTypeChange = (index: number, paymentTypeId: string) => {
+    const pt = allPaymentTypes.find((p) => p.id === paymentTypeId);
+    if (pt) {
+      const amount = parseFloat(pt.amount) || 0;
+      const qty = pt.isFixedQuantity ? parseFloat(pt.quantity) || 1 : (watchedItems?.[index]?.quantity ?? 1);
+      setValue(`items.${index}.paymentTypeId`, paymentTypeId);
+      setValue(`items.${index}.name`, pt.name);
+      setValue(`items.${index}.amount`, amount);
+      setValue(`items.${index}.quantity`, qty);
+      setValue(`items.${index}.subtotal`, amount * qty);
+    }
+  };
+
+  const handleQtyChange = (index: number, qty: number) => {
+    const amount = watchedItems?.[index]?.amount ?? 0;
+    setValue(`items.${index}.quantity`, qty);
+    setValue(`items.${index}.subtotal`, amount * qty);
+  };
+
+  const handleAmountChange = (index: number, amount: number) => {
+    const qty = watchedItems?.[index]?.quantity ?? 1;
+    setValue(`items.${index}.amount`, amount);
+    setValue(`items.${index}.subtotal`, amount * qty);
+  };
 
   React.useEffect(() => {
     if (editData) {
@@ -162,33 +262,101 @@ function PaymentFormDialog({
       setValue("majorId", editData.majorId || "");
       setValue("accountBankId", editData.accountBankId || "");
       setValue("month", editData.month || "");
-      setValue("amount", String(editData.amount));
       setValue("status", editData.status || "pending");
       setValue("paymentDate", editData.paymentDate ? new Date(editData.paymentDate).toISOString().split("T")[0] : "");
       setValue("dueDate", editData.dueDate ? new Date(editData.dueDate).toISOString().split("T")[0] : "");
       setValue("receiptNumber", editData.receiptNumber || "");
       setValue("notes", editData.notes || "");
+      if (userDataId) setValue("bendaharaId", userDataId);
+
+      // Populate items from existing payment items
+      if (editData.paymentItems?.length) {
+        setValue(
+          "items",
+          editData.paymentItems.map((item) => ({
+            paymentTypeId: item.paymentTypeId || "",
+            studentId: editData.student?.id,
+            name: item.paymentType?.name ?? item.skuName ?? "",
+            amount: parseFloat(String(item.amount)) || 0,
+            quantity: item.quantity || 1,
+            subtotal: parseFloat(String(item.subtotal)) || 0,
+          })),
+        );
+      } else {
+        setValue("items", [{ paymentTypeId: "", name: "", amount: 0, quantity: 1, subtotal: 0 }]);
+      }
     } else {
-      reset({ status: "pending", paymentDate: new Date().toISOString().split("T")[0] });
+      reset({
+        status: "pending",
+        paymentDate: new Date().toISOString().split("T")[0],
+        bendaharaId: userDataId || "",
+        items: [{ paymentTypeId: "", name: "", amount: 0, quantity: 1, subtotal: 0 }],
+      });
     }
-  }, [editData, setValue, reset]);
+  }, [editData, setValue, reset, userDataId]);
 
   const onSubmit = async (data: PaymentFormValues) => {
     try {
-      const submitData = {
-        ...data,
-        amount: parseFloat(data.amount),
+      const paymentPayload = {
+        studentId: data.studentId,
+        bendaharaId: data.bendaharaId,
+        majorId: data.majorId,
+        accountBankId: data.accountBankId,
+        month: data.month,
+        amount: grandTotal,
+        status: data.status,
         paymentDate: new Date(data.paymentDate).toISOString(),
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
+        receiptNumber: data.receiptNumber,
         notes: data.notes || null,
       };
+
       if (editData) {
-        await updatePayment.mutateAsync({ id: editData.id, ...submitData });
+        await updatePayment.mutateAsync({ id: editData.id, ...paymentPayload });
+
+        // Delete old items then recreate
+        if (editData.paymentItems?.length) {
+          await deleteItems.mutateAsync(editData.paymentItems.map((items) => items.id));
+          console.log(editData.paymentItems);
+        }
+
+        const selectedStudent = allStudents.find((s) => s.id === data.studentId);
+        await createItems.mutateAsync(
+          data.items.map((item) => ({
+            paymentId: editData.id,
+            studentId: data.studentId,
+            studentName: selectedStudent?.name || "",
+            paymentTypeId: item.paymentTypeId,
+            name: item.name,
+            amount: item.amount,
+            quantity: item.quantity,
+            subtotal: item.subtotal,
+          })),
+        );
         toast.success("Pembayaran berhasil diperbarui!");
+        console.log("items yang dikirim", data.items);
       } else {
-        await createPayment.mutateAsync(submitData);
+        const created = await createPayment.mutateAsync(paymentPayload);
+        const newPaymentId = created?.id;
+        if (newPaymentId) {
+          const selectedStudent = allStudents.find((s) => s.id === data.studentId);
+          await createItems.mutateAsync(
+            data.items.map((item) => ({
+              paymentId: newPaymentId,
+              studentId: data.studentId,
+              studentName: selectedStudent?.name || "",
+              paymentTypeId: item.paymentTypeId,
+              name: item.name ?? "",
+              amount: item.amount,
+              quantity: item.quantity,
+              subtotal: item.subtotal,
+            })),
+          );
+        }
+        console.log("items yang dikirim", data.items);
         toast.success("Pembayaran berhasil dibuat!");
       }
+
       reset();
       onOpenChange(false);
       onSuccess();
@@ -197,114 +365,139 @@ function PaymentFormDialog({
     }
   };
 
+  const isPending = createPayment.isPending || updatePayment.isPending || createItems.isPending || deleteItems.isPending;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editData ? "Edit Pembayaran" : "Tambah Pembayaran Baru"}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Student & Major */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <input type="hidden" {...register("bendaharaId")} />
+
+          {/* Student & Branch */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Siswa</Label>
-              <Select value={selectedStudentId || ""} onValueChange={(v) => setValue("studentId", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih Siswa" />
-                </SelectTrigger>
-                <SelectContent className="max-h-60">
-                  {allStudents?.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="studentId"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih Siswa" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {allStudents?.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}
             </div>
 
             <div className="space-y-2">
               <Label>Branch</Label>
-              <Select value={selectedMajorId || ""} onValueChange={(v) => setValue("majorId", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih Branch" />
-                </SelectTrigger>
-                <SelectContent>
-                  {allMajors?.map((m) => (
-                    <SelectItem key={m.id} value={m.id}>
-                      {m.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="majorId"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih Branch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allMajors?.map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          {m.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.majorId && <p className="text-sm text-red-500">{errors.majorId.message}</p>}
             </div>
           </div>
 
           {/* Account Bank & Month */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label>Rekening Bank</Label>
-              <Select value={selectedAccountBankId || ""} onValueChange={(v) => setValue("accountBankId", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih Rekening Bank" />
-                </SelectTrigger>
-                <SelectContent>
-                  {allAccountBanks?.map((b) => (
-                    <SelectItem key={b.id} value={b.id}>
-                      {`${b.accountBank} - ${b.accountName} - ${b.accountNumber} `}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="accountBankId"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih Rekening Bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allAccountBanks?.map((b) => (
+                        <SelectItem key={b.id} value={b.id}>
+                          {`${b.accountBank} - ${b.accountName} - ${b.accountNumber}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.accountBankId && <p className="text-sm text-red-500">{errors.accountBankId.message}</p>}
             </div>
-
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Bulan</Label>
-              <Select value={selectedMonth || ""} onValueChange={(v) => setValue("month", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih Bulan" />
-                </SelectTrigger>
-                <SelectContent>
-                  {MONTHS.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="month"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih Bulan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MONTHS.map((m) => (
+                        <SelectItem key={m} value={m}>
+                          {m}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.month && <p className="text-sm text-red-500">{errors.month.message}</p>}
             </div>
-          </div>
-
-          {/* Amount & Status */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="amount">Jumlah (Rp)</Label>
-              <Input id="amount" type="number" min="0" placeholder="Contoh: 500000" {...register("amount")} />
-              {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Menunggu</SelectItem>
+                        <SelectItem value="paid">Lunas</SelectItem>
+                        <SelectItem value="overdue">Terlambat</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
+              </div>
             </div>
+            {/* Status, Payment Date, Due Date */}
 
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select value={selectedStatus || "pending"} onValueChange={(v) => setValue("status", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Menunggu</SelectItem>
-                  <SelectItem value="paid">Lunas</SelectItem>
-                  <SelectItem value="overdue">Terlambat</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
-            </div>
-          </div>
-
-          {/* Payment Date & Due Date */}
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="paymentDate">Tanggal Bayar</Label>
               <Input id="paymentDate" type="date" {...register("paymentDate")} />
@@ -313,7 +506,7 @@ function PaymentFormDialog({
 
             <div className="space-y-2">
               <Label htmlFor="dueDate">
-                Jatuh Tempo <span className="text-muted-foreground text-xs">(opsional)</span>
+                Jatuh Tempo <span className="text-xs text-muted-foreground">(opsional)</span>
               </Label>
               <Input id="dueDate" type="date" {...register("dueDate")} />
             </div>
@@ -322,24 +515,124 @@ function PaymentFormDialog({
           {/* Receipt Number */}
           <div className="space-y-2">
             <Label htmlFor="receiptNumber">Nomor Kwitansi</Label>
-            <Input id="receiptNumber" placeholder="Contoh: RCP-2024-001" {...register("receiptNumber")} />
+            <Input disabled={true} value={`KWT-${uuidv4()}`} id="receiptNumber" placeholder="Contoh: RCP-2024-001" {...register("receiptNumber")} />
             {errors.receiptNumber && <p className="text-sm text-red-500">{errors.receiptNumber.message}</p>}
+          </div>
+
+          <Separator />
+
+          {/* Payment Items */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">Item Pembayaran</Label>
+              <Button type="button" variant="outline" size="sm" onClick={() => append({ paymentTypeId: "", name: "", amount: 0, quantity: 1, subtotal: 0 })}>
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah Item
+              </Button>
+            </div>
+
+            {errors.items && typeof errors.items === "object" && "message" in errors.items && <p className="text-sm text-red-500">{(errors.items as any).message}</p>}
+
+            {/* Items header */}
+            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground px-1">
+              <div className="col-span-4">Jenis Pembayaran</div>
+              <div className="col-span-3">Nominal (Rp)</div>
+              <div className="col-span-2 text-center">Qty</div>
+              <div className="col-span-2 text-right">Subtotal</div>
+              <div className="col-span-1" />
+            </div>
+
+            <div className="space-y-2">
+              {fields.map((field, index) => {
+                const currentItem = watchedItems?.[index];
+                const pt = currentItem?.paymentTypeId ? allPaymentTypes.find((p) => p.id === currentItem.paymentTypeId) : undefined;
+                const isFixedAmount = pt?.isFixedAmount ?? false;
+                const isFixedQty = pt?.isFixedQuantity ?? false;
+
+                return (
+                  <div key={field.id} className="grid border p-2 rounded-xl grid-cols-12 gap-2 items-start">
+                    {/* Payment Type Select */}
+                    <div className="col-span-4">
+                      <Controller
+                        name={`items.${index}.paymentTypeId`}
+                        control={control}
+                        render={({ field: f }) => (
+                          <Select value={f.value} onValueChange={(val) => handlePaymentTypeChange(index, val)}>
+                            <SelectTrigger className="h-9 text-xs">
+                              <SelectValue placeholder="Pilih Jenis" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {allPaymentTypes
+                                .filter((pt) => pt.isActive)
+                                .map((pt) => (
+                                  <SelectItem key={pt.id} value={pt.id}>
+                                    <span className="text-xs">{pt.name}</span>
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.items?.[index]?.paymentTypeId && <p className="text-xs text-red-500 mt-1">{errors.items[index]?.paymentTypeId?.message}</p>}
+                      {pt?.description && <p className="text-xs text-muted-foreground mt-0.5 truncate">{pt.description}</p>}
+                    </div>
+
+                    {/* Amount */}
+                    <div className="col-span-3">
+                      <Input className="h-9 text-xs" type="number" min={0} placeholder="Nominal" disabled={isFixedAmount} value={watchedItems?.[index]?.amount ?? 0} onChange={(e) => handleAmountChange(index, Number(e.target.value))} />
+                      {isFixedAmount && <p className="text-xs text-muted-foreground mt-0.5">Nominal tetap</p>}
+                    </div>
+
+                    {/* Quantity */}
+                    <div className="col-span-2">
+                      <Input className="h-9 text-xs text-center" type="number" disabled={isFixedQty} value={watchedItems?.[index]?.quantity ?? 1} onChange={(e) => handleQtyChange(index, Number(e.target.value))} />
+                      {isFixedQty && <p className="text-xs text-muted-foreground mt-0.5 text-center">Tetap</p>}
+                    </div>
+
+                    {/* Subtotal */}
+                    <div className="col-span-3 flex items-center justify-end h-9">
+                      <span className="text-l font-semibold tabular-nums">{formatRupiah(watchedItems?.[index]?.subtotal ?? 0)}</span>
+                    </div>
+
+                    {/* Remove */}
+                    <div className="col-span-2">
+                      <Button variant="secondary" size="sm" onClick={() => remove(index)} disabled={fields.length === 1}>
+                        Delete <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Grand Total */}
+          <div className="flex justify-end">
+            <div className="space-y-1 text-right min-w-[200px]">
+              <div className="flex justify-between text-sm gap-8">
+                <span className="text-muted-foreground">Total Pembayaran</span>
+                <span className="font-bold text-base tabular-nums">{formatRupiah(grandTotal)}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">{fields.length} item · otomatis dihitung dari item</p>
+            </div>
           </div>
 
           {/* Notes */}
           <div className="space-y-2">
             <Label htmlFor="notes">
-              Catatan <span className="text-muted-foreground text-xs">(opsional)</span>
+              Catatan <span className="text-xs text-muted-foreground">(opsional)</span>
             </Label>
-            <Textarea id="notes" placeholder="Catatan tambahan..." rows={3} {...register("notes")} />
+            <Textarea id="notes" placeholder="Catatan tambahan..." rows={2} {...register("notes")} />
           </div>
 
-          <div className="flex justify-end gap-2 pt-4">
+          <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Batal
             </Button>
-            <Button type="submit" disabled={createPayment.isPending || updatePayment.isPending}>
-              {createPayment.isPending || updatePayment.isPending ?
+            <Button type="submit" disabled={isPending}>
+              {isPending ?
                 "Menyimpan..."
               : editData ?
                 "Perbarui"
@@ -374,7 +667,8 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
         <AlertDialogHeader>
           <AlertDialogTitle>Hapus Pembayaran</AlertDialogTitle>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus pembayaran dengan nomor kwitansi <span className="font-semibold">"{paymentData?.receiptNumber}"</span> milik {paymentData?.student?.name ?? "siswa ini"}? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin menghapus pembayaran dengan nomor kwitansi <span className="font-semibold">"{paymentData?.receiptNumber}"</span> milik {paymentData?.student?.name ?? "siswa ini"}? Semua item pembayaran akan ikut
+            terhapus. Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -389,7 +683,16 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
 }
 
 // ─── Main DataTable ───────────────────────────────────────────────────────────
-function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?: string }; userDataId?: string }) {
+function PaymentDataTable({
+  userDataId,
+  userDataMajor,
+}: {
+  userDataId?: string;
+  userDataMajor: {
+    id?: string;
+    name?: string;
+  };
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -397,6 +700,7 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [monthFilter, setMonthFilter] = React.useState<string>("all");
+  const [expandedRows, setExpandedRows] = React.useState<Set<string>>(new Set());
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
@@ -406,20 +710,23 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
   const { data: payments = [], isLoading, refetch } = useGetPayments();
   const { data: allStudents = [] } = useGetStudents();
   const { data: allMajors = [] } = useGetMajors();
-  const { data: allPaymentType = [] } = useGetPaymentTypes();
   const { data: allAccountBanks = [] } = useGetAccountBank();
-
-  // console.log(allAccountBanks);
-  console.log("major:", major);
-  console.log("Bendhara id ", userDataId);
-  console.log(allPaymentType);
+  const { data: allPaymentTypes = [] } = useGetPaymentTypes();
 
   const handleSuccess = () => refetch();
+
+  const toggleExpand = (id: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
 
   const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
     if (!filterValue) return true;
     const p = row.original as PaymentData;
-    const text = [p.student?.name, p.major?.name, p.accountBank?.name, p.accountBank?.bankName, p.receiptNumber, p.month, p.status, p.notes, formatRupiah(p.amount)].filter(Boolean).join(" ").toLowerCase();
+    const text = [p.student?.name, p.major?.name, p.accountBank?.accountName, p.accountBank?.accountBank, p.receiptNumber, p.month, p.status, p.notes].filter(Boolean).join(" ").toLowerCase();
     return text.includes(filterValue.toLowerCase());
   }, []);
 
@@ -428,6 +735,26 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
       id: "select",
       header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)} aria-label="Select all" />,
       cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(v) => row.toggleSelected(!!v)} aria-label="Select row" />,
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      id: "expand",
+      header: () => <span className="text-xs text-muted-foreground">Item</span>,
+      cell: ({ row }) => {
+        const p = row.original;
+        const isExpanded = expandedRows.has(p.id);
+        const itemCount = p.paymentItems?.length ?? 0;
+        return (
+          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs px-2" onClick={() => toggleExpand(p.id)}>
+            <Package className="h-3.5 w-3.5" />
+            {itemCount}
+            {isExpanded ?
+              <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" />
+            : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
+          </Button>
+        );
+      },
       enableSorting: false,
       enableHiding: false,
     },
@@ -497,7 +824,7 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
     },
     {
       id: "accountBank",
-      accessorFn: (row) => row.accountBank?.name ?? "-",
+      accessorFn: (row) => row.accountBank?.accountName ?? "-",
       header: ({ column }) => (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           <Building2 className="mr-2 h-4 w-4" />
@@ -509,8 +836,8 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
         const bank = row.original.accountBank;
         return (
           <div>
-            <div className="text-sm font-medium">{bank?.bankName ?? "-"}</div>
-            {bank?.name && <div className="text-xs text-muted-foreground">{bank.name}</div>}
+            <div className="text-sm font-medium">{bank?.accountBank ?? "-"}</div>
+            {bank?.accountName && <div className="text-xs text-muted-foreground">{bank.accountName}</div>}
           </div>
         );
       },
@@ -537,18 +864,6 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
         const d = row.getValue("dueDate") as string;
         if (!d) return <span className="text-muted-foreground">-</span>;
         return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
-      },
-    },
-    {
-      accessorKey: "notes",
-      header: "Catatan",
-      cell: ({ row }) => {
-        const notes = row.getValue("notes") as string;
-        return (
-          <div className="max-w-xs truncate text-muted-foreground" title={notes}>
-            {notes || "-"}
-          </div>
-        );
       },
     },
     {
@@ -623,7 +938,6 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
 
   const filteredRows = table.getFilteredRowModel().rows;
   const totalPayments = (payments as any[]).length;
-
   const totalPaid = filteredRows.filter((r) => r.original.status === "paid").reduce((sum, r) => sum + parseFloat(String(r.original.amount)), 0);
 
   const columnLabels: Record<string, string> = {
@@ -636,7 +950,6 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
     accountBank: "Bank",
     paymentDate: "Tgl Bayar",
     dueDate: "Jatuh Tempo",
-    notes: "Catatan",
   };
 
   const hasActiveFilter = globalFilter || statusFilter !== "all" || monthFilter !== "all";
@@ -652,8 +965,6 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Cari siswa, kwitansi, bulan..." value={globalFilter ?? ""} onChange={(e) => setGlobalFilter(e.target.value)} className="max-w-sm pl-8" />
           </div>
-
-          {/* Status Filter */}
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-36">
               <SelectValue placeholder="Filter Status" />
@@ -665,8 +976,6 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
               <SelectItem value="overdue">Terlambat</SelectItem>
             </SelectContent>
           </Select>
-
-          {/* Month Filter */}
           <Select value={monthFilter} onValueChange={setMonthFilter}>
             <SelectTrigger className="w-36">
               <SelectValue placeholder="Filter Bulan" />
@@ -680,7 +989,6 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
               ))}
             </SelectContent>
           </Select>
-
           {hasActiveFilter && (
             <Button
               variant="outline"
@@ -763,11 +1071,21 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
           <TableBody>
             {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                  ))}
-                </TableRow>
+                <React.Fragment key={row.id}>
+                  <TableRow data-state={row.getIsSelected() && "selected"}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    ))}
+                  </TableRow>
+                  {/* Expanded items row */}
+                  {expandedRows.has(row.original.id) && (
+                    <TableRow className="hover:bg-transparent">
+                      <TableCell colSpan={columns.length} className="p-0">
+                        <ExpandedItemsRow items={row.original.paymentItems ?? []} />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))
             : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
@@ -827,7 +1145,6 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
           <p className="text-2xl font-bold mt-2">{totalPayments}</p>
           {filteredRows.length !== totalPayments && <p className="text-sm text-muted-foreground">({filteredRows.length} terfilter)</p>}
         </div>
-
         <div className="bg-card rounded-lg border p-4">
           <div className="flex items-center space-x-2">
             <BadgeCheck className="h-5 w-5 text-green-600" />
@@ -835,7 +1152,6 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
           </div>
           <p className="text-2xl font-bold mt-2">{filteredRows.filter((r) => r.original.status === "paid").length}</p>
         </div>
-
         <div className="bg-card rounded-lg border p-4">
           <div className="flex items-center space-x-2">
             <Clock className="h-5 w-5 text-yellow-500" />
@@ -843,7 +1159,6 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
           </div>
           <p className="text-2xl font-bold mt-2">{filteredRows.filter((r) => r.original.status === "pending").length}</p>
         </div>
-
         <div className="bg-card rounded-lg border p-4">
           <div className="flex items-center space-x-2">
             <CreditCard className="h-5 w-5 text-purple-500" />
@@ -855,8 +1170,27 @@ function PaymentDataTable({ major, userDataId }: { major?: { id?: string; name?:
       </div>
 
       {/* Dialogs */}
-      <PaymentFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allMajors={allMajors} allAccountBanks={allAccountBanks} />
-      <PaymentFormDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedPayment} onSuccess={handleSuccess} allStudents={allStudents} allMajors={allMajors} allAccountBanks={allAccountBanks} />
+      <PaymentFormDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={handleSuccess}
+        allStudents={allStudents}
+        allMajors={allMajors}
+        allAccountBanks={allAccountBanks}
+        allPaymentTypes={allPaymentTypes}
+        userDataId={userDataId}
+      />
+      <PaymentFormDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        editData={selectedPayment}
+        onSuccess={handleSuccess}
+        allStudents={allStudents}
+        allMajors={allMajors}
+        allAccountBanks={allAccountBanks}
+        allPaymentTypes={allPaymentTypes}
+        userDataId={userDataId}
+      />
       <DeletePaymentDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} paymentData={selectedPayment} onSuccess={handleSuccess} />
     </div>
   );
@@ -867,16 +1201,19 @@ export default function PaymentPage() {
   const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
-  console.log(userData);
   const userRole = userData?.role?.name;
   const userDataId = userData?.id;
   const userDataMajor = userData?.major;
-
-  if (isPending || isLoadingUserData) return <Loading />;
-  if (!userData || userRole !== "Admin") {
-    unauthorized();
-    return null;
+  if (isPending || isLoadingUserData) {
+    return <Loading />;
   }
 
-  return <PaymentDataTable userDataId={userDataId} major={userDataMajor} />;
+  // Check if user is Admin
+  if (userRole !== "Admin") {
+    if (userRole !== "Bendahara") {
+      unauthorized();
+      return null;
+    }
+  }
+  return <PaymentDataTable userDataId={userDataId} userDataMajor={userDataMajor} />;
 }

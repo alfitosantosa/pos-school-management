@@ -32,7 +32,7 @@ import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-
+import { v4 as uuidv4 } from "uuid";
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
   id: string;
@@ -515,14 +515,14 @@ function PaymentFormDialog({
           {/* Receipt Number */}
           <div className="space-y-2">
             <Label htmlFor="receiptNumber">Nomor Kwitansi</Label>
-            <Input id="receiptNumber" placeholder="Contoh: RCP-2024-001" {...register("receiptNumber")} />
+            <Input disabled={true} value={`KWT-${uuidv4()}`} id="receiptNumber" placeholder="Contoh: RCP-2024-001" {...register("receiptNumber")} />
             {errors.receiptNumber && <p className="text-sm text-red-500">{errors.receiptNumber.message}</p>}
           </div>
 
           <Separator />
 
           {/* Payment Items */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-base font-semibold">Item Pembayaran</Label>
               <Button type="button" variant="outline" size="sm" onClick={() => append({ paymentTypeId: "", name: "", amount: 0, quantity: 1, subtotal: 0 })}>
@@ -550,7 +550,7 @@ function PaymentFormDialog({
                 const isFixedQty = pt?.isFixedQuantity ?? false;
 
                 return (
-                  <div key={field.id} className="grid grid-cols-12 gap-2 items-start">
+                  <div key={field.id} className="grid border p-2 rounded-xl grid-cols-12 gap-2 items-start">
                     {/* Payment Type Select */}
                     <div className="col-span-4">
                       <Controller
@@ -585,19 +585,19 @@ function PaymentFormDialog({
 
                     {/* Quantity */}
                     <div className="col-span-2">
-                      <Input className="h-9 text-xs text-center" type="number" min={1} disabled={isFixedQty} value={watchedItems?.[index]?.quantity ?? 1} onChange={(e) => handleQtyChange(index, Number(e.target.value))} />
+                      <Input className="h-9 text-xs text-center" type="number" disabled={isFixedQty} value={watchedItems?.[index]?.quantity ?? 1} onChange={(e) => handleQtyChange(index, Number(e.target.value))} />
                       {isFixedQty && <p className="text-xs text-muted-foreground mt-0.5 text-center">Tetap</p>}
                     </div>
 
                     {/* Subtotal */}
-                    <div className="col-span-2 flex items-center justify-end h-9">
-                      <span className="text-xs font-semibold tabular-nums">{formatRupiah(watchedItems?.[index]?.subtotal ?? 0)}</span>
+                    <div className="col-span-3 flex items-center justify-end h-9">
+                      <span className="text-l font-semibold tabular-nums">{formatRupiah(watchedItems?.[index]?.subtotal ?? 0)}</span>
                     </div>
 
                     {/* Remove */}
-                    <div className="col-span-1 flex justify-center">
-                      <Button type="button" variant="ghost" size="sm" className="h-9 w-9 p-0 text-red-500 hover:text-red-700" onClick={() => remove(index)} disabled={fields.length === 1}>
-                        <Minus className="h-4 w-4" />
+                    <div className="col-span-2">
+                      <Button variant="secondary" size="sm" onClick={() => remove(index)} disabled={fields.length === 1}>
+                        Delete <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>

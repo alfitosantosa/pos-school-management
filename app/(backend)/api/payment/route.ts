@@ -118,11 +118,22 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    const deletedClass = await prisma.payment.delete({
+    // First, delete payment transaction if exists
+    await prisma.paymentTransaction.deleteMany({
+      where: { paymentId: id },
+    });
+
+    // Then, delete all payment items associated with this payment
+    await prisma.paymentItems.deleteMany({
+      where: { paymentId: id },
+    });
+
+    // Finally, delete the payment
+    const deletedPayment = await prisma.payment.delete({
       where: { id },
     });
 
-    return NextResponse.json(deletedClass, { status: 200 });
+    return NextResponse.json(deletedPayment, { status: 200 });
   } catch (error) {
     console.error("Error deleting payment:", error);
     return NextResponse.json({ error: "Failed to delete payment" }, { status: 500 });
