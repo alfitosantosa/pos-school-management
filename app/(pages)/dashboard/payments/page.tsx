@@ -544,7 +544,8 @@ function PaymentFormDialog({
 
             <div className="space-y-2">
               {fields.map((field, index) => {
-                const pt = allPaymentTypes.find((p) => p.id === watchedItems?.[index]?.paymentTypeId);
+                const currentItem = watchedItems?.[index];
+                const pt = currentItem?.paymentTypeId ? allPaymentTypes.find((p) => p.id === currentItem.paymentTypeId) : undefined;
                 const isFixedAmount = pt?.isFixedAmount ?? false;
                 const isFixedQty = pt?.isFixedQuantity ?? false;
 
