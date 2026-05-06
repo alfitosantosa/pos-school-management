@@ -33,6 +33,7 @@ export async function GET() {
         major: true,
         accountBank: true,
         createdBy: true,
+        paymentItems: true,
       },
       orderBy: {
         createdAt: "desc",
