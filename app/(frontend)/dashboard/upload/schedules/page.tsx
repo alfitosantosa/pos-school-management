@@ -54,9 +54,10 @@ function UploadSchedules() {
           if (typeof window === "undefined") {
             throw new Error("This function can only be called on the client side");
           }
+          // @ts-expect-error - read-excel-file doesn't have types
           const readXlsxFile = (await import("read-excel-file")).default;
           const rows = await readXlsxFile(excelFiles[0]);
-          const preview = rows.slice(1, 6).map((row) => ({
+          const preview = rows.slice(1, 6).map((row: any[]) => ({
             classId: row[0]?.toString() || "",
             subjectId: row[1]?.toString() || "",
             teacherId: row[2]?.toString() || "",
@@ -96,6 +97,7 @@ function UploadSchedules() {
       if (typeof window === "undefined") {
         throw new Error("This function can only be called on the client side");
       }
+      // @ts-expect-error - read-excel-file doesn't have types
       const readXlsxFile = (await import("read-excel-file")).default;
 
       let allSchedules: any[] = [];

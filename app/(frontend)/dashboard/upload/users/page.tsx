@@ -56,9 +56,10 @@ function UploadUsers() {
           if (typeof window === "undefined") {
             throw new Error("This function can only be called on the client side");
           }
+          // @ts-expect-error - read-excel-file doesn't have types
           const readXlsxFile = (await import("read-excel-file")).default;
           const rows = await readXlsxFile(excelFiles[0]);
-          const preview = rows.slice(1, 6).map((row) => ({
+          const preview = rows.slice(1, 6).map((row: any[]) => ({
             name: row[0]?.toString() || "",
             email: row[1]?.toString() || "",
             nik: row[2]?.toString() || "",
@@ -153,6 +154,7 @@ function UploadUsers() {
       if (typeof window === "undefined") {
         throw new Error("This function can only be called on the client side");
       }
+      // @ts-expect-error - read-excel-file doesn't have types
       const readXlsxFile = (await import("read-excel-file")).default;
 
       let allUsers: any[] = [];
