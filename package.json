@@ -71,7 +71,7 @@
     "@types/react-dom": "^19.2.3",
     "baseline-browser-mapping": "^2.10.28",
     "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
+    "lint-staged": "^17.0.3",
     "prettier": "^3.8.3",
     "prisma": "7.8.0",
     "tailwindcss": "^4.1.18",
