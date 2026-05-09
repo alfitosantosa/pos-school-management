@@ -2,6 +2,7 @@ import { type Metadata, type Viewport } from "next";
 import { Inter } from "next/font/google";
 import { ReactQueryProvider } from "./client/providers";
 import { Toaster } from "@/components/ui/sonner";
+// @ts-expect-error CSS import side-effect
 import "./globals.css";
 
 import Navbar from "@/components/navbar";
