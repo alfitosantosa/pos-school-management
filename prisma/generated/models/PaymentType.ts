@@ -312,10 +312,10 @@ export type PaymentTypeOrderByWithRelationInput = {
 
 export type PaymentTypeWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  name?: string
   AND?: Prisma.PaymentTypeWhereInput | Prisma.PaymentTypeWhereInput[]
   OR?: Prisma.PaymentTypeWhereInput[]
   NOT?: Prisma.PaymentTypeWhereInput | Prisma.PaymentTypeWhereInput[]
+  name?: Prisma.StringFilter<"PaymentType"> | string
   description?: Prisma.StringFilter<"PaymentType"> | string
   amount?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isMonthly?: Prisma.BoolFilter<"PaymentType"> | boolean
@@ -329,7 +329,7 @@ export type PaymentTypeWhereUniqueInput = Prisma.AtLeast<{
   skuType?: Prisma.StringFilter<"PaymentType"> | string
   paymentItems?: Prisma.PaymentItemsListRelationFilter
   major?: Prisma.XOR<Prisma.MajorScalarRelationFilter, Prisma.MajorWhereInput>
-}, "id" | "name">
+}, "id">
 
 export type PaymentTypeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

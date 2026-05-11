@@ -79,6 +79,7 @@ export const useCreatePaymentItemsBulk = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paymentItems"] });
+      queryClient.invalidateQueries({ queryKey: ["payment-by-id-major"] });
     },
   });
 };
@@ -139,6 +140,20 @@ export const usePaymentItemsUnpaidStudent = (studentId: string, options?: { enab
       }
     },
     enabled: options?.enabled ?? !!studentId,
+  });
+};
+
+export const usePaymentItemsByMajorId = (majorId: string) => {
+  return useQuery({
+    queryKey: ["payment-by-id-major", majorId],
+    queryFn: async () => {
+      try {
+        const res = await apiGet(`/api/payment/items/major/${majorId}`);
+        return res.data;
+      } catch (error: any) {
+        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
+      }
+    },
   });
 };
 

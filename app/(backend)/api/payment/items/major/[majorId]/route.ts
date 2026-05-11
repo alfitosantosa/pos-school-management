@@ -9,16 +9,14 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ majorI
   }
 
   try {
-    const payments = await prisma.payment.findMany({
+    const payments = await prisma.paymentItems.findMany({
       where: {
-        majorId: majorId,
+        student: {
+          majorId: majorId,
+        },
       },
       include: {
         student: true,
-        major: true,
-        accountBank: true,
-        createdBy: true,
-        paymentItems: true,
       },
       orderBy: {
         createdAt: "desc",

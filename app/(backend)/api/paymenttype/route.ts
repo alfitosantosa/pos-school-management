@@ -1,6 +1,6 @@
 // model PaymentType {
 //   id              String         @id @default(cuid())
-//   majorId         String
+
 //   name            String         @unique
 //   description     String
 //   amount          Decimal
@@ -11,9 +11,14 @@
 //   quantity        Decimal
 //   subtotal        Decimal
 //   owner           String
-//   major           Major         @relation(fields:[majorId], references:[id])
-//   paymentItems    PaymentItems[]
+//   majorId         String
+//   skuType         String
 
+//   paymentItems    PaymentItems[]
+//   major           Major          @relation(fields: [majorId], references: [id])
+
+//   @@index([majorId])
+//   @@index([owner])
 //   @@map("payment_types")
 // }
 

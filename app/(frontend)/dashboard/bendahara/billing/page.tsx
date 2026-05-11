@@ -20,14 +20,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 
-import { useGetPaymentsItems, useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, useCreatePaymentItemsBulk, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, useCreatePaymentItemsBulk, usePaymentItemsUnpaidStudent, usePaymentItemsByMajorId } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
 import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
-import { useGetPaymentTypes } from "@/app/(hooks)/hooks/Payments/usePaymentType";
+import { useGetPaymentTypeByIdMajor, useGetPaymentTypes } from "@/app/(hooks)/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetPayments } from "@/app/(hooks)/hooks/Payments/usePayment";
+import { useGetPaymentByIdMajor, useGetPayments } from "@/app/(hooks)/hooks/Payments/usePayment";
+import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -960,7 +961,7 @@ function DeleteItemDialog({ open, onOpenChange, itemData, onSuccess }: { open: b
 }
 
 // ─── Main DataTable ───────────────────────────────────────────────────────────
-function BillingDataTable() {
+function BillingDataTable({ majorId }: { majorId: string }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -977,10 +978,10 @@ function BillingDataTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<PaymentItemData | null>(null);
 
-  const { data: paymentItems = [], isLoading, refetch } = useGetPaymentsItems();
-  const { data: allStudents = [] } = useGetStudents();
-  const { data: allPaymentTypes = [] } = useGetPaymentTypes();
-  const { data: rawPayments = [] } = useGetPayments();
+  const { data: paymentItems = [], isLoading, refetch } = usePaymentItemsByMajorId(majorId);
+  const { data: allStudents = [] } = useGetStudentByIdMajor(majorId);
+  const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorId);
+  const { data: rawPayments = [] } = useGetPaymentByIdMajor(majorId);
 
   // Normalize payments for dropdowns
   const allPayments = React.useMemo(() => {
@@ -1476,6 +1477,7 @@ export default function BillingPage() {
   const userId = session?.user?.id;
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
+  const majorId = userData?.major?.id;
 
   if (isPending || isLoadingUserData) return <Loading />;
   // Check if user is Admin
@@ -1485,5 +1487,5 @@ export default function BillingPage() {
       return null;
     }
   }
-  return <BillingDataTable />;
+  return <BillingDataTable majorId={majorId} />;
 }
