@@ -1,9 +1,9 @@
 "use client";
 
-import { useGetAcademicYears } from "@/app/hooks/AcademicYears/useAcademicYear";
-import { useGetClasses } from "@/app/hooks/Classes/useClass";
-import { useGetMajors } from "@/app/hooks/Majors/useMajors";
-import { useGetRoles } from "@/app/hooks/Roles/useRoles";
+import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { useGetRoles } from "@/app/(hooks)/hooks/Roles/useRoles";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
@@ -12,12 +12,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { FileText, X, Upload, Download, AlertCircle } from "lucide-react";
 import { useState } from "react";
-import { useBulkCreateUserData } from "@/app/hooks/Users/useBulkUsersData";
+import { useBulkCreateUserData } from "@/app/(hooks)/hooks/Users/useBulkUsersData";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import Loading from "@/components/loading";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useGetTahfidzGroup } from "@/app/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
 
 export type typeData = {
   id: string;
@@ -613,8 +613,10 @@ export default function UserDataTable() {
 
   // Check if user is Admin
   if (userRole !== "Admin") {
-    unauthorized();
-    return null;
+    if (userRole !== "Bendahara") {
+      unauthorized();
+      return null;
+    }
   }
 
   // Render dashboard only after authorization is confirmed

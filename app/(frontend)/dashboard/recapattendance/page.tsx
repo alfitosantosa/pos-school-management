@@ -7,14 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, AlertCircle, XCircle, Search, Calendar, BarChart3, ChevronDown, ChevronUp, User, ChevronLeft, ChevronRight, Download } from "lucide-react";
-import { useGetStudents } from "@/app/hooks/Users/useStudents";
-import { useGetAttendanceByIdStudent } from "@/app/hooks/Attendances/useAttendaceByIdStudent";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
+import { useGetAttendanceByIdStudent } from "@/app/(hooks)/hooks/Attendances/useAttendaceByIdStudent";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import Loading from "@/components/loading";
 import { exportStudentAttendanceToExcel, exportStudentAttendanceDetailToExcel, exportStudentAttendanceDailyToExcel } from "@/lib/export/exportStudentAttendance";
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { unauthorized } from "next/navigation";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { DEFAULT_AVATAR } from "@/lib/image-loader";
@@ -261,23 +261,24 @@ function RecapAttendance() {
             </div>
           </CardHeader>
           <CardContent>
-            {isLoadingAttendances ?
+            {isLoadingAttendances ? (
               <div className="space-y-2 sm:space-y-3">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="h-12 sm:h-14 bg-gray-100 rounded-lg animate-pulse" />
                 ))}
               </div>
-            : !selectedStudent ?
+            ) : !selectedStudent ? (
               <div className="py-6 sm:py-8 text-center text-gray-500">
                 <User className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 opacity-20" />
                 <p className="text-xs sm:text-sm">Silakan pilih siswa terlebih dahulu</p>
               </div>
-            : filteredAttendances.length === 0 ?
+            ) : filteredAttendances.length === 0 ? (
               <div className="py-6 sm:py-8 text-center text-gray-500">
                 <Calendar className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 opacity-20" />
                 <p className="text-xs sm:text-sm">Tidak ada data absensi untuk periode ini</p>
               </div>
-            : <>
+            ) : (
+              <>
                 <div className="space-y-2 sm:space-y-3">
                   {paginatedAttendances.map((attendance: any) => {
                     const statusConfig = STATUS_CONFIG[attendance.status as keyof typeof STATUS_CONFIG];
@@ -301,11 +302,7 @@ function RecapAttendance() {
                                 <StatusIcon className="w-3 h-3" />
                                 {statusConfig.label}
                               </Badge>
-                              <button className="p-1">
-                                {isExpanded ?
-                                  <ChevronUp className="w-4 h-4 text-gray-500" />
-                                : <ChevronDown className="w-4 h-4 text-gray-500" />}
-                              </button>
+                              <button className="p-1">{isExpanded ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}</button>
                             </div>
                           </div>
                         </div>
@@ -377,7 +374,7 @@ function RecapAttendance() {
                   </div>
                 )}
               </>
-            }
+            )}
           </CardContent>
         </Card>
       </div>

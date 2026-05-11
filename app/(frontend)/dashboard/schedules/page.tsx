@@ -21,16 +21,16 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetSchedules, useCreateSchedule, useUpdateSchedule, useDeleteSchedule } from "@/app/hooks/Schedules/useSchedules";
-import { useGetClasses } from "@/app/hooks/Classes/useClass";
-import { useGetSubjects } from "@/app/hooks/Subjects/useSubjects";
-import { useGetTeachers } from "@/app/hooks/Users/useTeachers";
-import { useGetAcademicYears } from "@/app/hooks/AcademicYears/useAcademicYear";
+import { useGetSchedules, useCreateSchedule, useUpdateSchedule, useDeleteSchedule } from "@/app/(hooks)/hooks/Schedules/useSchedules";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetSubjects } from "@/app/(hooks)/hooks/Subjects/useSubjects";
+import { useGetTeachers } from "@/app/(hooks)/hooks/Users/useTeachers";
+import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useGetTahfidzGroup } from "@/app/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
 
 // Type definitions
 export type ScheduleData = {
@@ -321,11 +321,7 @@ function ScheduleFormDialog({ open, onOpenChange, editData, onSuccess }: { open:
               Batal
             </Button>
             <Button type="submit" disabled={createSchedule.isPending || updateSchedule.isPending}>
-              {createSchedule.isPending || updateSchedule.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createSchedule.isPending || updateSchedule.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -883,7 +879,7 @@ function ScheduleDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ?
+              {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -891,7 +887,8 @@ function ScheduleDataTable() {
                     ))}
                   </TableRow>
                 ))
-              : <TableRow>
+              ) : (
+                <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <Calendar className="h-8 w-8 text-muted-foreground" />
@@ -916,7 +913,7 @@ function ScheduleDataTable() {
                     </div>
                   </TableCell>
                 </TableRow>
-              }
+              )}
             </TableBody>
           </Table>
         </div>

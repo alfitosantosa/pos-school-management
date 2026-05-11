@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useGetAttendance } from "../../hooks/Attendances/useAttendance";
+import { useGetAttendance } from "../../(hooks)/hooks/Attendances/useAttendance";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { CheckCircle, XCircle, Clock, AlertCircle, Users, Calendar, BookOpen, MapPin, Search, Filter, TrendingUp, AlertTriangle, User, UserCheck, BarChart3, PieChart as PieChartIcon } from "lucide-react";
-import { useAttendanceByDate } from "@/app/hooks/Attendances/useAttendanceByDate";
+import { useAttendanceByDate } from "@/app/(hooks)/hooks/Attendances/useAttendanceByDate";
 import { DatePickerWithRange } from "@/components/date/datePicker";
 import { DateRange } from "react-day-picker";
 

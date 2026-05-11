@@ -36,13 +36,14 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, owner, description, amount, quantity, subtotal, isMonthly, isActive, isFixedAmount, isFixedQuantity, majorId } = await request.json();
+    const { name, owner, description, amount, quantity, subtotal, isMonthly, isActive, isFixedAmount, isFixedQuantity, majorId, skuType } = await request.json();
 
     const newPaymentType = await prisma.paymentType.create({
       data: {
         name,
         description,
         majorId,
+        skuType,
         amount: parseFloat(amount),
         quantity: parseFloat(quantity),
         subtotal: parseFloat(subtotal),

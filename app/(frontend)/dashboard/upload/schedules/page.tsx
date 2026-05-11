@@ -1,10 +1,10 @@
 "use client";
 
-import { useGetAcademicYears } from "@/app/hooks/AcademicYears/useAcademicYear";
-import { useGetClasses } from "@/app/hooks/Classes/useClass";
-import { useGetTeachers } from "@/app/hooks/Users/useTeachers";
-import { useGetSubjects } from "@/app/hooks/Subjects/useSubjects";
-import { useBulkCreateSchedulesData } from "@/app/hooks/Schedules/useBulkSchedules";
+import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetTeachers } from "@/app/(hooks)/hooks/Users/useTeachers";
+import { useGetSubjects } from "@/app/(hooks)/hooks/Subjects/useSubjects";
+import { useBulkCreateSchedulesData } from "@/app/(hooks)/hooks/Schedules/useBulkSchedules";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
@@ -16,7 +16,7 @@ import { useState } from "react";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import Loading from "@/components/loading";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 export type typeData = {
   id: string;

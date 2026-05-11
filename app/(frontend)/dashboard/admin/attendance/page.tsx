@@ -9,14 +9,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarDays, Clock, MapPin, BookOpen, Users, GraduationCap, Eye, Plus, LucidePanelTopClose } from "lucide-react";
 import Link from "next/link";
 import { useState, useMemo } from "react";
-import { useGetScheduleAcademicYearActive } from "@/app/hooks/Schedules/useSchedules";
+import { useGetScheduleAcademicYearActive } from "@/app/(hooks)/hooks/Schedules/useSchedules";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import Loading from "@/components/loading";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useAttendanceIsSubmitted } from "@/app/hooks/Attendances/useAttendanceIsSubmitted";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useAttendanceIsSubmitted } from "@/app/(hooks)/hooks/Attendances/useAttendanceIsSubmitted";
 
-const ScheduleCard = ({ schedule }: { schedule:any }) => {
+const ScheduleCard = ({ schedule }: { schedule: any }) => {
   const isTodaySchedule = (dayOfWeek: number) => {
     const currentDay = new Date().getDay();
     return dayOfWeek === currentDay;
@@ -38,25 +38,18 @@ const ScheduleCard = ({ schedule }: { schedule:any }) => {
   // Call the hook for each schedule
   const { data: isSubmitted, isLoading } = useAttendanceIsSubmitted({
     date: todayDate,
-    scheduleId: schedule.id
+    scheduleId: schedule.id,
   });
 
   if (isLoading) {
     return <Loading />;
   }
 
-
-
-
   // Check if button should be disabled
   const isDisabled = isSubmitted === true || !isTodaySchedule(schedule.dayOfWeek);
 
   // Get button text
-  const buttonText = isSubmitted
-    ? "Sudah Diabsen"
-    : !isTodaySchedule(schedule.dayOfWeek)
-      ? "Bukan Hari Ini"
-      : "Buat Absensi";
+  const buttonText = isSubmitted ? "Sudah Diabsen" : !isTodaySchedule(schedule.dayOfWeek) ? "Bukan Hari Ini" : "Buat Absensi";
 
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200">
@@ -82,7 +75,6 @@ const ScheduleCard = ({ schedule }: { schedule:any }) => {
               </span>
               <div>{schedule.id}</div>
             </div>
-
 
             <div className="flex items-center gap-3">
               <MapPin className="h-4 w-4 text-slate-500" />

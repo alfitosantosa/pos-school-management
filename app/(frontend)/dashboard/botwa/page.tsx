@@ -1,7 +1,7 @@
-"use client"
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useGetConnectionBotWa } from "@/app/hooks/BotWA/useBotWA";
+import { useGetConnectionBotWa } from "@/app/(hooks)/hooks/BotWA/useBotWA";
 import { Wifi, WifiOff } from "lucide-react";
 
 export default function WaPage() {
@@ -13,11 +13,7 @@ export default function WaPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            {connection?.connection === "success" ? (
-              <Wifi className="h-5 w-5 text-green-500" />
-            ) : (
-              <WifiOff className="h-5 w-5 text-red-500" />
-            )}
+            {connection?.connection === "success" ? <Wifi className="h-5 w-5 text-green-500" /> : <WifiOff className="h-5 w-5 text-red-500" />}
             Connection Status
           </CardTitle>
         </CardHeader>
@@ -30,9 +26,7 @@ export default function WaPage() {
             <>
               <div className="flex items-center gap-2">
                 <span className="font-medium">Status:</span>
-                <Badge variant={connection?.connection === "success" ? "default" : "destructive"}>
-                  {connection?.connection || "Unknown"}
-                </Badge>
+                <Badge variant={connection?.connection === "success" ? "default" : "destructive"}>{connection?.connection || "Unknown"}</Badge>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium">Instance:</span>

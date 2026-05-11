@@ -20,14 +20,14 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetAccountBank, useCreateAccountBank, useUpdateAccountBank, useDeleteAccountBank } from "@/app/hooks/AccountBank/useAccountBank";
+import { useGetAccountBank, useCreateAccountBank, useUpdateAccountBank, useDeleteAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // You may need to create or import a hook for majors
-import { useGetMajors } from "@/app/hooks/Majors/useMajors";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
 
 // Type definitions
 export type AccountBankData = {
@@ -224,11 +224,7 @@ function AccountBankFormDialog({ open, onOpenChange, editData, onSuccess }: { op
               Batal
             </Button>
             <Button type="submit" disabled={createAccountBank.isPending || updateAccountBank.isPending}>
-              {createAccountBank.isPending || updateAccountBank.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createAccountBank.isPending || updateAccountBank.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -488,7 +484,7 @@ function AccountBankDashboard() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ?
+                {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -496,12 +492,13 @@ function AccountBankDashboard() {
                       ))}
                     </TableRow>
                   ))
-                : <TableRow>
+                ) : (
+                  <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data rekening bank.
                     </TableCell>
                   </TableRow>
-                }
+                )}
               </TableBody>
             </Table>
           </div>

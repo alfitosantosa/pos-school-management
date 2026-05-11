@@ -106,7 +106,6 @@ model UserData {
   createdAt               DateTime?              @default(now())
   updatedAt               DateTime?              @updatedAt
   tahfidzGroupId          String?
-  PaymentCreated          Payment[]              @relation("CreatedPayment")
   Announcements           Announcement[]
   studentSubmissions      AssignmentSubmission[] @relation("StudentSubmission")
   teacherAssignments      Assignment[]           @relation("TeacherAssignment")
@@ -115,6 +114,7 @@ model UserData {
   grades                  Grade[]                @relation("StudentGrade")
   notifications           Notification[]
   paymentItems            PaymentItems[]
+  PaymentCreated          Payment[]              @relation("CreatedPayment")
   payments                Payment[]              @relation("StudentPayment")
   reportCards             ReportCard[]           @relation("StudentReportCard")
   schedules               Schedule[]             @relation("TeacherSchedule")
@@ -304,25 +304,37 @@ model PaymentType {
   subtotal        Decimal
   owner           String
   majorId         String
+  skuType         String
   paymentItems    PaymentItems[]
   major           Major          @relation(fields: [majorId], references: [id])
 
+  @@index([majorId])
+  @@index([owner])
   @@map("payment_types")
 }
 
 model PaymentItems {
-  id            String      @id @default(uuid())
-  paymentId     String
-  studentId     String
-  studentName   String
-  paymentTypeId String
-  skuName       String
-  quantity      Int
-  amount        Int
-  subtotal      Int
-  payment       Payment     @relation(fields: [paymentId], references: [id])
-  PaymentType   PaymentType @relation(fields: [paymentTypeId], references: [id])
-  student       UserData    @relation(fields: [studentId], references: [id])
+  id              String      @id @default(uuid())
+  paymentId       String?
+  studentId       String
+  paymentTypeId   String
+  quantity        Int
+  amount          Int
+  subtotal        Int
+  isActive        Boolean     @default(true)
+  isFixedAmount   Boolean
+  isFixedQuantity Boolean
+  isMonthly       Boolean     @default(false)
+  isPaid          Boolean     @default(false)
+  month           String
+  name            String
+  year            String
+  skuType         String
+  payment         Payment?    @relation(fields: [paymentId], references: [id], onDelete: SetNull) 
+  PaymentType     PaymentType @relation(fields: [paymentTypeId], references: [id])
+  student         UserData    @relation(fields: [studentId], references: [id])
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 
   @@map("payment_items")
 }
@@ -330,7 +342,6 @@ model PaymentItems {
 model Payment {
   id                 String              @id @default(cuid())
   studentId          String
-  bendaharaId        String
   amount             Decimal
   dueDate            DateTime?
   status             String              @default("pending")
@@ -339,12 +350,14 @@ model Payment {
   paymentDate        DateTime
   receiptNumber      String              @unique
   accountBankId      String
+  bankRef            String?
   majorId            String
   month              String
+  bendaharaId        String
   paymentItems       PaymentItems[]
   paymentTransaction PaymentTransaction?
-  createdBy          UserData            @relation("CreatedPayment", fields:[bendaharaId], references:[id])
   accountBank        AccountBank         @relation(fields: [accountBankId], references: [id])
+  createdBy          UserData            @relation("CreatedPayment", fields: [bendaharaId], references: [id])
   major              Major               @relation(fields: [majorId], references: [id])
   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
 

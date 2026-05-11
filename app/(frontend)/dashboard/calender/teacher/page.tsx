@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 import { CalendarBody, CalendarDate, CalendarDatePagination, CalendarDatePicker, CalendarHeader, CalendarItem, CalendarMonthPicker, CalendarProvider, CalendarYearPicker } from "@/components/ui/kibo-ui/calendar";
-import { useGetSpecialSchedules } from "@/app/hooks/SpecialSchedules/useSpecialSchedule";
+import { useGetSpecialSchedules } from "@/app/(hooks)/hooks/SpecialSchedules/useSpecialSchedule";
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useGetScheduleByIdTeacher } from "@/app/hooks/Schedules/useGetScheduleById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useGetScheduleByIdTeacher } from "@/app/(hooks)/hooks/Schedules/useGetScheduleById";
 import Loading from "@/components/loading";
 
 // Type definitions berdasarkan JSON

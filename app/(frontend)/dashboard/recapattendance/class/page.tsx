@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, AlertCircle, XCircle, Calendar, Users, Download, ChevronLeft, ChevronRight } from "lucide-react";
-import { useGetClasses } from "@/app/hooks/Classes/useClass";
-import { useGetStudents } from "@/app/hooks/Users/useStudents";
-import { useGetAttendanceByClass } from "@/app/hooks/Attendances/useAttendanceByClass";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
+import { useGetAttendanceByClass } from "@/app/(hooks)/hooks/Attendances/useAttendanceByClass";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import Loading from "@/components/loading";
@@ -16,7 +16,7 @@ import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { DEFAULT_AVATAR } from "@/lib/image-loader";
 import { exportClassAttendanceDailyToExcel } from "@/lib/export/exportClassAttendance";
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { unauthorized } from "next/navigation";
 
 const STATUS_CONFIG = {
@@ -63,10 +63,7 @@ function RecapAttendanceByClass() {
   const attendanceData = Array.from(uniqueAttendanceMap.values());
 
   // Use students from attendance response if available, otherwise filter from all students
-  const filteredStudents =
-    classStudents.length > 0 ? classStudents
-    : selectedClass ? students.filter((student: any) => student.classId === selectedClass.id)
-    : [];
+  const filteredStudents = classStudents.length > 0 ? classStudents : selectedClass ? students.filter((student: any) => student.classId === selectedClass.id) : [];
 
   // Group attendance by date
   const attendanceByDate: Record<string, any[]> = {};
@@ -242,19 +239,20 @@ function RecapAttendanceByClass() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
-                {isLoading ?
+                {isLoading ? (
                   <div className="space-y-4">
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
-                : paginatedDates.length === 0 ?
+                ) : paginatedDates.length === 0 ? (
                   <div className="py-12 text-center">
                     <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                     <p className="text-gray-500 font-medium">Tidak ada data absensi</p>
                     <p className="text-sm text-gray-400 mt-1">Silakan pilih periode lain</p>
                   </div>
-                : <div className="space-y-4">
+                ) : (
+                  <div className="space-y-4">
                     {paginatedDates.map((date) => {
                       const dailyAttendances = attendanceByDate[date] || [];
 
@@ -280,9 +278,10 @@ function RecapAttendanceByClass() {
                           </div>
 
                           <div className="p-4 bg-white">
-                            {dailyAttendances.length === 0 ?
+                            {dailyAttendances.length === 0 ? (
                               <p className="text-sm text-gray-500 text-center py-4">Tidak ada data kehadiran</p>
-                            : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            ) : (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {dailyAttendances.map((attendance: any) => {
                                   const student = filteredStudents.find((s: any) => s.id === attendance.studentId);
                                   const config = STATUS_CONFIG[attendance.status as keyof typeof STATUS_CONFIG];
@@ -306,13 +305,13 @@ function RecapAttendanceByClass() {
                                   );
                                 })}
                               </div>
-                            }
+                            )}
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                }
+                )}
 
                 {/* Pagination */}
                 {totalPages > 1 && (

@@ -8,10 +8,10 @@ import { format, isSameDay, parseISO } from "date-fns";
 import { id } from "date-fns/locale";
 import { Calendar, Clock, MapPin, User } from "lucide-react";
 
-import { useGetSpecialSchedules } from "@/app/hooks/SpecialSchedules/useSpecialSchedule";
-import { useGetSchedulesByStudent } from "@/app/hooks/Schedules/useSchedules";
+import { useGetSpecialSchedules } from "@/app/(hooks)/hooks/SpecialSchedules/useSpecialSchedule";
+import { useGetSchedulesByStudent } from "@/app/(hooks)/hooks/Schedules/useSchedules";
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Loading from "@/components/loading";
 
 // Type definitions berdasarkan JSON

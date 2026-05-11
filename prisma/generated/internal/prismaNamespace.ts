@@ -3222,7 +3222,8 @@ export const PaymentTypeScalarFieldEnum = {
   quantity: 'quantity',
   subtotal: 'subtotal',
   owner: 'owner',
-  majorId: 'majorId'
+  majorId: 'majorId',
+  skuType: 'skuType'
 } as const
 
 export type PaymentTypeScalarFieldEnum = (typeof PaymentTypeScalarFieldEnum)[keyof typeof PaymentTypeScalarFieldEnum]
@@ -3232,12 +3233,21 @@ export const PaymentItemsScalarFieldEnum = {
   id: 'id',
   paymentId: 'paymentId',
   studentId: 'studentId',
-  studentName: 'studentName',
   paymentTypeId: 'paymentTypeId',
-  skuName: 'skuName',
   quantity: 'quantity',
   amount: 'amount',
-  subtotal: 'subtotal'
+  subtotal: 'subtotal',
+  isActive: 'isActive',
+  isFixedAmount: 'isFixedAmount',
+  isFixedQuantity: 'isFixedQuantity',
+  isMonthly: 'isMonthly',
+  isPaid: 'isPaid',
+  month: 'month',
+  name: 'name',
+  year: 'year',
+  skuType: 'skuType',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type PaymentItemsScalarFieldEnum = (typeof PaymentItemsScalarFieldEnum)[keyof typeof PaymentItemsScalarFieldEnum]
@@ -3246,7 +3256,6 @@ export type PaymentItemsScalarFieldEnum = (typeof PaymentItemsScalarFieldEnum)[k
 export const PaymentScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
-  bendaharaId: 'bendaharaId',
   amount: 'amount',
   dueDate: 'dueDate',
   status: 'status',
@@ -3255,8 +3264,10 @@ export const PaymentScalarFieldEnum = {
   paymentDate: 'paymentDate',
   receiptNumber: 'receiptNumber',
   accountBankId: 'accountBankId',
+  bankRef: 'bankRef',
   majorId: 'majorId',
-  month: 'month'
+  month: 'month',
+  bendaharaId: 'bendaharaId'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]

@@ -14,11 +14,11 @@ import { Badge } from "@/components/ui/badge";
 
 import * as z from "zod";
 
-import { useGetSchedulesByIdClass } from "@/app/hooks/Schedules/useScheduleByIdClass";
-import { useClassByIdUser } from "@/app/hooks/Classes/useClassByIdUser";
-import { useGetStudentById } from "@/app/hooks/Users/useGetStudentById";
+import { useGetSchedulesByIdClass } from "@/app/(hooks)/hooks/Schedules/useScheduleByIdClass";
+import { useClassByIdUser } from "@/app/(hooks)/hooks/Classes/useClassByIdUser";
+import { useGetStudentById } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // Type definitions
 export type ScheduleData = {
@@ -465,7 +465,7 @@ export default function ScheduleDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ?
+              {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -473,7 +473,8 @@ export default function ScheduleDataTable() {
                     ))}
                   </TableRow>
                 ))
-              : <TableRow>
+              ) : (
+                <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <Calendar className="h-8 w-8 text-muted-foreground" />
@@ -495,7 +496,7 @@ export default function ScheduleDataTable() {
                     </div>
                   </TableCell>
                 </TableRow>
-              }
+              )}
             </TableBody>
           </Table>
         </div>

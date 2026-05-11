@@ -42,36 +42,63 @@ export type PaymentItemsMinAggregateOutputType = {
   id: string | null
   paymentId: string | null
   studentId: string | null
-  studentName: string | null
   paymentTypeId: string | null
-  skuName: string | null
   quantity: number | null
   amount: number | null
   subtotal: number | null
+  isActive: boolean | null
+  isFixedAmount: boolean | null
+  isFixedQuantity: boolean | null
+  isMonthly: boolean | null
+  isPaid: boolean | null
+  month: string | null
+  name: string | null
+  year: string | null
+  skuType: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type PaymentItemsMaxAggregateOutputType = {
   id: string | null
   paymentId: string | null
   studentId: string | null
-  studentName: string | null
   paymentTypeId: string | null
-  skuName: string | null
   quantity: number | null
   amount: number | null
   subtotal: number | null
+  isActive: boolean | null
+  isFixedAmount: boolean | null
+  isFixedQuantity: boolean | null
+  isMonthly: boolean | null
+  isPaid: boolean | null
+  month: string | null
+  name: string | null
+  year: string | null
+  skuType: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type PaymentItemsCountAggregateOutputType = {
   id: number
   paymentId: number
   studentId: number
-  studentName: number
   paymentTypeId: number
-  skuName: number
   quantity: number
   amount: number
   subtotal: number
+  isActive: number
+  isFixedAmount: number
+  isFixedQuantity: number
+  isMonthly: number
+  isPaid: number
+  month: number
+  name: number
+  year: number
+  skuType: number
+  createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -92,36 +119,63 @@ export type PaymentItemsMinAggregateInputType = {
   id?: true
   paymentId?: true
   studentId?: true
-  studentName?: true
   paymentTypeId?: true
-  skuName?: true
   quantity?: true
   amount?: true
   subtotal?: true
+  isActive?: true
+  isFixedAmount?: true
+  isFixedQuantity?: true
+  isMonthly?: true
+  isPaid?: true
+  month?: true
+  name?: true
+  year?: true
+  skuType?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type PaymentItemsMaxAggregateInputType = {
   id?: true
   paymentId?: true
   studentId?: true
-  studentName?: true
   paymentTypeId?: true
-  skuName?: true
   quantity?: true
   amount?: true
   subtotal?: true
+  isActive?: true
+  isFixedAmount?: true
+  isFixedQuantity?: true
+  isMonthly?: true
+  isPaid?: true
+  month?: true
+  name?: true
+  year?: true
+  skuType?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type PaymentItemsCountAggregateInputType = {
   id?: true
   paymentId?: true
   studentId?: true
-  studentName?: true
   paymentTypeId?: true
-  skuName?: true
   quantity?: true
   amount?: true
   subtotal?: true
+  isActive?: true
+  isFixedAmount?: true
+  isFixedQuantity?: true
+  isMonthly?: true
+  isPaid?: true
+  month?: true
+  name?: true
+  year?: true
+  skuType?: true
+  createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -213,14 +267,23 @@ export type PaymentItemsGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 
 export type PaymentItemsGroupByOutputType = {
   id: string
-  paymentId: string
+  paymentId: string | null
   studentId: string
-  studentName: string
   paymentTypeId: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly: boolean
+  isPaid: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt: Date
+  updatedAt: Date
   _count: PaymentItemsCountAggregateOutputType | null
   _avg: PaymentItemsAvgAggregateOutputType | null
   _sum: PaymentItemsSumAggregateOutputType | null
@@ -248,29 +311,47 @@ export type PaymentItemsWhereInput = {
   OR?: Prisma.PaymentItemsWhereInput[]
   NOT?: Prisma.PaymentItemsWhereInput | Prisma.PaymentItemsWhereInput[]
   id?: Prisma.StringFilter<"PaymentItems"> | string
-  paymentId?: Prisma.StringFilter<"PaymentItems"> | string
+  paymentId?: Prisma.StringNullableFilter<"PaymentItems"> | string | null
   studentId?: Prisma.StringFilter<"PaymentItems"> | string
-  studentName?: Prisma.StringFilter<"PaymentItems"> | string
   paymentTypeId?: Prisma.StringFilter<"PaymentItems"> | string
-  skuName?: Prisma.StringFilter<"PaymentItems"> | string
   quantity?: Prisma.IntFilter<"PaymentItems"> | number
   amount?: Prisma.IntFilter<"PaymentItems"> | number
   subtotal?: Prisma.IntFilter<"PaymentItems"> | number
-  payment?: Prisma.XOR<Prisma.PaymentScalarRelationFilter, Prisma.PaymentWhereInput>
+  isActive?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isFixedAmount?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isFixedQuantity?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isMonthly?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isPaid?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  month?: Prisma.StringFilter<"PaymentItems"> | string
+  name?: Prisma.StringFilter<"PaymentItems"> | string
+  year?: Prisma.StringFilter<"PaymentItems"> | string
+  skuType?: Prisma.StringFilter<"PaymentItems"> | string
+  createdAt?: Prisma.DateTimeFilter<"PaymentItems"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"PaymentItems"> | Date | string
+  payment?: Prisma.XOR<Prisma.PaymentNullableScalarRelationFilter, Prisma.PaymentWhereInput> | null
   PaymentType?: Prisma.XOR<Prisma.PaymentTypeScalarRelationFilter, Prisma.PaymentTypeWhereInput>
   student?: Prisma.XOR<Prisma.UserDataScalarRelationFilter, Prisma.UserDataWhereInput>
 }
 
 export type PaymentItemsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  paymentId?: Prisma.SortOrder
+  paymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   studentId?: Prisma.SortOrder
-  studentName?: Prisma.SortOrder
   paymentTypeId?: Prisma.SortOrder
-  skuName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  isMonthly?: Prisma.SortOrder
+  isPaid?: Prisma.SortOrder
+  month?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  year?: Prisma.SortOrder
+  skuType?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   payment?: Prisma.PaymentOrderByWithRelationInput
   PaymentType?: Prisma.PaymentTypeOrderByWithRelationInput
   student?: Prisma.UserDataOrderByWithRelationInput
@@ -281,29 +362,47 @@ export type PaymentItemsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.PaymentItemsWhereInput | Prisma.PaymentItemsWhereInput[]
   OR?: Prisma.PaymentItemsWhereInput[]
   NOT?: Prisma.PaymentItemsWhereInput | Prisma.PaymentItemsWhereInput[]
-  paymentId?: Prisma.StringFilter<"PaymentItems"> | string
+  paymentId?: Prisma.StringNullableFilter<"PaymentItems"> | string | null
   studentId?: Prisma.StringFilter<"PaymentItems"> | string
-  studentName?: Prisma.StringFilter<"PaymentItems"> | string
   paymentTypeId?: Prisma.StringFilter<"PaymentItems"> | string
-  skuName?: Prisma.StringFilter<"PaymentItems"> | string
   quantity?: Prisma.IntFilter<"PaymentItems"> | number
   amount?: Prisma.IntFilter<"PaymentItems"> | number
   subtotal?: Prisma.IntFilter<"PaymentItems"> | number
-  payment?: Prisma.XOR<Prisma.PaymentScalarRelationFilter, Prisma.PaymentWhereInput>
+  isActive?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isFixedAmount?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isFixedQuantity?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isMonthly?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isPaid?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  month?: Prisma.StringFilter<"PaymentItems"> | string
+  name?: Prisma.StringFilter<"PaymentItems"> | string
+  year?: Prisma.StringFilter<"PaymentItems"> | string
+  skuType?: Prisma.StringFilter<"PaymentItems"> | string
+  createdAt?: Prisma.DateTimeFilter<"PaymentItems"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"PaymentItems"> | Date | string
+  payment?: Prisma.XOR<Prisma.PaymentNullableScalarRelationFilter, Prisma.PaymentWhereInput> | null
   PaymentType?: Prisma.XOR<Prisma.PaymentTypeScalarRelationFilter, Prisma.PaymentTypeWhereInput>
   student?: Prisma.XOR<Prisma.UserDataScalarRelationFilter, Prisma.UserDataWhereInput>
 }, "id">
 
 export type PaymentItemsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  paymentId?: Prisma.SortOrder
+  paymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   studentId?: Prisma.SortOrder
-  studentName?: Prisma.SortOrder
   paymentTypeId?: Prisma.SortOrder
-  skuName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  isMonthly?: Prisma.SortOrder
+  isPaid?: Prisma.SortOrder
+  month?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  year?: Prisma.SortOrder
+  skuType?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.PaymentItemsCountOrderByAggregateInput
   _avg?: Prisma.PaymentItemsAvgOrderByAggregateInput
   _max?: Prisma.PaymentItemsMaxOrderByAggregateInput
@@ -316,95 +415,167 @@ export type PaymentItemsScalarWhereWithAggregatesInput = {
   OR?: Prisma.PaymentItemsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PaymentItemsScalarWhereWithAggregatesInput | Prisma.PaymentItemsScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
-  paymentId?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
+  paymentId?: Prisma.StringNullableWithAggregatesFilter<"PaymentItems"> | string | null
   studentId?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
-  studentName?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
   paymentTypeId?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
-  skuName?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"PaymentItems"> | number
   amount?: Prisma.IntWithAggregatesFilter<"PaymentItems"> | number
   subtotal?: Prisma.IntWithAggregatesFilter<"PaymentItems"> | number
+  isActive?: Prisma.BoolWithAggregatesFilter<"PaymentItems"> | boolean
+  isFixedAmount?: Prisma.BoolWithAggregatesFilter<"PaymentItems"> | boolean
+  isFixedQuantity?: Prisma.BoolWithAggregatesFilter<"PaymentItems"> | boolean
+  isMonthly?: Prisma.BoolWithAggregatesFilter<"PaymentItems"> | boolean
+  isPaid?: Prisma.BoolWithAggregatesFilter<"PaymentItems"> | boolean
+  month?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
+  name?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
+  year?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
+  skuType?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentItems"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentItems"> | Date | string
 }
 
 export type PaymentItemsCreateInput = {
   id?: string
-  studentName: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
-  payment: Prisma.PaymentCreateNestedOneWithoutPaymentItemsInput
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  payment?: Prisma.PaymentCreateNestedOneWithoutPaymentItemsInput
   PaymentType: Prisma.PaymentTypeCreateNestedOneWithoutPaymentItemsInput
   student: Prisma.UserDataCreateNestedOneWithoutPaymentItemsInput
 }
 
 export type PaymentItemsUncheckedCreateInput = {
   id?: string
-  paymentId: string
+  paymentId?: string | null
   studentId: string
-  studentName: string
   paymentTypeId: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type PaymentItemsUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
-  payment?: Prisma.PaymentUpdateOneRequiredWithoutPaymentItemsNestedInput
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payment?: Prisma.PaymentUpdateOneWithoutPaymentItemsNestedInput
   PaymentType?: Prisma.PaymentTypeUpdateOneRequiredWithoutPaymentItemsNestedInput
   student?: Prisma.UserDataUpdateOneRequiredWithoutPaymentItemsNestedInput
 }
 
 export type PaymentItemsUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentItemsCreateManyInput = {
   id?: string
-  paymentId: string
+  paymentId?: string | null
   studentId: string
-  studentName: string
   paymentTypeId: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type PaymentItemsUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentItemsUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentItemsListRelationFilter = {
@@ -421,12 +592,21 @@ export type PaymentItemsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   paymentId?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
-  studentName?: Prisma.SortOrder
   paymentTypeId?: Prisma.SortOrder
-  skuName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  isMonthly?: Prisma.SortOrder
+  isPaid?: Prisma.SortOrder
+  month?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  year?: Prisma.SortOrder
+  skuType?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type PaymentItemsAvgOrderByAggregateInput = {
@@ -439,24 +619,42 @@ export type PaymentItemsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   paymentId?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
-  studentName?: Prisma.SortOrder
   paymentTypeId?: Prisma.SortOrder
-  skuName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  isMonthly?: Prisma.SortOrder
+  isPaid?: Prisma.SortOrder
+  month?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  year?: Prisma.SortOrder
+  skuType?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type PaymentItemsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   paymentId?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
-  studentName?: Prisma.SortOrder
   paymentTypeId?: Prisma.SortOrder
-  skuName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  isFixedAmount?: Prisma.SortOrder
+  isFixedQuantity?: Prisma.SortOrder
+  isMonthly?: Prisma.SortOrder
+  isPaid?: Prisma.SortOrder
+  month?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  year?: Prisma.SortOrder
+  skuType?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type PaymentItemsSumOrderByAggregateInput = {
@@ -593,24 +791,42 @@ export type PaymentItemsUncheckedUpdateManyWithoutPaymentNestedInput = {
 
 export type PaymentItemsCreateWithoutStudentInput = {
   id?: string
-  studentName: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
-  payment: Prisma.PaymentCreateNestedOneWithoutPaymentItemsInput
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  payment?: Prisma.PaymentCreateNestedOneWithoutPaymentItemsInput
   PaymentType: Prisma.PaymentTypeCreateNestedOneWithoutPaymentItemsInput
 }
 
 export type PaymentItemsUncheckedCreateWithoutStudentInput = {
   id?: string
-  paymentId: string
-  studentName: string
+  paymentId?: string | null
   paymentTypeId: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type PaymentItemsCreateOrConnectWithoutStudentInput = {
@@ -644,36 +860,63 @@ export type PaymentItemsScalarWhereInput = {
   OR?: Prisma.PaymentItemsScalarWhereInput[]
   NOT?: Prisma.PaymentItemsScalarWhereInput | Prisma.PaymentItemsScalarWhereInput[]
   id?: Prisma.StringFilter<"PaymentItems"> | string
-  paymentId?: Prisma.StringFilter<"PaymentItems"> | string
+  paymentId?: Prisma.StringNullableFilter<"PaymentItems"> | string | null
   studentId?: Prisma.StringFilter<"PaymentItems"> | string
-  studentName?: Prisma.StringFilter<"PaymentItems"> | string
   paymentTypeId?: Prisma.StringFilter<"PaymentItems"> | string
-  skuName?: Prisma.StringFilter<"PaymentItems"> | string
   quantity?: Prisma.IntFilter<"PaymentItems"> | number
   amount?: Prisma.IntFilter<"PaymentItems"> | number
   subtotal?: Prisma.IntFilter<"PaymentItems"> | number
+  isActive?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isFixedAmount?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isFixedQuantity?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isMonthly?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  isPaid?: Prisma.BoolFilter<"PaymentItems"> | boolean
+  month?: Prisma.StringFilter<"PaymentItems"> | string
+  name?: Prisma.StringFilter<"PaymentItems"> | string
+  year?: Prisma.StringFilter<"PaymentItems"> | string
+  skuType?: Prisma.StringFilter<"PaymentItems"> | string
+  createdAt?: Prisma.DateTimeFilter<"PaymentItems"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"PaymentItems"> | Date | string
 }
 
 export type PaymentItemsCreateWithoutPaymentTypeInput = {
   id?: string
-  studentName: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
-  payment: Prisma.PaymentCreateNestedOneWithoutPaymentItemsInput
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  payment?: Prisma.PaymentCreateNestedOneWithoutPaymentItemsInput
   student: Prisma.UserDataCreateNestedOneWithoutPaymentItemsInput
 }
 
 export type PaymentItemsUncheckedCreateWithoutPaymentTypeInput = {
   id?: string
-  paymentId: string
+  paymentId?: string | null
   studentId: string
-  studentName: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type PaymentItemsCreateOrConnectWithoutPaymentTypeInput = {
@@ -704,11 +947,20 @@ export type PaymentItemsUpdateManyWithWhereWithoutPaymentTypeInput = {
 
 export type PaymentItemsCreateWithoutPaymentInput = {
   id?: string
-  studentName: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
   PaymentType: Prisma.PaymentTypeCreateNestedOneWithoutPaymentItemsInput
   student: Prisma.UserDataCreateNestedOneWithoutPaymentItemsInput
 }
@@ -716,12 +968,21 @@ export type PaymentItemsCreateWithoutPaymentInput = {
 export type PaymentItemsUncheckedCreateWithoutPaymentInput = {
   id?: string
   studentId: string
-  studentName: string
   paymentTypeId: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type PaymentItemsCreateOrConnectWithoutPaymentInput = {
@@ -752,110 +1013,200 @@ export type PaymentItemsUpdateManyWithWhereWithoutPaymentInput = {
 
 export type PaymentItemsCreateManyStudentInput = {
   id?: string
-  paymentId: string
-  studentName: string
+  paymentId?: string | null
   paymentTypeId: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type PaymentItemsUpdateWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
-  payment?: Prisma.PaymentUpdateOneRequiredWithoutPaymentItemsNestedInput
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payment?: Prisma.PaymentUpdateOneWithoutPaymentItemsNestedInput
   PaymentType?: Prisma.PaymentTypeUpdateOneRequiredWithoutPaymentItemsNestedInput
 }
 
 export type PaymentItemsUncheckedUpdateWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentItemsUncheckedUpdateManyWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentItemsCreateManyPaymentTypeInput = {
   id?: string
-  paymentId: string
+  paymentId?: string | null
   studentId: string
-  studentName: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type PaymentItemsUpdateWithoutPaymentTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
-  payment?: Prisma.PaymentUpdateOneRequiredWithoutPaymentItemsNestedInput
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payment?: Prisma.PaymentUpdateOneWithoutPaymentItemsNestedInput
   student?: Prisma.UserDataUpdateOneRequiredWithoutPaymentItemsNestedInput
 }
 
 export type PaymentItemsUncheckedUpdateWithoutPaymentTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentItemsUncheckedUpdateManyWithoutPaymentTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentItemsCreateManyPaymentInput = {
   id?: string
   studentId: string
-  studentName: string
   paymentTypeId: string
-  skuName: string
   quantity: number
   amount: number
   subtotal: number
+  isActive?: boolean
+  isFixedAmount: boolean
+  isFixedQuantity: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month: string
+  name: string
+  year: string
+  skuType: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type PaymentItemsUpdateWithoutPaymentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   PaymentType?: Prisma.PaymentTypeUpdateOneRequiredWithoutPaymentItemsNestedInput
   student?: Prisma.UserDataUpdateOneRequiredWithoutPaymentItemsNestedInput
 }
@@ -863,23 +1214,41 @@ export type PaymentItemsUpdateWithoutPaymentInput = {
 export type PaymentItemsUncheckedUpdateWithoutPaymentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentItemsUncheckedUpdateManyWithoutPaymentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  studentName?: Prisma.StringFieldUpdateOperationsInput | string
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  skuName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMonthly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  month?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.StringFieldUpdateOperationsInput | string
+  skuType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -888,13 +1257,22 @@ export type PaymentItemsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   id?: boolean
   paymentId?: boolean
   studentId?: boolean
-  studentName?: boolean
   paymentTypeId?: boolean
-  skuName?: boolean
   quantity?: boolean
   amount?: boolean
   subtotal?: boolean
-  payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
+  isActive?: boolean
+  isFixedAmount?: boolean
+  isFixedQuantity?: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month?: boolean
+  name?: boolean
+  year?: boolean
+  skuType?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  payment?: boolean | Prisma.PaymentItems$paymentArgs<ExtArgs>
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
   student?: boolean | Prisma.UserDataDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentItems"]>
@@ -903,13 +1281,22 @@ export type PaymentItemsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   paymentId?: boolean
   studentId?: boolean
-  studentName?: boolean
   paymentTypeId?: boolean
-  skuName?: boolean
   quantity?: boolean
   amount?: boolean
   subtotal?: boolean
-  payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
+  isActive?: boolean
+  isFixedAmount?: boolean
+  isFixedQuantity?: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month?: boolean
+  name?: boolean
+  year?: boolean
+  skuType?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  payment?: boolean | Prisma.PaymentItems$paymentArgs<ExtArgs>
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
   student?: boolean | Prisma.UserDataDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentItems"]>
@@ -918,13 +1305,22 @@ export type PaymentItemsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   paymentId?: boolean
   studentId?: boolean
-  studentName?: boolean
   paymentTypeId?: boolean
-  skuName?: boolean
   quantity?: boolean
   amount?: boolean
   subtotal?: boolean
-  payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
+  isActive?: boolean
+  isFixedAmount?: boolean
+  isFixedQuantity?: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month?: boolean
+  name?: boolean
+  year?: boolean
+  skuType?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  payment?: boolean | Prisma.PaymentItems$paymentArgs<ExtArgs>
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
   student?: boolean | Prisma.UserDataDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentItems"]>
@@ -933,27 +1329,36 @@ export type PaymentItemsSelectScalar = {
   id?: boolean
   paymentId?: boolean
   studentId?: boolean
-  studentName?: boolean
   paymentTypeId?: boolean
-  skuName?: boolean
   quantity?: boolean
   amount?: boolean
   subtotal?: boolean
+  isActive?: boolean
+  isFixedAmount?: boolean
+  isFixedQuantity?: boolean
+  isMonthly?: boolean
+  isPaid?: boolean
+  month?: boolean
+  name?: boolean
+  year?: boolean
+  skuType?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type PaymentItemsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentId" | "studentId" | "studentName" | "paymentTypeId" | "skuName" | "quantity" | "amount" | "subtotal", ExtArgs["result"]["paymentItems"]>
+export type PaymentItemsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentId" | "studentId" | "paymentTypeId" | "quantity" | "amount" | "subtotal" | "isActive" | "isFixedAmount" | "isFixedQuantity" | "isMonthly" | "isPaid" | "month" | "name" | "year" | "skuType" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentItems"]>
 export type PaymentItemsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
+  payment?: boolean | Prisma.PaymentItems$paymentArgs<ExtArgs>
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
   student?: boolean | Prisma.UserDataDefaultArgs<ExtArgs>
 }
 export type PaymentItemsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
+  payment?: boolean | Prisma.PaymentItems$paymentArgs<ExtArgs>
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
   student?: boolean | Prisma.UserDataDefaultArgs<ExtArgs>
 }
 export type PaymentItemsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
+  payment?: boolean | Prisma.PaymentItems$paymentArgs<ExtArgs>
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
   student?: boolean | Prisma.UserDataDefaultArgs<ExtArgs>
 }
@@ -961,20 +1366,29 @@ export type PaymentItemsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types
 export type $PaymentItemsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PaymentItems"
   objects: {
-    payment: Prisma.$PaymentPayload<ExtArgs>
+    payment: Prisma.$PaymentPayload<ExtArgs> | null
     PaymentType: Prisma.$PaymentTypePayload<ExtArgs>
     student: Prisma.$UserDataPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    paymentId: string
+    paymentId: string | null
     studentId: string
-    studentName: string
     paymentTypeId: string
-    skuName: string
     quantity: number
     amount: number
     subtotal: number
+    isActive: boolean
+    isFixedAmount: boolean
+    isFixedQuantity: boolean
+    isMonthly: boolean
+    isPaid: boolean
+    month: string
+    name: string
+    year: string
+    skuType: string
+    createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["paymentItems"]>
   composites: {}
 }
@@ -1369,7 +1783,7 @@ readonly fields: PaymentItemsFieldRefs;
  */
 export interface Prisma__PaymentItemsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  payment<T extends Prisma.PaymentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentDefaultArgs<ExtArgs>>): Prisma.Prisma__PaymentClient<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  payment<T extends Prisma.PaymentItems$paymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentItems$paymentArgs<ExtArgs>>): Prisma.Prisma__PaymentClient<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   PaymentType<T extends Prisma.PaymentTypeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTypeDefaultArgs<ExtArgs>>): Prisma.Prisma__PaymentTypeClient<runtime.Types.Result.GetResult<Prisma.$PaymentTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   student<T extends Prisma.UserDataDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDataDefaultArgs<ExtArgs>>): Prisma.Prisma__UserDataClient<runtime.Types.Result.GetResult<Prisma.$UserDataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1404,12 +1818,21 @@ export interface PaymentItemsFieldRefs {
   readonly id: Prisma.FieldRef<"PaymentItems", 'String'>
   readonly paymentId: Prisma.FieldRef<"PaymentItems", 'String'>
   readonly studentId: Prisma.FieldRef<"PaymentItems", 'String'>
-  readonly studentName: Prisma.FieldRef<"PaymentItems", 'String'>
   readonly paymentTypeId: Prisma.FieldRef<"PaymentItems", 'String'>
-  readonly skuName: Prisma.FieldRef<"PaymentItems", 'String'>
   readonly quantity: Prisma.FieldRef<"PaymentItems", 'Int'>
   readonly amount: Prisma.FieldRef<"PaymentItems", 'Int'>
   readonly subtotal: Prisma.FieldRef<"PaymentItems", 'Int'>
+  readonly isActive: Prisma.FieldRef<"PaymentItems", 'Boolean'>
+  readonly isFixedAmount: Prisma.FieldRef<"PaymentItems", 'Boolean'>
+  readonly isFixedQuantity: Prisma.FieldRef<"PaymentItems", 'Boolean'>
+  readonly isMonthly: Prisma.FieldRef<"PaymentItems", 'Boolean'>
+  readonly isPaid: Prisma.FieldRef<"PaymentItems", 'Boolean'>
+  readonly month: Prisma.FieldRef<"PaymentItems", 'String'>
+  readonly name: Prisma.FieldRef<"PaymentItems", 'String'>
+  readonly year: Prisma.FieldRef<"PaymentItems", 'String'>
+  readonly skuType: Prisma.FieldRef<"PaymentItems", 'String'>
+  readonly createdAt: Prisma.FieldRef<"PaymentItems", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"PaymentItems", 'DateTime'>
 }
     
 
@@ -1808,6 +2231,25 @@ export type PaymentItemsDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many PaymentItems to delete.
    */
   limit?: number
+}
+
+/**
+ * PaymentItems.payment
+ */
+export type PaymentItems$paymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
 }
 
 /**

@@ -12,18 +12,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 
 // Import hooks
-import { useGetUsers } from "@/app/hooks/Users/useUsers";
-import { useGetBetterAuth } from "@/app/hooks/Users/useBetterAuth";
+import { useGetUsers } from "@/app/(hooks)/hooks/Users/useUsers";
+import { useGetBetterAuth } from "@/app/(hooks)/hooks/Users/useBetterAuth";
 
 // Import dialog components
 import { UserFormDialog, DeleteUserDialog, UserData, BetterAuthUser, DeleteUserBulkDialog } from "@/components/dialog/DialogUser";
 import Image from "next/image";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { unauthorized } from "next/navigation";
-import { useGetClasses } from "@/app/hooks/Classes/useClass";
-import { useGetTahfidzGroup } from "@/app/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
 
 // Dashboard Component - Only rendered after role verification
 function UserDashboard() {
@@ -638,7 +638,7 @@ function UserDashboard() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -646,12 +646,13 @@ function UserDashboard() {
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data user.
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>

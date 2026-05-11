@@ -20,11 +20,11 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks (Anda perlu membuat hooks ini sesuai dengan API backend)
-import { useGetRoles, useCreateRole, useUpdateRole, useDeleteRole } from "@/app/hooks/Roles/useRoles";
+import { useGetRoles, useCreateRole, useUpdateRole, useDeleteRole } from "@/app/(hooks)/hooks/Roles/useRoles";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // Type definitions
 export type RoleData = {
@@ -132,6 +132,10 @@ const availablePermissions = [
   {
     id: "/dashboard/accountbank",
     label: "Akun Bank Management",
+  },
+  {
+    id: "/dashboard/bendahara/billing",
+    label: "Data Billing (Bendahara)",
   },
 ];
 
@@ -248,11 +252,7 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
               Batal
             </Button>
             <Button type="submit" disabled={createRole.isPending || updateRole.isPending}>
-              {createRole.isPending || updateRole.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createRole.isPending || updateRole.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -367,13 +367,15 @@ function RoleDataTable() {
         const permissions = (row.getValue("permissions") as string[]) || [];
         return (
           <div className="flex flex-wrap gap-1">
-            {permissions.length > 0 ?
+            {permissions.length > 0 ? (
               permissions.slice(0, 3).map((permission) => (
                 <Badge key={permission} variant="outline" className="text-xs">
                   {availablePermissions.find((p) => p.id === permission)?.label || permission}
                 </Badge>
               ))
-            : <span className="text-muted-foreground text-sm">Tidak ada</span>}
+            ) : (
+              <span className="text-muted-foreground text-sm">Tidak ada</span>
+            )}
             {permissions.length > 3 && (
               <Badge variant="outline" className="text-xs">
                 +{permissions.length - 3} lainnya
@@ -521,7 +523,7 @@ function RoleDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ?
+              {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -529,12 +531,13 @@ function RoleDataTable() {
                     ))}
                   </TableRow>
                 ))
-              : <TableRow>
+              ) : (
+                <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     Tidak ada data role.
                   </TableCell>
                 </TableRow>
-              }
+              )}
             </TableBody>
           </Table>
         </div>
@@ -577,10 +580,10 @@ export default function UserDataTable() {
   }
 
   // Check if user is Admin
-  if (userRole !== "Admin") {
-    unauthorized();
-    return null;
-  }
+  // if (userRole !== "Admin") {
+  //   unauthorized();
+  //   return null;
+  // }
 
   // Render dashboard only after authorization is confirmed
   return <RoleDataTable />;

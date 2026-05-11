@@ -21,11 +21,11 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetMajors, useCreateMajor, useUpdateMajor, useDeleteMajor } from "@/app/hooks/Majors/useMajors";
+import { useGetMajors, useCreateMajor, useUpdateMajor, useDeleteMajor } from "@/app/(hooks)/hooks/Majors/useMajors";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // Type definitions
 export type MajorData = {
@@ -145,11 +145,7 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
               Batal
             </Button>
             <Button type="submit" disabled={createMajor.isPending || updateMajor.isPending}>
-              {createMajor.isPending || updateMajor.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createMajor.isPending || updateMajor.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -244,28 +240,23 @@ function DeleteMajorDialog({ open, onOpenChange, majorData, onSuccess }: { open:
         <AlertDialogHeader>
           <AlertDialogTitle>Hapus Branch</AlertDialogTitle>
           <AlertDialogDescription>
-            {hasRelatedData ?
+            {hasRelatedData ? (
               <div className="space-y-2">
                 <p>
                   Brnach <strong>{majorData?.name}</strong> memiliki data terkait:
                 </p>
                 <ul className="list-disc list-inside text-sm space-y-1">
-                  {majorData?._count?.classes ?
-                    <li>{majorData._count.classes} kelas</li>
-                  : null}
-                  {majorData?._count?.students ?
-                    <li>{majorData._count.students} siswa</li>
-                  : null}
-                  {majorData?._count?.subjects ?
-                    <li>{majorData._count.subjects} mata pelajaran</li>
-                  : null}
+                  {majorData?._count?.classes ? <li>{majorData._count.classes} kelas</li> : null}
+                  {majorData?._count?.students ? <li>{majorData._count.students} siswa</li> : null}
+                  {majorData?._count?.subjects ? <li>{majorData._count.subjects} mata pelajaran</li> : null}
                 </ul>
                 <p className="text-red-600 font-medium">Menghapus Branch akan menghapus semua data terkait. Tindakan ini tidak dapat dibatalkan.</p>
               </div>
-            : <p>
+            ) : (
+              <p>
                 Apakah Anda yakin ingin menghapus branch <strong>{majorData?.name}</strong>? Tindakan ini tidak dapat dibatalkan.
               </p>
-            }
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -511,7 +502,7 @@ function MajorDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ?
+                {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -519,12 +510,13 @@ function MajorDataTable() {
                       ))}
                     </TableRow>
                   ))
-                : <TableRow>
+                ) : (
+                  <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data Branch.
                     </TableCell>
                   </TableRow>
-                }
+                )}
               </TableBody>
             </Table>
           </div>

@@ -23,14 +23,14 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useCreateAttendance, useUpdateAttendance, useDeleteAttendance } from "@/app/hooks/Attendances/useAttendance";
-import { useGetSchedules } from "@/app/hooks/Schedules/useSchedules";
-import { useGetStudents } from "@/app/hooks/Users/useStudents";
+import { useCreateAttendance, useUpdateAttendance, useDeleteAttendance } from "@/app/(hooks)/hooks/Attendances/useAttendance";
+import { useGetSchedules } from "@/app/(hooks)/hooks/Schedules/useSchedules";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useAttendanceByDate } from "@/app/hooks/Attendances/useAttendanceByDate";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useAttendanceByDate } from "@/app/(hooks)/hooks/Attendances/useAttendanceByDate";
 
 // Type definitions
 export type AttendanceData = {
@@ -318,7 +318,11 @@ function AttendanceDataTable() {
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
 
   // Use the attendance by date hook
-  const { data: attendanceByDate = [], isLoading: isLoadingAttendanceByDate, refetch } = useAttendanceByDate({
+  const {
+    data: attendanceByDate = [],
+    isLoading: isLoadingAttendanceByDate,
+    refetch,
+  } = useAttendanceByDate({
     fromdate: dateRange?.from || new Date(),
     todate: dateRange?.to || new Date(),
   });
@@ -344,9 +348,7 @@ function AttendanceDataTable() {
         return;
       }
 
-      const wsData = [
-        ["Tanggal", "Hari", "Nama Siswa", "Email Siswa", "NISN", "Kelas", "Mata Pelajaran", "Kode Mapel", "Guru Pengajar", "Waktu Mulai", "Waktu Selesai", "Ruangan", "Status Kehadiran", "Catatan"],
-      ];
+      const wsData = [["Tanggal", "Hari", "Nama Siswa", "Email Siswa", "NISN", "Kelas", "Mata Pelajaran", "Kode Mapel", "Guru Pengajar", "Waktu Mulai", "Waktu Selesai", "Ruangan", "Status Kehadiran", "Catatan"]];
 
       selectedRows.forEach((row) => {
         const attendance = row.original;
@@ -378,11 +380,7 @@ function AttendanceDataTable() {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-      ws["!cols"] = [
-        { wch: 12 }, { wch: 10 }, { wch: 25 }, { wch: 25 }, { wch: 12 }, 
-        { wch: 15 }, { wch: 25 }, { wch: 12 }, { wch: 25 }, { wch: 12 }, 
-        { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 35 }
-      ];
+      ws["!cols"] = [{ wch: 12 }, { wch: 10 }, { wch: 25 }, { wch: 25 }, { wch: 12 }, { wch: 15 }, { wch: 25 }, { wch: 12 }, { wch: 25 }, { wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 35 }];
 
       XLSX.utils.book_append_sheet(wb, ws, "Data Kehadiran");
 
@@ -435,7 +433,7 @@ function AttendanceDataTable() {
 
       return schedule?.class?.id === filterValue;
     },
-    [schedules]
+    [schedules],
   );
 
   const columns: ColumnDef<AttendanceData>[] = [
@@ -831,9 +829,7 @@ function AttendanceDataTable() {
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <CheckCircle className="h-8 w-8 text-muted-foreground" />
-                      <p className="text-muted-foreground">
-                        {globalFilter || statusFilter !== "all" || classFilter !== "all" ? "Tidak ada data kehadiran yang sesuai dengan filter." : "Tidak ada data kehadiran yang ditemukan."}
-                      </p>
+                      <p className="text-muted-foreground">{globalFilter || statusFilter !== "all" || classFilter !== "all" ? "Tidak ada data kehadiran yang sesuai dengan filter." : "Tidak ada data kehadiran yang ditemukan."}</p>
                       {(globalFilter || statusFilter !== "all" || classFilter !== "all") && (
                         <Button
                           variant="outline"

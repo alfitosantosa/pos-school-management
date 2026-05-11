@@ -1,7 +1,6 @@
 // model Payment {
 //   id                 String              @id @default(cuid())
 //   studentId          String
-//   BendaharaId        String
 //   amount             Decimal
 //   dueDate            DateTime?
 //   status             String              @default("pending")
@@ -10,12 +9,14 @@
 //   paymentDate        DateTime
 //   receiptNumber      String              @unique
 //   accountBankId      String
+//   bankRef            String?
 //   majorId            String
 //   month              String
+//   bendaharaId        String
 //   paymentItems       PaymentItems[]
 //   paymentTransaction PaymentTransaction?
-//   createdBy          UserData            @relation("CreatedPayment", fields:[BendaharaId], references:[id])
 //   accountBank        AccountBank         @relation(fields: [accountBankId], references: [id])
+//   createdBy          UserData            @relation("CreatedPayment", fields: [bendaharaId], references: [id])
 //   major              Major               @relation(fields: [majorId], references: [id])
 //   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
 
@@ -48,7 +49,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { studentId, amount, dueDate, status, notes, paymentDate, receiptNumber, accountBankId, majorId, month, bendaharaId } = await request.json();
+    const { studentId, amount, dueDate, status, notes, paymentDate, receiptNumber, accountBankId, majorId, month, bendaharaId, bankRef } = await request.json();
 
     const newPayment = await prisma.payment.create({
       data: {
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
         bendaharaId,
         amount: parseFloat(amount),
         accountBankId,
+        bankRef,
         majorId,
         month,
         dueDate: dueDate ? new Date(dueDate) : undefined,

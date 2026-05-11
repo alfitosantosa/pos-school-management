@@ -21,11 +21,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 
-import { useGetPaymentTypes, useCreatePaymentType, useUpdatePaymentType, useDeletePaymentType, useGetPaymentTypeByIdMajor } from "@/app/hooks/Payments/usePaymentType";
+import { useGetPaymentTypes, useCreatePaymentType, useUpdatePaymentType, useDeletePaymentType, useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // ============================================================================
 // Type Definitions
@@ -41,6 +41,7 @@ export type PaymentTypeData = {
   isFixedAmount: boolean;
   isFixedQuantity: boolean;
   owner: string;
+  skuType: string;
   majorId: string;
   isMonthly: boolean;
   isActive: boolean;
@@ -53,6 +54,15 @@ type PaymentTypeFormValues = z.infer<typeof paymentTypeSchema>;
 // ============================================================================
 // Constants & Schemas
 // ============================================================================
+
+const SKUTYPE_OPTIONS = [
+  { value: "SPP", label: "SPP" },
+  { value: "Buku", label: "Buku" },
+  { value: "Seragam", label: "Seragam" },
+  { value: "Kegiatan", label: "Kegiatan" },
+  { value: "Catering", label: "Catering" },
+  { value: "Lainnya", label: "Lainnya" },
+] as const;
 
 const OWNER_OPTIONS = [
   { value: "Sekolah", label: "Sekolah" },
@@ -76,13 +86,14 @@ const paymentTypeSchema = z.object({
   description: z.string().min(1, "Deskripsi wajib diisi"),
   amount: z.number().min(0, "Jumlah minimal 0"),
   subtotal: z.number().min(0, "Jumlah minimal 0"),
+  owner: z.string().min(1, "Jenis peruntukan wajib diisi"),
+  majorId: z.string().min(1, "ID Branch wajib diisi"),
+  skuType: z.string().min(1, "SKU Type wajib diisi"),
+  quantity: z.number().min(0, "Jumlah minimal 0"),
   isMonthly: z.boolean(),
   isActive: z.boolean(),
-  quantity: z.number().min(0, "Jumlah minimal 0"),
   isFixedAmount: z.boolean(),
   isFixedQuantity: z.boolean(),
-  owner: z.string(),
-  majorId: z.string(),
 });
 
 const DEFAULT_FORM_VALUES: Partial<PaymentTypeFormValues> = {
@@ -96,6 +107,7 @@ const DEFAULT_FORM_VALUES: Partial<PaymentTypeFormValues> = {
   owner: "",
   name: "",
   description: "",
+  skuType: "",
 };
 
 // ============================================================================
@@ -170,6 +182,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
       setValue("isFixedAmount", editData.isFixedAmount);
       setValue("isFixedQuantity", editData.isFixedQuantity);
       setValue("owner", editData.owner);
+      setValue("skuType", editData.skuType);
       setValue("subtotal", parseToFloat(editData.subtotal));
     } else {
       reset(DEFAULT_FORM_VALUES);
@@ -229,6 +242,24 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
               </SelectContent>
             </Select>
             {errors.owner && <p className="text-sm text-red-500">{errors.owner.message}</p>}
+          </div>
+
+          {/* SKU Type Selection */}
+          <div className="space-y-2">
+            <Label htmlFor="skuType">Jenis SKU</Label>
+            <Select value={watch("skuType")} onValueChange={(value) => setValue("skuType", value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih jenis SKU" />
+              </SelectTrigger>
+              <SelectContent>
+                {SKUTYPE_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.skuType && <p className="text-sm text-red-500">{errors.skuType.message}</p>}
           </div>
 
           {/* Name Input */}
@@ -306,11 +337,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
               Batal
             </Button>
             <Button type="submit" disabled={createPaymentType.isPending || updatePaymentType.isPending}>
-              {createPaymentType.isPending || updatePaymentType.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createPaymentType.isPending || updatePaymentType.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -390,6 +417,16 @@ const createColumns = (onEdit: (data: PaymentTypeData) => void, onDelete: (data:
         {row.getValue("description")}
       </div>
     ),
+  },
+  {
+    accessorKey: "owner",
+    header: "Peruntukan",
+    cell: ({ row }) => <div>{row.getValue("owner")}</div>,
+  },
+  {
+    accessorKey: "skuType",
+    header: "Jenis SKU",
+    cell: ({ row }) => <div>{row.getValue("skuType")}</div>,
   },
   {
     accessorKey: "amount",
@@ -591,7 +628,7 @@ function PaymentTypeDataTable({ id }: { id: string }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -599,12 +636,13 @@ function PaymentTypeDataTable({ id }: { id: string }) {
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data jenis pembayaran.
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>

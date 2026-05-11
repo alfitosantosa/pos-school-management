@@ -24,14 +24,14 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 // Import hooks
-import { useGetViolations, useCreateViolation, useUpdateViolation, useDeleteViolation } from "@/app/hooks/Violations/useViolations";
-import { useGetTypeViolations } from "@/app/hooks/Violations/useTypeViolations";
-import { useGetClasses } from "@/app/hooks/Classes/useClass";
-import { useGetUsers } from "@/app/hooks/Users/useUsers";
+import { useGetViolations, useCreateViolation, useUpdateViolation, useDeleteViolation } from "@/app/(hooks)/hooks/Violations/useViolations";
+import { useGetTypeViolations } from "@/app/(hooks)/hooks/Violations/useTypeViolations";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetUsers } from "@/app/(hooks)/hooks/Users/useUsers";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // Type definitions
 export type ViolationData = {
@@ -701,11 +701,9 @@ function ViolationDataTable() {
         <div className="font-bold text-3xl mb-6">Data Pelanggaran</div>
         <div className="mx-auto">
           <div className="flex items-center justify-between gap-2 py-4">
-          
             <div className="flex flex-wrap gap-2 ">
-              
               <Input placeholder="Cari siswa, kelas, pelanggaran..." value={globalFilter ?? ""} onChange={(event) => setGlobalFilter(event.target.value)} className="" disabled={isLoading} />
-         
+
               <div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-[140px]">
@@ -774,18 +772,18 @@ function ViolationDataTable() {
                             {column.id === "student"
                               ? "Siswa"
                               : column.id === "class"
-                              ? "Kelas"
-                              : column.id === "violationType"
-                              ? "Jenis Pelanggaran"
-                              : column.id === "date"
-                              ? "Tanggal"
-                              : column.id === "status"
-                              ? "Status"
-                              : column.id === "reportedBy"
-                              ? "Dilaporkan Oleh"
-                              : column.id === "description"
-                              ? "Deskripsi"
-                              : column.id}
+                                ? "Kelas"
+                                : column.id === "violationType"
+                                  ? "Jenis Pelanggaran"
+                                  : column.id === "date"
+                                    ? "Tanggal"
+                                    : column.id === "status"
+                                      ? "Status"
+                                      : column.id === "reportedBy"
+                                        ? "Dilaporkan Oleh"
+                                        : column.id === "description"
+                                          ? "Deskripsi"
+                                          : column.id}
                           </DropdownMenuCheckboxItem>
                         );
                       })}

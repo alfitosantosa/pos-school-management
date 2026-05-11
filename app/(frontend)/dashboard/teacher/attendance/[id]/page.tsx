@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { useGetClassById } from "@/app/hooks/Classes/useGetClassById";
-import { useGetScheduleById } from "@/app/hooks/Schedules/useGetScheduleById";
+import { useGetClassById } from "@/app/(hooks)/hooks/Classes/useGetClassById";
+import { useGetScheduleById } from "@/app/(hooks)/hooks/Schedules/useGetScheduleById";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,14 +10,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Smartphone, Clock, AlertTriangle, CheckCircle, User, BookOpen, Users, MessageSquare, Send } from "lucide-react";
 import { unauthorized, useParams } from "next/navigation";
-import { useCreateAttendanceBulk } from "@/app/hooks/Attendances/useBulkAttendance";
-import { useBulkSendWhatsApp } from "@/app/hooks/BotWA/useBotWA";
+import { useCreateAttendanceBulk } from "@/app/(hooks)/hooks/Attendances/useBulkAttendance";
+import { useBulkSendWhatsApp } from "@/app/(hooks)/hooks/BotWA/useBotWA";
 import Loading from "@/components/loading";
 import { toast } from "sonner";
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 interface Student {
   id: string;
@@ -59,9 +59,8 @@ function AttendanceModule() {
   const createAttendanceMutation = useCreateAttendanceBulk();
   const bulkSendWA = useBulkSendWhatsApp();
 
-  const currentSession =
-    scheduleDataById[0] ?
-      {
+  const currentSession = scheduleDataById[0]
+    ? {
         subject: scheduleDataById[0].subject.name,
         class: classData?.name || "Loading...",
         time: `${scheduleDataById[0].startTime} - ${scheduleDataById[0].endTime}`,
@@ -378,9 +377,9 @@ Terima kasih.
             </div>
           </CardHeader>
           <CardContent>
-            {isLoadingSchedule || isLoadingClass ?
+            {isLoadingSchedule || isLoadingClass ? (
               <Loading />
-            : currentSession ?
+            ) : currentSession ? (
               <div className="bg-blue-50 p-4 rounded-lg mb-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -406,12 +405,13 @@ Terima kasih.
                   </div>
                 </div>
               </div>
-            : null}
+            ) : null}
 
             <div className="space-y-3">
-              {isLoadingClass ?
+              {isLoadingClass ? (
                 <Loading />
-              : classData?.students.map((student: Student) => (
+              ) : (
+                classData?.students.map((student: Student) => (
                   <div key={student.id} className="flex flex-wrap items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors gap-3">
                     <div className={`w-3 h-3 rounded-xl ${getStatusColor(attendanceData[student.id]?.status)}`}></div>
                     <div>
@@ -447,7 +447,7 @@ Terima kasih.
                     </div>
                   </div>
                 ))
-              }
+              )}
             </div>
 
             <div className="mt-6 space-y-4">
@@ -468,17 +468,18 @@ Terima kasih.
 
               <div className="flex justify-between items-center">
                 <Button onClick={saveAttendance} disabled={isLoadingClass || createAttendanceMutation.isPending || isSendingWA} className="min-w-[180px]">
-                  {createAttendanceMutation.isPending || isSendingWA ?
+                  {createAttendanceMutation.isPending || isSendingWA ? (
                     <>
                       <span className="animate-spin mr-2">⏳</span>
                       {isSendingWA ? "Mengirim WA..." : "Menyimpan..."}
                     </>
-                  : <>
+                  ) : (
+                    <>
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Simpan Absensi
                       {sendWhatsApp && " & Kirim WA"}
                     </>
-                  }
+                  )}
                 </Button>
 
                 {/* Show success/error states */}
@@ -495,16 +496,13 @@ Terima kasih.
         <Card>
           <CardHeader>
             <CardTitle>Ringkasan Absensi Hari Ini</CardTitle>
-            <CardDescription>
-              {isLoadingClass ?
-                <Loading />
-              : `${classData?.students.length || 0} siswa dalam kelas ini`}
-            </CardDescription>
+            <CardDescription>{isLoadingClass ? <Loading /> : `${classData?.students.length || 0} siswa dalam kelas ini`}</CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoadingClass ?
+            {isLoadingClass ? (
               <Loading />
-            : <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <div className="text-2xl font-bold text-green-600">{stats.present}</div>
                   <div className="text-sm text-gray-600">Hadir</div>
@@ -526,7 +524,7 @@ Terima kasih.
                   <div className="text-sm text-gray-600">Tidak Hadir</div>
                 </div>
               </div>
-            }
+            )}
           </CardContent>
         </Card>
 

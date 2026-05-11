@@ -13,12 +13,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-import { useGetViolationsByIdStudent } from "@/app/hooks/Violations/useViolationsByIdStudent";
-import { useGetClasses } from "@/app/hooks/Classes/useClass";
-import { useGetStudentById } from "@/app/hooks/Users/useGetStudentById";
+import { useGetViolationsByIdStudent } from "@/app/(hooks)/hooks/Violations/useViolationsByIdStudent";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetStudentById } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Image from "next/image";
 import Loading from "@/components/loading";
 
@@ -385,18 +385,18 @@ export default function ViolationDataTable() {
                         {column.id === "student"
                           ? "Siswa"
                           : column.id === "class"
-                          ? "Kelas"
-                          : column.id === "violationType"
-                          ? "Jenis Pelanggaran"
-                          : column.id === "date"
-                          ? "Tanggal"
-                          : column.id === "status"
-                          ? "Status"
-                          : column.id === "reportedBy"
-                          ? "Dilaporkan Oleh"
-                          : column.id === "description"
-                          ? "Deskripsi"
-                          : column.id}
+                            ? "Kelas"
+                            : column.id === "violationType"
+                              ? "Jenis Pelanggaran"
+                              : column.id === "date"
+                                ? "Tanggal"
+                                : column.id === "status"
+                                  ? "Status"
+                                  : column.id === "reportedBy"
+                                    ? "Dilaporkan Oleh"
+                                    : column.id === "description"
+                                      ? "Deskripsi"
+                                      : column.id}
                       </DropdownMenuCheckboxItem>
                     );
                   })}

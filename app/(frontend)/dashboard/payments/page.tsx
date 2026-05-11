@@ -22,16 +22,16 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
-import { useGetPayments, useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/hooks/Payments/usePayment";
-import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems } from "@/app/hooks/Payments/usePaymentItems";
-import { useGetStudents } from "@/app/hooks/Users/useStudents";
-import { useGetMajors } from "@/app/hooks/Majors/useMajors";
-import { useGetAccountBank } from "@/app/hooks/AccountBank/useAccountBank";
-import { useGetPaymentTypes } from "@/app/hooks/Payments/usePaymentType";
+import { useGetPayments, useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
+import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { useGetAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
+import { useGetPaymentTypes } from "@/app/(hooks)/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { v4 as uuidv4 } from "uuid";
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -632,11 +632,7 @@ function PaymentFormDialog({
               Batal
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -740,9 +736,7 @@ function PaymentDataTable({ userDataId }: { userDataId?: string }) {
           <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs px-2" onClick={() => toggleExpand(p.id)}>
             <Package className="h-3.5 w-3.5" />
             {itemCount}
-            {isExpanded ?
-              <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" />
-            : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
+            {isExpanded ? <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" /> : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
           </Button>
         );
       },
@@ -1060,7 +1054,7 @@ function PaymentDataTable({ userDataId }: { userDataId?: string }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
                   <TableRow data-state={row.getIsSelected() && "selected"}>
@@ -1078,7 +1072,8 @@ function PaymentDataTable({ userDataId }: { userDataId?: string }) {
                   )}
                 </React.Fragment>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1100,7 +1095,7 @@ function PaymentDataTable({ userDataId }: { userDataId?: string }) {
                   </div>
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>

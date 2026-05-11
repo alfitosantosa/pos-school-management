@@ -4,13 +4,13 @@
 import React from "react";
 import Image from "next/image";
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { UserX, Shield, User, Mail, Phone, MapPin, Calendar, GraduationCap, Building2, Award, Clock, CheckCircle, FileText, Key, Users, BookOpen, School } from "lucide-react";
+import { Shield, User, Mail, Phone, MapPin, Calendar, GraduationCap, Building2, Award, CheckCircle, Key, Users, BookOpen, School } from "lucide-react";
 
 const NoUserDataComponent = ({ authUser }: { authUser: any }) => {
   return (

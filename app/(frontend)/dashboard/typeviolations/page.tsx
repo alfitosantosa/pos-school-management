@@ -21,13 +21,13 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetTypeViolations, useCreateTypeViolation, useUpdateTypeViolation, useDeleteTypeViolation } from "@/app/hooks/Violations/useTypeViolations";
-import { useGetAcademicYears } from "@/app/hooks/AcademicYears/useAcademicYear";
+import { useGetTypeViolations, useCreateTypeViolation, useUpdateTypeViolation, useDeleteTypeViolation } from "@/app/(hooks)/hooks/Violations/useTypeViolations";
+import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // Type definitions
 export type ViolationTypeData = {
@@ -438,14 +438,14 @@ function ViolationTypeDataTable() {
                           {column.id === "name"
                             ? "Nama Pelanggaran"
                             : column.id === "description"
-                            ? "Deskripsi"
-                            : column.id === "category"
-                            ? "Kategori"
-                            : column.id === "points"
-                            ? "Poin"
-                            : column.id === "academicYear"
-                            ? "Tahun Ajaran"
-                            : column.id}
+                              ? "Deskripsi"
+                              : column.id === "category"
+                                ? "Kategori"
+                                : column.id === "points"
+                                  ? "Poin"
+                                  : column.id === "academicYear"
+                                    ? "Tahun Ajaran"
+                                    : column.id}
                         </DropdownMenuCheckboxItem>
                       );
                     })}

@@ -14,11 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
-import { useGetTahfidzRecords } from "@/app/hooks/TahfidzRecord/useTahfidzRecord";
+import { useGetTahfidzRecords } from "@/app/(hooks)/hooks/TahfidzRecord/useTahfidzRecord";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type SurahQuranData = {
@@ -139,12 +139,14 @@ function TahfidzRecordDataTable() {
         const surah = row.original.surah;
         return (
           <div>
-            {surah ?
+            {surah ? (
               <>
                 <div className="font-medium">{surah.name}</div>
                 <div className="text-xs text-muted-foreground">{surah.nameLatin}</div>
               </>
-            : <span className="text-muted-foreground">-</span>}
+            ) : (
+              <span className="text-muted-foreground">-</span>
+            )}
             {row.original.startVerse != null && row.original.endVerse != null && (
               <div className="text-xs text-muted-foreground mt-0.5">
                 Ayat {row.original.startVerse} – {row.original.endVerse}
@@ -366,7 +368,7 @@ function TahfidzRecordDataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -374,7 +376,8 @@ function TahfidzRecordDataTable() {
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -395,7 +398,7 @@ function TahfidzRecordDataTable() {
                   </div>
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>

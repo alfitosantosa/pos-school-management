@@ -22,13 +22,13 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetSubjects, useCreateSubject, useUpdateSubject, useDeleteSubject } from "@/app/hooks/Subjects/useSubjects";
-import { useGetMajors } from "@/app/hooks/Majors/useMajors";
+import { useGetSubjects, useCreateSubject, useUpdateSubject, useDeleteSubject } from "@/app/(hooks)/hooks/Subjects/useSubjects";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // Type definitions
 export type SubjectData = {

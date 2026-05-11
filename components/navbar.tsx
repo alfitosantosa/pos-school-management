@@ -10,7 +10,7 @@ import { useSession, signOut } from "@/lib/auth-client";
 import { LogOut, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 const permissionLabels: Record<string, string> = {
   "/": "Home",
@@ -58,6 +58,7 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/bendahara/users": "Data Murid",
   "/dashboard/bendahara/class": "Data Kelas",
   "/dashboard/bendahara/paymenttype": "Data Jenis Pembayaran",
+  "/dashboard/bendahara/billing": "Data Billing",
 };
 
 export default function Navbar() {

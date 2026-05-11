@@ -21,12 +21,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 
-import { useGetPaymentTypes, useCreatePaymentType, useUpdatePaymentType, useDeletePaymentType } from "@/app/hooks/Payments/usePaymentType";
-import { useGetMajors } from "@/app/hooks/Majors/useMajors";
+import { useGetPaymentTypes, useCreatePaymentType, useUpdatePaymentType, useDeletePaymentType } from "@/app/(hooks)/hooks/Payments/usePaymentType";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // ============================================================================
 // Type Definitions
@@ -220,16 +220,17 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
                 <SelectValue placeholder="Pilih branch" />
               </SelectTrigger>
               <SelectContent>
-                {majorsLoading ?
+                {majorsLoading ? (
                   <SelectItem value="" disabled>
                     Loading...
                   </SelectItem>
-                : majors.map((major: any) => (
+                ) : (
+                  majors.map((major: any) => (
                     <SelectItem key={major.id} value={major.id}>
                       {major.name}
                     </SelectItem>
                   ))
-                }
+                )}
               </SelectContent>
             </Select>
             {errors.majorId && <p className="text-sm text-red-500">{errors.majorId.message}</p>}
@@ -328,11 +329,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
               Batal
             </Button>
             <Button type="submit" disabled={createPaymentType.isPending || updatePaymentType.isPending}>
-              {createPaymentType.isPending || updatePaymentType.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createPaymentType.isPending || updatePaymentType.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -650,7 +647,7 @@ function PaymentTypeDataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -658,12 +655,13 @@ function PaymentTypeDataTable() {
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data jenis pembayaran.
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>

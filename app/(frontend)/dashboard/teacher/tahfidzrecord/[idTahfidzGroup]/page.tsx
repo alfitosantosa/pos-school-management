@@ -21,13 +21,13 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
-import { useCreateTahfidzRecord, useUpdateTahfidzRecord, useDeleteTahfidzRecord, useGetTahfidzRecordByIdTeacher } from "@/app/hooks/TahfidzRecord/useTahfidzRecord";
+import { useCreateTahfidzRecord, useUpdateTahfidzRecord, useDeleteTahfidzRecord, useGetTahfidzRecordByIdTeacher } from "@/app/(hooks)/hooks/TahfidzRecord/useTahfidzRecord";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized, useParams } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useGetStudentByIdTahfidzGroup } from "@/app/hooks/Users/useStudents";
-import { useGetQuranSurah } from "@/app/hooks/TahfidzRecord/useQuranSurah";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useGetStudentByIdTahfidzGroup } from "@/app/(hooks)/hooks/Users/useStudents";
+import { useGetQuranSurah } from "@/app/(hooks)/hooks/TahfidzRecord/useQuranSurah";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type SurahQuranData = {
@@ -314,11 +314,7 @@ function TahfidzFormDialog({
               Batal
             </Button>
             <Button type="submit" disabled={createRecord.isPending || updateRecord.isPending}>
-              {createRecord.isPending || updateRecord.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createRecord.isPending || updateRecord.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -446,12 +442,14 @@ function TahfidzRecordDataTable() {
         const surah = row.original.surah;
         return (
           <div>
-            {surah ?
+            {surah ? (
               <>
                 <div className="font-medium">{surah.name}</div>
                 <div className="text-xs text-muted-foreground">{surah.nameLatin}</div>
               </>
-            : <span className="text-muted-foreground">-</span>}
+            ) : (
+              <span className="text-muted-foreground">-</span>
+            )}
             {row.original.startVerse != null && row.original.endVerse != null && (
               <div className="text-xs text-muted-foreground mt-0.5">
                 Ayat {row.original.startVerse} – {row.original.endVerse}
@@ -697,7 +695,7 @@ function TahfidzRecordDataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -705,7 +703,8 @@ function TahfidzRecordDataTable() {
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -726,7 +725,7 @@ function TahfidzRecordDataTable() {
                   </div>
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>

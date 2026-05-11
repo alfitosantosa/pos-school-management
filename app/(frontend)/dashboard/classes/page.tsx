@@ -19,13 +19,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetClasses, useCreateClass, useUpdateClass, useDeleteClass } from "@/app/hooks/Classes/useClass";
-import { useGetMajors } from "@/app/hooks/Majors/useMajors";
-import { useGetAcademicYears } from "@/app/hooks/AcademicYears/useAcademicYear";
+import { useGetClasses, useCreateClass, useUpdateClass, useDeleteClass } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { ClassDataTypes, ClassFormValues, classSchemaForm } from "@/app/types/class-types";
 import { z } from "zod";
 import { MajorDataTypes } from "@/app/types/majors-types";
@@ -153,11 +153,7 @@ function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
               Batal
             </Button>
             <Button type="submit" disabled={createClass.isPending || updateClass.isPending}>
-              {createClass.isPending || updateClass.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createClass.isPending || updateClass.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -461,7 +457,7 @@ function ClassDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ?
+                {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -469,12 +465,13 @@ function ClassDataTable() {
                       ))}
                     </TableRow>
                   ))
-                : <TableRow>
+                ) : (
+                  <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data kelas.
                     </TableCell>
                   </TableRow>
-                }
+                )}
               </TableBody>
             </Table>
           </div>

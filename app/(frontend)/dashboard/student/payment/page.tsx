@@ -17,14 +17,14 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetPaymentByStudentId } from "@/app/hooks/Payments/usePayment";
+import { useGetPaymentByStudentId } from "@/app/(hooks)/hooks/Payments/usePayment";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useCreateSnapMidtransTransaction, useMidtransCheckStatusOderId, useUpdateMidtransSuccessTransaction } from "@/app/hooks/Midtrans/useMidtrans";
-import { useUpdatePaymentTransaction } from "@/app/hooks/Payments/usePaymentTransaction";
-import { useBulkSendWhatsApp } from "@/app/hooks/BotWA/useBotWA";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useCreateSnapMidtransTransaction, useMidtransCheckStatusOderId, useUpdateMidtransSuccessTransaction } from "@/app/(hooks)/hooks/Midtrans/useMidtrans";
+import { useUpdatePaymentTransaction } from "@/app/(hooks)/hooks/Payments/usePaymentTransaction";
+import { useBulkSendWhatsApp } from "@/app/(hooks)/hooks/BotWA/useBotWA";
 
 // Declare Snap type for TypeScript
 declare global {
@@ -345,24 +345,13 @@ function MidtransPaymentDialog({
               <TableRow>
                 <TableCell>Status</TableCell>
                 <TableCell>
-                  {paymentData ?
-                    <Badge
-                      className={`text-white ${
-                        paymentData.status === "paid" ? "bg-green-600"
-                        : paymentData.status === "pending" ? "bg-yellow-600"
-                        : paymentData.status === "overdue" ? "bg-red-600"
-                        : "bg-gray-600"
-                      }`}
-                    >
-                      {paymentData.status === "paid" ?
-                        "Lunas"
-                      : paymentData.status === "pending" ?
-                        "Belum Lunas"
-                      : paymentData.status === "overdue" ?
-                        "Terlambat"
-                      : "-"}
+                  {paymentData ? (
+                    <Badge className={`text-white ${paymentData.status === "paid" ? "bg-green-600" : paymentData.status === "pending" ? "bg-yellow-600" : paymentData.status === "overdue" ? "bg-red-600" : "bg-gray-600"}`}>
+                      {paymentData.status === "paid" ? "Lunas" : paymentData.status === "pending" ? "Belum Lunas" : paymentData.status === "overdue" ? "Terlambat" : "-"}
                     </Badge>
-                  : "-"}
+                  ) : (
+                    "-"
+                  )}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -371,11 +360,11 @@ function MidtransPaymentDialog({
               </TableRow>
             </TableBody>
           </Table>
-          {paymentData && paymentData.status === "paid" ?
+          {paymentData && paymentData.status === "paid" ? (
             <Button disabled={true} className=" mt-4">
               Pembayaran sudah lunas
             </Button>
-          : paymentData ?
+          ) : paymentData ? (
             <Button
               className="mt-4"
               onClick={() => {
@@ -386,7 +375,9 @@ function MidtransPaymentDialog({
             >
               {isProcessing ? "Memproses..." : "Bayar dengan Midtrans"}
             </Button>
-          : <p className="text-red-600 mt-4">Tidak dapat memproses pembayaran karena data tidak lengkap.</p>}
+          ) : (
+            <p className="text-red-600 mt-4">Tidak dapat memproses pembayaran karena data tidak lengkap.</p>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -648,7 +639,7 @@ function PaymentDashboard({ userId }: { userId: string }) {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ?
+                {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -656,12 +647,13 @@ function PaymentDashboard({ userId }: { userId: string }) {
                       ))}
                     </TableRow>
                   ))
-                : <TableRow>
+                ) : (
+                  <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data pembayaran.
                     </TableCell>
                   </TableRow>
-                }
+                )}
               </TableBody>
             </Table>
           </div>

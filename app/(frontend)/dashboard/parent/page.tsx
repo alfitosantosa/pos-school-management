@@ -9,13 +9,13 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { User, Calendar, CheckCircle, XCircle, AlertCircle, Clock, AlertTriangle, BookOpen, GraduationCap, Mail, Phone, FileText, Award, ChevronLeft, ChevronRight, ArrowUpDown, TrendingUp, TrendingDown } from "lucide-react";
 import { useState, useMemo } from "react";
-import { useGetAttendanceByIdStudent } from "@/app/hooks/Attendances/useAttendaceByIdStudent";
-import { useGetStudentsByIds } from "@/app/hooks/Users/useStudentByIds";
-import { useGetUserById } from "@/app/hooks/Users/useUserById";
-import { useGetViolationsByIdStudent } from "@/app/hooks/Violations/useViolationsByIdStudent";
+import { useGetAttendanceByIdStudent } from "@/app/(hooks)/hooks/Attendances/useAttendaceByIdStudent";
+import { useGetStudentsByIds } from "@/app/(hooks)/hooks/Users/useStudentByIds";
+import { useGetUserById } from "@/app/(hooks)/hooks/Users/useUserById";
+import { useGetViolationsByIdStudent } from "@/app/(hooks)/hooks/Violations/useViolationsByIdStudent";
 
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Loading from "@/components/loading";
 
 // Simple Table Component

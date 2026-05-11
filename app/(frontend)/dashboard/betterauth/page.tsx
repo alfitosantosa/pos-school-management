@@ -15,13 +15,13 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { useGetBetterAuth } from "@/app/hooks/Users/useBetterAuth";
+import { useGetBetterAuth } from "@/app/(hooks)/hooks/Users/useBetterAuth";
 import Image from "next/image";
 import { authClient, useSession } from "@/lib/auth-client";
 import { toast } from "sonner";
 import Loading from "@/components/loading";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 export type User = {
   id: string;

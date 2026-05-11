@@ -21,14 +21,14 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useCreateAttendance, useUpdateAttendance, useDeleteAttendance } from "@/app/hooks/Attendances/useAttendance";
-import { useGetSchedules } from "@/app/hooks/Schedules/useSchedules";
-import { useGetStudents } from "@/app/hooks/Users/useStudents";
-import { useGetAttendanceByIdSchedule } from "@/app/hooks/Attendances/useAttendanceByIdShcedule";
+import { useCreateAttendance, useUpdateAttendance, useDeleteAttendance } from "@/app/(hooks)/hooks/Attendances/useAttendance";
+import { useGetSchedules } from "@/app/(hooks)/hooks/Schedules/useSchedules";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
+import { useGetAttendanceByIdSchedule } from "@/app/(hooks)/hooks/Attendances/useAttendanceByIdShcedule";
 import { unauthorized, useParams } from "next/navigation";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // Type definitions
 export type AttendanceData = {
@@ -247,11 +247,7 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
               Batal
             </Button>
             <Button type="submit" disabled={createAttendance.isPending || updateAttendance.isPending}>
-              {createAttendance.isPending || updateAttendance.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createAttendance.isPending || updateAttendance.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -587,11 +583,13 @@ function AttendanceDataTable() {
         const notes = row.getValue("notes") as string;
         return (
           <div className="max-w-[200px]">
-            {notes ?
+            {notes ? (
               <div className="text-sm truncate" title={notes}>
                 {notes}
               </div>
-            : <span className="text-muted-foreground">-</span>}
+            ) : (
+              <span className="text-muted-foreground">-</span>
+            )}
           </div>
         );
       },
@@ -884,7 +882,7 @@ function AttendanceDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ?
+              {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -892,7 +890,8 @@ function AttendanceDataTable() {
                     ))}
                   </TableRow>
                 ))
-              : <TableRow>
+              ) : (
+                <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <CheckCircle className="h-8 w-8 text-muted-foreground" />
@@ -917,7 +916,7 @@ function AttendanceDataTable() {
                     </div>
                   </TableCell>
                 </TableRow>
-              }
+              )}
             </TableBody>
           </Table>
         </div>

@@ -19,11 +19,11 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetTahfidzGroup, useCreateTahfidzGroup, useUpdateTahfidzGroup, useDeleteTahfidzGroup } from "@/app/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetTahfidzGroup, useCreateTahfidzGroup, useUpdateTahfidzGroup, useDeleteTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // Type definitions
 export type TahfidzGroupData = {
@@ -47,17 +47,7 @@ const tahfidzGroupSchema = z.object({
 type TahfidzGroupFormValues = z.infer<typeof tahfidzGroupSchema>;
 
 // Create/Edit Dialog Component
-function TahfidzGroupFormDialog({ 
-  open, 
-  onOpenChange, 
-  editData, 
-  onSuccess 
-}: { 
-  open: boolean; 
-  onOpenChange: (open: boolean) => void; 
-  editData?: TahfidzGroupData | null; 
-  onSuccess: () => void 
-}) {
+function TahfidzGroupFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: TahfidzGroupData | null; onSuccess: () => void }) {
   const createTahfidzGroup = useCreateTahfidzGroup();
   const updateTahfidzGroup = useUpdateTahfidzGroup();
 
@@ -145,17 +135,7 @@ function TahfidzGroupFormDialog({
 }
 
 // Delete Confirmation Dialog
-function DeleteTahfidzGroupDialog({ 
-  open, 
-  onOpenChange, 
-  tahfidzGroupData, 
-  onSuccess 
-}: { 
-  open: boolean; 
-  onOpenChange: (open: boolean) => void; 
-  tahfidzGroupData: TahfidzGroupData | null; 
-  onSuccess: () => void 
-}) {
+function DeleteTahfidzGroupDialog({ open, onOpenChange, tahfidzGroupData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; tahfidzGroupData: TahfidzGroupData | null; onSuccess: () => void }) {
   const deleteTahfidzGroup = useDeleteTahfidzGroup();
 
   const handleDelete = async () => {
@@ -216,20 +196,8 @@ function TahfidzGroupDataTable() {
   const columns: ColumnDef<TahfidzGroupData>[] = [
     {
       id: "select",
-      header: ({ table }) => (
-        <Checkbox 
-          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} 
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} 
-          aria-label="Select all" 
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox 
-          checked={row.getIsSelected()} 
-          onCheckedChange={(value) => row.toggleSelected(!!value)} 
-          aria-label="Select row" 
-        />
-      ),
+      header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
+      cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
       enableSorting: false,
       enableHiding: false,
     },
@@ -291,11 +259,7 @@ function TahfidzGroupDataTable() {
       header: "Status",
       cell: ({ row }) => {
         const isActive = row.getValue("isActive") as boolean;
-        return (
-          <Badge variant={isActive ? "default" : "secondary"}>
-            {isActive ? "Aktif" : "Tidak Aktif"}
-          </Badge>
-        );
+        return <Badge variant={isActive ? "default" : "secondary"}>{isActive ? "Aktif" : "Tidak Aktif"}</Badge>;
       },
     },
     {
@@ -314,9 +278,7 @@ function TahfidzGroupDataTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(tahfidzGroupData.id)}>
-                Copy ID Kelompok
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(tahfidzGroupData.id)}>Copy ID Kelompok</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
@@ -386,12 +348,7 @@ function TahfidzGroupDataTable() {
         <div className="mx-auto">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-2 flex-wrap gap-y-2">
-              <Input 
-                placeholder="Cari nama kelompok..." 
-                value={(table.getColumn("name")?.getFilterValue() as string) ?? ""} 
-                onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)} 
-                className="max-w-sm" 
-              />
+              <Input placeholder="Cari nama kelompok..." value={(table.getColumn("name")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)} className="max-w-sm" />
 
               {/* Grade Filter */}
               <select
@@ -400,7 +357,7 @@ function TahfidzGroupDataTable() {
                 className="flex h-10 w-[180px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="all">Semua Tingkat</option>
-                {uniqueGrades.map((grade:any) => (
+                {uniqueGrades.map((grade: any) => (
                   <option key={grade} value={grade}>
                     Kelas {grade}
                   </option>
@@ -436,12 +393,7 @@ function TahfidzGroupDataTable() {
                     .filter((column) => column.getCanHide())
                     .map((column) => {
                       return (
-                        <DropdownMenuCheckboxItem 
-                          key={column.id} 
-                          className="capitalize" 
-                          checked={column.getIsVisible()} 
-                          onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                        >
+                        <DropdownMenuCheckboxItem key={column.id} className="capitalize" checked={column.getIsVisible()} onCheckedChange={(value) => column.toggleVisibility(!!value)}>
                           {column.id}
                         </DropdownMenuCheckboxItem>
                       );
@@ -462,11 +414,7 @@ function TahfidzGroupDataTable() {
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      );
+                      return <TableHead key={header.id}>{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}</TableHead>;
                     })}
                   </TableRow>
                 ))}
@@ -476,9 +424,7 @@ function TahfidzGroupDataTable() {
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                       ))}
                     </TableRow>
                   ))
@@ -509,25 +455,11 @@ function TahfidzGroupDataTable() {
         </div>
 
         {/* Dialogs */}
-        <TahfidzGroupFormDialog 
-          open={createDialogOpen} 
-          onOpenChange={setCreateDialogOpen} 
-          onSuccess={handleSuccess} 
-        />
+        <TahfidzGroupFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} />
 
-        <TahfidzGroupFormDialog 
-          open={editDialogOpen} 
-          onOpenChange={setEditDialogOpen} 
-          editData={selectedTahfidzGroup} 
-          onSuccess={handleSuccess} 
-        />
+        <TahfidzGroupFormDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedTahfidzGroup} onSuccess={handleSuccess} />
 
-        <DeleteTahfidzGroupDialog 
-          open={deleteDialogOpen} 
-          onOpenChange={setDeleteDialogOpen} 
-          tahfidzGroupData={selectedTahfidzGroup} 
-          onSuccess={handleSuccess} 
-        />
+        <DeleteTahfidzGroupDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} tahfidzGroupData={selectedTahfidzGroup} onSuccess={handleSuccess} />
       </div>
     </>
   );

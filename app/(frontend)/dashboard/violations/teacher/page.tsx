@@ -24,14 +24,14 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 // Import hooks
-import { useGetViolations, useCreateViolation, useUpdateViolation, useDeleteViolation } from "@/app/hooks/Violations/useViolations";
-import { useGetViolationsByIdTeacher } from "@/app/hooks/Violations/useViolationsByIdTeacher";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
-import { useGetTypeViolations } from "@/app/hooks/Violations/useTypeViolations";
-import { useGetClasses } from "@/app/hooks/Classes/useClass";
-import { useGetUsers } from "@/app/hooks/Users/useUsers";
+import { useGetViolations, useCreateViolation, useUpdateViolation, useDeleteViolation } from "@/app/(hooks)/hooks/Violations/useViolations";
+import { useGetViolationsByIdTeacher } from "@/app/(hooks)/hooks/Violations/useViolationsByIdTeacher";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useGetTypeViolations } from "@/app/(hooks)/hooks/Violations/useTypeViolations";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetUsers } from "@/app/(hooks)/hooks/Users/useUsers";
 import { useSession } from "@/lib/auth-client";
-import { useGetStudents } from "@/app/hooks/Users/useStudents";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
 import Loading from "@/components/loading";
 import { unauthorized } from "next/navigation";
 
@@ -129,12 +129,14 @@ function SearchableStudentSelect({ students, value, onValueChange, placeholder =
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className={cn("w-full justify-between h-auto min-h-10 px-3 py-2", !selectedStudent && "text-muted-foreground", className)} disabled={disabled}>
           <div className="flex flex-1 items-center gap-2 overflow-hidden">
-            {selectedStudent ?
+            {selectedStudent ? (
               <div className="flex flex-col items-start flex-1 min-w-0">
                 <span className="font-medium truncate w-full">{selectedStudent.name}</span>
                 <span className="text-xs text-muted-foreground truncate w-full">{selectedStudent.email}</span>
               </div>
-            : <span className="truncate">{placeholder}</span>}
+            ) : (
+              <span className="truncate">{placeholder}</span>
+            )}
           </div>
           <div className="flex items-center gap-1 ml-2">
             {selectedStudent && !disabled && <X className="h-4 w-4 opacity-50 hover:opacity-100 cursor-pointer" onClick={handleClear} />}
@@ -282,11 +284,13 @@ function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Siswa</Label>
-              {usersLoading ?
+              {usersLoading ? (
                 <div className="flex items-center justify-center h-10 border rounded-md">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                 </div>
-              : <SearchableStudentSelect students={students} value={selectedStudentId} onValueChange={(value) => setValue("studentId", value)} placeholder="Cari nama siswa..." className="w-full" />}
+              ) : (
+                <SearchableStudentSelect students={students} value={selectedStudentId} onValueChange={(value) => setValue("studentId", value)} placeholder="Cari nama siswa..." className="w-full" />
+              )}
               {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}
             </div>
 
@@ -380,11 +384,7 @@ function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open
               Batal
             </Button>
             <Button type="submit" disabled={createViolation.isPending || updateViolation.isPending}>
-              {createViolation.isPending || updateViolation.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createViolation.isPending || updateViolation.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -781,21 +781,21 @@ function ViolationDataTable() {
                       .map((column) => {
                         return (
                           <DropdownMenuCheckboxItem key={column.id} className="capitalize" checked={column.getIsVisible()} onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                            {column.id === "student" ?
-                              "Siswa"
-                            : column.id === "class" ?
-                              "Kelas"
-                            : column.id === "violationType" ?
-                              "Jenis Pelanggaran"
-                            : column.id === "date" ?
-                              "Tanggal"
-                            : column.id === "status" ?
-                              "Status"
-                            : column.id === "reportedBy" ?
-                              "Dilaporkan Oleh"
-                            : column.id === "description" ?
-                              "Deskripsi"
-                            : column.id}
+                            {column.id === "student"
+                              ? "Siswa"
+                              : column.id === "class"
+                                ? "Kelas"
+                                : column.id === "violationType"
+                                  ? "Jenis Pelanggaran"
+                                  : column.id === "date"
+                                    ? "Tanggal"
+                                    : column.id === "status"
+                                      ? "Status"
+                                      : column.id === "reportedBy"
+                                        ? "Dilaporkan Oleh"
+                                        : column.id === "description"
+                                          ? "Deskripsi"
+                                          : column.id}
                           </DropdownMenuCheckboxItem>
                         );
                       })}
@@ -848,7 +848,7 @@ function ViolationDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ?
+                {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -856,7 +856,8 @@ function ViolationDataTable() {
                       ))}
                     </TableRow>
                   ))
-                : <TableRow>
+                ) : (
+                  <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       <div className="flex flex-col items-center justify-center space-y-2">
                         <AlertTriangle className="h-8 w-8 text-muted-foreground" />
@@ -878,7 +879,7 @@ function ViolationDataTable() {
                       </div>
                     </TableCell>
                   </TableRow>
-                }
+                )}
               </TableBody>
             </Table>
           </div>

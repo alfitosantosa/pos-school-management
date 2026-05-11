@@ -10,13 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { useGetSchedules } from "@/app/hooks/Schedules/useSchedules";
+import { useGetSchedules } from "@/app/(hooks)/hooks/Schedules/useSchedules";
 
-import { useGetAttendanceByIdStudent } from "@/app/hooks/Attendances/useAttendaceByIdStudent";
-import { useGetStudentById } from "@/app/hooks/Users/useGetStudentById";
+import { useGetAttendanceByIdStudent } from "@/app/(hooks)/hooks/Attendances/useAttendaceByIdStudent";
+import { useGetStudentById } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 
 import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/hooks/Users/useUsersByIdBetterAuth";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Loading from "@/components/loading";
 import { unauthorized } from "next/navigation";
 
@@ -164,7 +164,7 @@ export default function AttendanceDataTable() {
 
       return schedule?.class?.id === filterValue;
     },
-    [schedules]
+    [schedules],
   );
 
   // Custom subject filter function
@@ -178,7 +178,7 @@ export default function AttendanceDataTable() {
 
       return schedule?.subject?.id === filterValue;
     },
-    [schedules]
+    [schedules],
   );
 
   const columns: ColumnDef<AttendanceData>[] = [
