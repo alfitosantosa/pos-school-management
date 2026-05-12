@@ -79,6 +79,7 @@ export type PaymentData = {
   createdAt: string;
   paymentDate: string;
   receiptNumber: string;
+  bankRef: string;
   accountBankId: string;
   majorId: string;
   month: string;
@@ -135,6 +136,7 @@ const paymentSchema = z.object({
   paymentDate: z.string().min(1, "Tanggal bayar wajib diisi"),
   dueDate: z.string().optional(),
   receiptNumber: z.string().min(1, "Nomor kwitansi wajib diisi"),
+  bankRef: z.string().min(1, "Masukan Ref Bank"),
   notes: z.string().optional(),
   items: z.array(paymentItemSchema).min(1, "Minimal satu item pembayaran harus dipilih"),
 });
@@ -208,8 +210,6 @@ function PaymentFormDialog({
 
   const [selectedStudentId, setSelectedStudentId] = React.useState<string>("");
   const [unpaidItems, setUnpaidItems] = React.useState<PaymentItemData[]>([]);
-  // ✅ FIX #1: Generate UUID di state, bukan di render
-  const [receiptNumber, setReceiptNumber] = React.useState<string>("");
 
   // Fetch unpaid items when student is selected
   const { data: unpaidItemsData = [], isLoading: isLoadingUnpaid } = usePaymentItemsUnpaidStudent(selectedStudentId, {
@@ -239,14 +239,16 @@ function PaymentFormDialog({
   const watchedItems = watch("items");
   const watchedStudentId = watch("studentId");
 
-  // ✅ FIX #2: Generate receipt number sekali saat dialog buka
+  // Generate receipt number sekali saat dialog buka
   React.useEffect(() => {
     if (open && !editData) {
-      setReceiptNumber(`KWT-${uuidv4().substring(0, 8).toUpperCase()}`);
+      const newReceiptNumber = `KWT-${uuidv4().substring(0, 8).toUpperCase()}`;
+      setValue("receiptNumber", newReceiptNumber);
     } else if (editData) {
-      setReceiptNumber(editData.receiptNumber);
+      setValue("receiptNumber", editData.receiptNumber);
+      setValue("bankRef", editData.bankRef);
     }
-  }, [open, editData?.id]);
+  }, [open, editData?.id, setValue]);
 
   // Load unpaid items when student changes
   React.useEffect(() => {
@@ -305,6 +307,7 @@ function PaymentFormDialog({
         paymentDate: editData.paymentDate ? new Date(editData.paymentDate).toISOString().split("T")[0] : "",
         dueDate: editData.dueDate ? new Date(editData.dueDate).toISOString().split("T")[0] : "",
         receiptNumber: editData.receiptNumber || "",
+        bankRef: editData.bankRef || "",
         notes: editData.notes || "",
         bendaharaId: userDataId || "",
         majorId: userDataMajorId || "",
@@ -356,6 +359,7 @@ function PaymentFormDialog({
         paymentDate: new Date(data.paymentDate).toISOString(),
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
         receiptNumber: data.receiptNumber,
+        bankRef: data.bankRef,
         notes: data.notes || null,
       };
 
@@ -391,7 +395,6 @@ function PaymentFormDialog({
       reset();
       setSelectedStudentId("");
       setUnpaidItems([]);
-      setReceiptNumber("");
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
@@ -447,7 +450,7 @@ function PaymentFormDialog({
           </div>
 
           {/* Account Bank & Month */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label>Rekening Bank</Label>
               <Controller
@@ -470,54 +473,54 @@ function PaymentFormDialog({
               />
               {errors.accountBankId && <p className="text-sm text-red-500">{errors.accountBankId.message}</p>}
             </div>
-
-            <div className="space-y-2">
-              <Label>Bulan</Label>
-              <Controller
-                name="month"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih Bulan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {MONTHS.map((m) => (
-                        <SelectItem key={m} value={m}>
-                          {m}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.month && <p className="text-sm text-red-500">{errors.month.message}</p>}
+            <div className="grid grid-cols-2 gap-4">
+              {" "}
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Menunggu</SelectItem>
+                        <SelectItem value="paid">Lunas</SelectItem>
+                        <SelectItem value="overdue">Terlambat</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label>Bulan</Label>
+                <Controller
+                  name="month"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Bulan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MONTHS.map((m) => (
+                          <SelectItem key={m} value={m}>
+                            {m}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.month && <p className="text-sm text-red-500">{errors.month.message}</p>}
+              </div>
             </div>
           </div>
-
           {/* Status, Payment Date, Due Date */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Menunggu</SelectItem>
-                      <SelectItem value="paid">Lunas</SelectItem>
-                      <SelectItem value="overdue">Terlambat</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
-            </div>
-
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="paymentDate">Tanggal Bayar</Label>
               <Input id="paymentDate" type="date" {...register("paymentDate")} />
@@ -532,13 +535,20 @@ function PaymentFormDialog({
             </div>
           </div>
 
-          {/* Receipt Number */}
-          <div className="space-y-2">
-            <Label htmlFor="receiptNumber">Nomor Kwitansi</Label>
-            <Input disabled={true} value={receiptNumber} id="receiptNumber" placeholder="Contoh: KWT-2024-001" {...register("receiptNumber")} />
-            {errors.receiptNumber && <p className="text-sm text-red-500">{errors.receiptNumber.message}</p>}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Receipt Number */}
+            <div className="space-y-2">
+              <Label htmlFor="receiptNumber">Nomor Kwitansi</Label>
+              <Input disabled={true} id="receiptNumber" placeholder="Contoh: KWT-2024-001" {...register("receiptNumber")} />
+              {errors.receiptNumber && <p className="text-sm text-red-500">{errors.receiptNumber.message}</p>}
+            </div>
+            {/* bankref */}
+            <div className="space-y-2">
+              <Label htmlFor="bankRef">Nomor Ref Bank</Label>
+              <Input id="bankRef" placeholder="Contoh: 122237678764" {...register("bankRef")} />
+              {errors.bankRef && <p className="text-sm text-red-500">{errors.bankRef.message}</p>}
+            </div>
           </div>
-
           <Separator />
 
           {/* Payment Items (Unpaid Items) */}

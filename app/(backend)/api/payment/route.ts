@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, studentId, amount, dueDate, status, notes, paymentDate, receiptNumber, accountBankId, majorId, month } = await request.json();
+    const { id, studentId, amount, dueDate, status, notes, paymentDate, receiptNumber, accountBankId, majorId, month, bankRef } = await request.json();
 
     const updatedPayment = await prisma.payment.update({
       where: { id },
@@ -98,6 +98,7 @@ export async function PUT(request: NextRequest) {
         notes,
         paymentDate: new Date(paymentDate),
         receiptNumber,
+        bankRef,
       },
       include: {
         student: true,
