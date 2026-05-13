@@ -17,6 +17,8 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ majorI
       },
       include: {
         student: true,
+        PaymentType: true,
+        payment: true,
       },
       orderBy: {
         createdAt: "desc",

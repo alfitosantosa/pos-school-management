@@ -983,6 +983,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorId);
   const { data: rawPayments = [] } = useGetPaymentByIdMajor(majorId);
 
+  console.log(paymentItems);
   // Normalize payments for dropdowns
   const allPayments = React.useMemo(() => {
     const list = Array.isArray(rawPayments) ? rawPayments : ((rawPayments as any)?.data ?? []);
