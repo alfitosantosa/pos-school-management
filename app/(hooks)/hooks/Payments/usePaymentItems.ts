@@ -52,9 +52,9 @@ export const useUpdatePaymentItems = () => {
 export const useDeletePaymentItems = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (ids: any) => {
+    mutationFn: async (id: any) => {
       const response = await apiDelete(`/api/payment/items`, {
-        body: JSON.stringify({ ids }),
+        body: JSON.stringify({ id }),
         headers: {
           "Content-Type": "application/json",
         },

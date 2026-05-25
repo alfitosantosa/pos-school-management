@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, BadgeCheck, Clock, Package, Layers } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, BadgeCheck, Clock, Package, Layers, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -13,21 +13,20 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 
-import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, useCreatePaymentItemsBulk, usePaymentItemsUnpaidStudent, usePaymentItemsByMajorId } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
-import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
-import { useGetPaymentTypeByIdMajor, useGetPaymentTypes } from "@/app/(hooks)/hooks/Payments/usePaymentType";
+import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, usePaymentItemsUnpaidStudent, usePaymentItemsByMajorId } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+
+import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetPaymentByIdMajor, useGetPayments } from "@/app/(hooks)/hooks/Payments/usePayment";
+import { useGetPaymentByIdMajor } from "@/app/(hooks)/hooks/Payments/usePayment";
 import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -143,28 +142,6 @@ const singleItemSchema = z.object({
   isActive: z.boolean().default(true),
 });
 type SingleItemFormValues = z.infer<typeof singleItemSchema>;
-
-// ─── Bulk Item Schema ─────────────────────────────────────────────────────────
-const bulkItemRowSchema = z.object({
-  paymentTypeId: z.string().optional(),
-  name: z.string().optional(),
-  skuType: z.string().optional(),
-  quantity: z.number().min(1),
-  amount: z.number().min(0),
-  subtotal: z.number(),
-  isFixedAmount: z.boolean().default(false),
-  isFixedQuantity: z.boolean().default(false),
-  selected: z.boolean().default(true),
-});
-
-const bulkSchema = z.object({
-  paymentId: z.string().min(1, "Pembayaran wajib dipilih"),
-  studentId: z.string().min(1, "Siswa wajib dipilih"),
-  month: z.string().min(1, "Bulan wajib dipilih"),
-  year: z.string().min(1, "Tahun wajib dipilih"),
-  items: z.array(bulkItemRowSchema).min(1, "Minimal satu item"),
-});
-type BulkFormValues = z.infer<typeof bulkSchema>;
 
 // ─── Single Item Edit Dialog ──────────────────────────────────────────────────
 function SingleItemDialog({
@@ -485,22 +462,6 @@ function SingleItemDialog({
             <span className="font-bold tabular-nums">{formatRupiah(watch("subtotal") ?? 0)}</span>
           </div>
 
-          {/* Toggles */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2">
-              <Switch checked={isPaid} onCheckedChange={(v) => setValue("isPaid", v)} />
-              <Label className="text-sm">Sudah Lunas</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <Switch checked={isActive} onCheckedChange={(v) => setValue("isActive", v)} />
-              <Label className="text-sm">Aktif</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <Switch checked={isMonthly} onCheckedChange={(v) => setValue("isMonthly", v)} />
-              <Label className="text-sm">Tagihan Bulanan</Label>
-            </div>
-          </div>
-
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Batal
@@ -519,406 +480,6 @@ function SingleItemDialog({
   );
 }
 
-// ─── Bulk Create Dialog ───────────────────────────────────────────────────────
-function BulkCreateDialog({
-  open,
-  onOpenChange,
-  onSuccess,
-  allStudents,
-  allPaymentTypes,
-  allPayments,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
-  allStudents: { id: string; name: string }[];
-  allPaymentTypes: PaymentTypeData[];
-  allPayments: { id: string; receiptNumber: string; studentId: string }[];
-}) {
-  const createBulk = useCreatePaymentItemsBulk();
-
-  const {
-    control,
-    watch,
-    setValue,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<BulkFormValues>({
-    resolver: zodResolver(bulkSchema as any),
-    defaultValues: {
-      studentId: "",
-      paymentId: "",
-      month: MONTHS[new Date().getMonth()],
-      year: String(currentYear),
-      items: [{ paymentTypeId: "", name: "", skuType: "default", quantity: 1, amount: 0, subtotal: 0, isFixedAmount: false, isFixedQuantity: false, selected: true }],
-    },
-  });
-
-  const { fields, append, remove } = useFieldArray({ control, name: "items" });
-  const watchedItems = watch("items");
-  const watchedStudentId = watch("studentId");
-  const watchedMonth = watch("month");
-  const watchedYear = watch("year");
-
-  const filteredPayments = React.useMemo(() => (watchedStudentId ? allPayments.filter((p) => p.studentId === watchedStudentId) : allPayments), [allPayments, watchedStudentId]);
-
-  const grandTotal = React.useMemo(() => watchedItems?.filter((item) => item.selected)?.reduce((sum, item) => sum + (item.subtotal || 0), 0) ?? 0, [watchedItems]);
-
-  // ✅ FIX #5: Wrap callbacks with useCallback to prevent recreation on every render
-  const handlePaymentTypeChange = React.useCallback(
-    (index: number, ptId: string) => {
-      const pt = allPaymentTypes.find((p) => p.id === ptId);
-      if (pt) {
-        const amount = parseFloat(pt.amount) || 0;
-        const qty = pt.isFixedQuantity ? parseInt(pt.quantity) || 1 : (watchedItems?.[index]?.quantity ?? 1);
-        setValue(`items.${index}.paymentTypeId`, ptId);
-        setValue(`items.${index}.name`, pt.name);
-        setValue(`items.${index}.skuType`, pt.owner || "default");
-        setValue(`items.${index}.amount`, amount);
-        setValue(`items.${index}.quantity`, qty);
-        setValue(`items.${index}.subtotal`, amount * qty);
-        setValue(`items.${index}.isFixedAmount`, pt.isFixedAmount);
-        setValue(`items.${index}.isFixedQuantity`, pt.isFixedQuantity);
-      }
-    },
-    [allPaymentTypes, watchedItems, setValue],
-  );
-
-  const handleQtyChange = React.useCallback(
-    (index: number, qty: number) => {
-      const amount = watchedItems?.[index]?.amount ?? 0;
-      setValue(`items.${index}.quantity`, qty);
-      setValue(`items.${index}.subtotal`, amount * qty);
-    },
-    [watchedItems, setValue],
-  );
-
-  const handleAmountChange = React.useCallback(
-    (index: number, amount: number) => {
-      const qty = watchedItems?.[index]?.quantity ?? 1;
-      setValue(`items.${index}.amount`, amount);
-      setValue(`items.${index}.subtotal`, amount * qty);
-    },
-    [watchedItems, setValue],
-  );
-
-  // ✅ NEW: Toggle item selection
-  const toggleItemSelection = React.useCallback(
-    (index: number) => {
-      const currentSelected = watchedItems[index].selected;
-      setValue(`items.${index}.selected`, !currentSelected);
-    },
-    [watchedItems, setValue],
-  );
-
-  // Add all active payment types at once
-  const handleAddAllTypes = React.useCallback(() => {
-    const activeTypes = allPaymentTypes.filter((pt) => pt.isActive);
-    const newItems = activeTypes.map((pt) => {
-      const amount = parseFloat(pt.amount) || 0;
-      const qty = parseInt(pt.quantity) || 1;
-      return {
-        paymentTypeId: pt.id,
-        name: pt.name,
-        skuType: pt.owner || "default",
-        amount,
-        quantity: pt.isFixedQuantity ? qty : 1,
-        subtotal: amount * (pt.isFixedQuantity ? qty : 1),
-        isFixedAmount: pt.isFixedAmount,
-        isFixedQuantity: pt.isFixedQuantity,
-        selected: true,
-      };
-    });
-    setValue("items", newItems);
-  }, [allPaymentTypes, setValue]);
-
-  const onSubmit = async (data: BulkFormValues) => {
-    try {
-      // Filter only selected items
-      const selectedItems = data.items.filter((item) => item.selected);
-
-      if (selectedItems.length === 0) {
-        toast.error("Pilih minimal satu item tagihan!");
-        return;
-      }
-
-      const monthNumber = MONTH_NUMBER[data.month] ?? data.month;
-      const payload = selectedItems.map((item) => ({
-        paymentId: data.paymentId,
-        studentId: data.studentId,
-        paymentTypeId: item.paymentTypeId,
-        name: item.name ?? "",
-        skuType: item.skuType || "default",
-        quantity: item.quantity,
-        amount: item.amount,
-        subtotal: item.subtotal,
-        month: String(monthNumber),
-        year: data.year,
-        isFixedAmount: item.isFixedAmount,
-        isFixedQuantity: item.isFixedQuantity,
-      }));
-
-      await createBulk.mutateAsync(payload);
-      toast.success(`${selectedItems.length} item tagihan berhasil dibuat!`);
-      reset();
-      onOpenChange(false);
-      onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Layers className="h-5 w-5" />
-            Buat Tagihan Bulk
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Student & Payment */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Siswa</Label>
-              <Controller
-                name="studentId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(v) => {
-                      field.onChange(v);
-                      setValue("paymentId", "");
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih Siswa" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      {allStudents.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Pembayaran (Kwitansi)</Label>
-              <Controller
-                name="paymentId"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange} disabled={!watchedStudentId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih Kwitansi" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      {filteredPayments.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>
-                          {p.receiptNumber}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.paymentId && <p className="text-sm text-red-500">{errors.paymentId.message}</p>}
-            </div>
-          </div>
-
-          {/* Month & Year */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Bulan</Label>
-              <Controller
-                name="month"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih Bulan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {MONTHS.map((m) => (
-                        <SelectItem key={m} value={m}>
-                          {m}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.month && <p className="text-sm text-red-500">{errors.month.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label>Tahun</Label>
-              <Controller
-                name="year"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih Tahun" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {YEARS.map((y) => (
-                        <SelectItem key={y} value={y}>
-                          {y}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.year && <p className="text-sm text-red-500">{errors.year.message}</p>}
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Items */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-semibold">Item Tagihan</Label>
-              <div className="flex gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={handleAddAllTypes} title="Tambahkan semua jenis tagihan aktif sekaligus">
-                  <Package className="mr-2 h-4 w-4" />
-                  Tambah Semua Jenis
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => append({ paymentTypeId: "", name: "", skuType: "default", quantity: 1, amount: 0, subtotal: 0, isFixedAmount: false, isFixedQuantity: false, selected: true })}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Tambah Item
-                </Button>
-              </div>
-            </div>
-
-            {errors.items && typeof errors.items === "object" && "message" in errors.items && <p className="text-sm text-red-500">{(errors.items as any).message}</p>}
-
-            {/* Header */}
-            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground px-1">
-              <div className="col-span-1 text-center">Pilih</div>
-              <div className="col-span-3">Jenis Tagihan</div>
-              <div className="col-span-3">Nominal (Rp)</div>
-              <div className="col-span-2 text-center">Qty</div>
-              <div className="col-span-2 text-right">Subtotal</div>
-              <div className="col-span-1" />
-            </div>
-
-            <div className="space-y-2">
-              {fields.map((field, index) => {
-                const pt = allPaymentTypes.find((p) => p.id === watchedItems?.[index]?.paymentTypeId);
-                const isFixedAmount = pt?.isFixedAmount ?? watchedItems?.[index]?.isFixedAmount ?? false;
-                const isFixedQty = pt?.isFixedQuantity ?? watchedItems?.[index]?.isFixedQuantity ?? false;
-                const isSelected = watchedItems?.[index]?.selected ?? true;
-
-                return (
-                  <div key={field.id} className={`grid grid-cols-12 gap-2 items-start p-3 rounded-lg border transition-all ${isSelected ? "bg-blue-50 border-blue-200" : "bg-muted/20 opacity-60 border-muted"}`}>
-                    {/* Checkbox */}
-                    <div className="col-span-1 flex justify-center pt-1">
-                      <Checkbox checked={isSelected} onCheckedChange={() => toggleItemSelection(index)} />
-                    </div>
-
-                    {/* Payment Type */}
-                    <div className="col-span-3">
-                      <Controller
-                        name={`items.${index}.paymentTypeId`}
-                        control={control}
-                        render={({ field: f }) => (
-                          <Select value={f.value} onValueChange={(v) => handlePaymentTypeChange(index, v)}>
-                            <SelectTrigger className="h-9 text-xs">
-                              <SelectValue placeholder="Pilih Jenis" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {allPaymentTypes
-                                .filter((pt) => pt.isActive)
-                                .map((pt) => (
-                                  <SelectItem key={pt.id} value={pt.id}>
-                                    <span className="text-xs">{pt.name}</span>
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      />
-                      {errors.items?.[index]?.paymentTypeId && <p className="text-xs text-red-500 mt-0.5">{errors.items[index]?.paymentTypeId?.message}</p>}
-                    </div>
-
-                    {/* Amount */}
-                    <div className="col-span-3">
-                      <Input className="h-9 text-xs" type="number" min={0} disabled={isFixedAmount} value={watchedItems?.[index]?.amount ?? 0} onChange={(e) => handleAmountChange(index, Number(e.target.value))} />
-                      {isFixedAmount && <p className="text-xs text-muted-foreground mt-0.5">Tetap</p>}
-                    </div>
-
-                    {/* Quantity */}
-                    <div className="col-span-2">
-                      <Input className="h-9 text-xs text-center" type="number" min={1} disabled={isFixedQty} value={watchedItems?.[index]?.quantity ?? 1} onChange={(e) => handleQtyChange(index, Number(e.target.value))} />
-                      {isFixedQty && <p className="text-xs text-muted-foreground mt-0.5 text-center">Tetap</p>}
-                    </div>
-
-                    {/* Subtotal */}
-                    <div className="col-span-2 flex items-center justify-end h-9">
-                      <span className="text-xs font-semibold tabular-nums">{formatRupiah(watchedItems?.[index]?.subtotal ?? 0)}</span>
-                    </div>
-
-                    {/* Delete Button */}
-                    <div className="col-span-1 flex justify-center">
-                      <Button type="button" variant="ghost" size="sm" className="h-9 w-9 p-0 text-red-500 hover:text-red-700" onClick={() => remove(index)} disabled={fields.length === 1}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Grand Total */}
-          <div className="flex justify-between items-center rounded-lg bg-muted/40 px-4 py-3">
-            <div>
-              <p className="text-sm text-muted-foreground">{fields.length} item tagihan</p>
-              <p className="text-xs text-muted-foreground">
-                {watchedMonth} {watchedYear}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-muted-foreground">Total Tagihan</p>
-              <p className="font-bold text-lg tabular-nums text-blue-600">{formatRupiah(grandTotal)}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {watchedItems?.filter((item) => item.selected)?.length ?? 0} dari {fields.length} item dipilih
-              </p>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Batal
-            </Button>
-            <Button type="submit" disabled={createBulk.isPending || (watchedItems?.filter((item) => item.selected)?.length ?? 0) === 0}>
-              {createBulk.isPending ? "Membuat..." : `Buat ${watchedItems?.filter((item) => item.selected)?.length ?? 0} Item`}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 // ─── Delete Dialog ────────────────────────────────────────────────────────────
 function DeleteItemDialog({ open, onOpenChange, itemData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; itemData: PaymentItemData | null; onSuccess: () => void }) {
   const deleteItem = useDeletePaymentItems();
@@ -926,7 +487,7 @@ function DeleteItemDialog({ open, onOpenChange, itemData, onSuccess }: { open: b
   const handleDelete = async () => {
     if (!itemData) return;
     try {
-      await deleteItem.mutateAsync([itemData.id]);
+      await deleteItem.mutateAsync(itemData.id);
       toast.success("Item tagihan berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
@@ -965,10 +526,8 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   const [paidFilter, setPaidFilter] = React.useState<string>("all");
   const [monthFilter, setMonthFilter] = React.useState<string>("all");
   const [yearFilter, setYearFilter] = React.useState<string>("all");
-  const [activeFilter, setActiveFilter] = React.useState<string>("all");
 
   const [singleDialogOpen, setSingleDialogOpen] = React.useState(false);
-  const [bulkDialogOpen, setBulkDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<PaymentItemData | null>(null);
@@ -976,18 +535,6 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   const { data: paymentItems = [], isLoading, refetch } = usePaymentItemsByMajorId(majorId);
   const { data: allStudents = [] } = useGetStudentByIdMajor(majorId);
   const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorId);
-  const { data: rawPayments = [] } = useGetPaymentByIdMajor(majorId);
-
-  // Normalize payments for dropdowns
-  const allPayments = React.useMemo(() => {
-    const list = Array.isArray(rawPayments) ? rawPayments : ((rawPayments as any)?.data ?? []);
-    return list.map((p: any) => ({
-      id: p.id,
-      receiptNumber: p.receiptNumber,
-      studentId: p.studentId,
-    }));
-  }, [rawPayments]);
-
   const handleSuccess = () => refetch();
 
   const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
@@ -1094,6 +641,21 @@ function BillingDataTable({ majorId }: { majorId: string }) {
       },
     },
     {
+      accessorKey: "year",
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Calendar className="mr-2 h-4 w-4" />
+          Tahun
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("year")}</div>,
+      filterFn: (row, _id, value) => {
+        if (value === "all") return true;
+        return String(row.original.year) === String(value);
+      },
+    },
+    {
       accessorKey: "isPaid",
       header: "Status Bayar",
       cell: ({ row }) => <PaidBadge isPaid={row.getValue("isPaid")} />,
@@ -1101,17 +663,6 @@ function BillingDataTable({ majorId }: { majorId: string }) {
         if (value === "all") return true;
         if (value === "paid") return row.original.isPaid === true;
         if (value === "unpaid") return row.original.isPaid === false;
-        return true;
-      },
-    },
-    {
-      accessorKey: "isActive",
-      header: "Status",
-      cell: ({ row }) => <ActiveBadge isActive={row.getValue("isActive")} />,
-      filterFn: (row, _id, value) => {
-        if (value === "all") return true;
-        if (value === "active") return row.original.isActive === true;
-        if (value === "inactive") return row.original.isActive === false;
         return true;
       },
     },
@@ -1189,12 +740,8 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   }, [monthFilter, table]);
 
   React.useEffect(() => {
-    table.getColumn("month")?.setFilterValue(yearFilter !== "all" ? yearFilter : undefined);
+    table.getColumn("year")?.setFilterValue(yearFilter !== "all" ? yearFilter : undefined);
   }, [yearFilter, table]);
-
-  React.useEffect(() => {
-    table.getColumn("isActive")?.setFilterValue(activeFilter !== "all" ? activeFilter : undefined);
-  }, [activeFilter, table]);
 
   if (isLoading) return <Loading />;
 
@@ -1216,14 +763,13 @@ function BillingDataTable({ majorId }: { majorId: string }) {
     receipt: "Kwitansi",
   };
 
-  const hasActiveFilter = globalFilter || paidFilter !== "all" || monthFilter !== "all" || yearFilter !== "all" || activeFilter !== "all";
+  const hasActiveFilter = globalFilter || paidFilter !== "all" || monthFilter !== "all" || yearFilter !== "all";
 
   const resetFilters = () => {
     setGlobalFilter("");
     setPaidFilter("all");
     setMonthFilter("all");
     setYearFilter("all");
-    setActiveFilter("all");
     table.resetColumnFilters();
   };
 
@@ -1279,17 +825,6 @@ function BillingDataTable({ majorId }: { majorId: string }) {
             </SelectContent>
           </Select>
 
-          <Select value={activeFilter} onValueChange={setActiveFilter}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua</SelectItem>
-              <SelectItem value="active">Aktif</SelectItem>
-              <SelectItem value="inactive">Nonaktif</SelectItem>
-            </SelectContent>
-          </Select>
-
           {hasActiveFilter && (
             <Button variant="outline" size="sm" onClick={resetFilters}>
               <X className="mr-2 h-4 w-4" />
@@ -1316,11 +851,6 @@ function BillingDataTable({ majorId }: { majorId: string }) {
                 ))}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <Button variant="outline" onClick={() => setBulkDialogOpen(true)}>
-            <Layers className="mr-2 h-4 w-4" />
-            Buat Bulk
-          </Button>
           <Button onClick={() => setSingleDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Item
@@ -1350,10 +880,10 @@ function BillingDataTable({ majorId }: { majorId: string }) {
               <X className="h-3 w-3 cursor-pointer" onClick={() => setMonthFilter("all")} />
             </Badge>
           )}
-          {activeFilter !== "all" && (
+          {yearFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
-              {activeFilter === "active" ? "Aktif" : "Nonaktif"}
-              <X className="h-3 w-3 cursor-pointer" onClick={() => setActiveFilter("all")} />
+              Tahun: {yearFilter}
+              <X className="h-3 w-3 cursor-pointer" onClick={() => setYearFilter("all")} />
             </Badge>
           )}
         </div>
@@ -1460,7 +990,6 @@ function BillingDataTable({ majorId }: { majorId: string }) {
       {/* Dialogs */}
       <SingleItemDialog open={singleDialogOpen} onOpenChange={setSingleDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allPaymentTypes={allPaymentTypes} />
       <SingleItemDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedItem} onSuccess={handleSuccess} allStudents={allStudents} allPaymentTypes={allPaymentTypes} />
-      <BulkCreateDialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allPaymentTypes={allPaymentTypes} allPayments={allPayments} />
       <DeleteItemDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} itemData={selectedItem} onSuccess={handleSuccess} />
     </div>
   );
