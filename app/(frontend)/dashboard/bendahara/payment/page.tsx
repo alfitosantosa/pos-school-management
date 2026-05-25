@@ -207,13 +207,17 @@ function PaymentFormDialog({
   const createPayment = useCreatePayment();
   const updatePayment = useUpdatePayment();
   const setPaidMutation = userPaymentItemsSetPaid();
-
   const [selectedStudentId, setSelectedStudentId] = React.useState<string>("");
-  const [unpaidItems, setUnpaidItems] = React.useState<PaymentItemData[]>([]);
+
+  React.useEffect(() => {
+    if (selectedStudentId) {
+      refetchPaymentItemsStudent();
+    }
+  }, [selectedStudentId]);
 
   // Fetch unpaid items when student is selected
-  const { data: unpaidItemsData = [], isLoading: isLoadingUnpaid } = usePaymentItemsUnpaidStudent(selectedStudentId);
-
+  const { data: unpaidItemsData = [], isLoading: isLoadingUnpaid, refetch: refetchPaymentItemsStudent } = usePaymentItemsUnpaidStudent(selectedStudentId);
+  const [unpaidItems, setUnpaidItems] = React.useState<PaymentItemData[]>([]);
   const {
     register,
     handleSubmit,
@@ -247,13 +251,6 @@ function PaymentFormDialog({
       setValue("bankRef", editData.bankRef);
     }
   }, [open, editData?.id, setValue]);
-
-  // Load unpaid items when student changes
-  React.useEffect(() => {
-    if (watchedStudentId && watchedStudentId !== selectedStudentId) {
-      setSelectedStudentId(watchedStudentId);
-    }
-  }, [watchedStudentId, selectedStudentId]);
 
   // ✅ FIX #3: Memoize unpaid items untuk stabilize reference
   const memoizedUnpaidItems = React.useMemo(() => {

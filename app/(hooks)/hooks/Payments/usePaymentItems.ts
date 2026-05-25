@@ -131,7 +131,7 @@ export const usePaymentTransactionSuccess = () => {
 
 export const usePaymentItemsUnpaidStudent = (studentId: string) => {
   return useQuery({
-    queryKey: ["unpaid-students"],
+    queryKey: ["unpaid-students", studentId], // ← tambahkan studentId di sini
     queryFn: async () => {
       try {
         const res = await apiGet(`/api/payment/items/unpaid/student/${studentId}`);
@@ -140,7 +140,7 @@ export const usePaymentItemsUnpaidStudent = (studentId: string) => {
         throw new Error(error?.response?.data?.message || "Failed to fetch payment");
       }
     },
-    enabled: !!studentId,
+    enabled: !!studentId, // ← query HANYA jalan jika studentId truthy
   });
 };
 
