@@ -59,6 +59,7 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/bendahara/class": "Data Kelas",
   "/dashboard/bendahara/paymenttype": "Data Jenis Pembayaran",
   "/dashboard/bendahara/billing": "Data Billing",
+  "/dashboard/bendahara/billing/upload": "Upload Billing",
 };
 
 export default function Navbar() {

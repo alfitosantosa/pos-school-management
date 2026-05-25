@@ -21,6 +21,7 @@ export const useCreatePaymentItems = () => {
   return useMutation({
     mutationFn: async (data: any) => {
       const res = await apiPost("/api/payment/items", data);
+      console.log(data);
       return res.data;
     },
     onSuccess: () => {
@@ -128,7 +129,7 @@ export const usePaymentTransactionSuccess = () => {
   });
 };
 
-export const usePaymentItemsUnpaidStudent = (studentId: string, options?: { enabled?: boolean }) => {
+export const usePaymentItemsUnpaidStudent = (studentId: string) => {
   return useQuery({
     queryKey: ["unpaid-students"],
     queryFn: async () => {
@@ -139,7 +140,7 @@ export const usePaymentItemsUnpaidStudent = (studentId: string, options?: { enab
         throw new Error(error?.response?.data?.message || "Failed to fetch payment");
       }
     },
-    enabled: options?.enabled ?? !!studentId,
+    enabled: !!studentId,
   });
 };
 
@@ -168,6 +169,20 @@ export const userPaymentItemsSetPaid = () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["unpaid-students"] });
       queryClient.invalidateQueries({ queryKey: ["payment-by-id-major"] });
+    },
+  });
+};
+
+export const BulkUploadPaymentItems = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: any) => {
+      const res = await apiPost("/api/payment/items/bulk", data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["paymentItems"] });
+      queryClient.invalidateQueries({ queryKey: ["unpaid-students"] });
     },
   });
 };

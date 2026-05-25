@@ -217,7 +217,7 @@ function SingleItemDialog({
   const isMonthly = watch("isMonthly");
 
   // Fetch unpaid items for selected student
-  const { data: unpaidItems = [] } = usePaymentItemsUnpaidStudent(watchedStudentId, { enabled: !!watchedStudentId });
+  const { data: unpaidItems = [] } = usePaymentItemsUnpaidStudent(watchedStudentId);
 
   // ✅ FIX #2: Memoize selectedPT to prevent unnecessary recalculations
   const selectedPT = React.useMemo(() => allPaymentTypes.find((p) => p.id === watchedPaymentTypeId), [allPaymentTypes, watchedPaymentTypeId]);
@@ -301,24 +301,19 @@ function SingleItemDialog({
     try {
       if (editData) {
         await updateItem.mutateAsync({
-          paymentItems: [
-            {
-              id: editData.id,
-              ...data,
-              month: String(MONTH_NUMBER[data.month] ?? data.month),
-              year: data.year,
-            },
-          ],
+          id: editData.id,
+          ...data,
+          month: String(MONTH_NUMBER[data.month] ?? data.month),
+          year: data.year,
         });
         toast.success("Item tagihan berhasil diperbarui!");
       } else {
-        await createItem.mutateAsync([
-          {
-            ...data,
-            month: String(MONTH_NUMBER[data.month] ?? data.month),
-            year: data.year,
-          },
-        ]);
+        await createItem.mutateAsync({
+          ...data,
+          month: String(MONTH_NUMBER[data.month] ?? data.month),
+          year: data.year,
+        });
+        console.log(data);
         toast.success("Item tagihan berhasil dibuat!");
       }
       reset();
@@ -983,7 +978,6 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorId);
   const { data: rawPayments = [] } = useGetPaymentByIdMajor(majorId);
 
-  console.log(paymentItems);
   // Normalize payments for dropdowns
   const allPayments = React.useMemo(() => {
     const list = Array.isArray(rawPayments) ? rawPayments : ((rawPayments as any)?.data ?? []);

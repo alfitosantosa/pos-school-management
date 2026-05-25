@@ -13,10 +13,10 @@ export function ReactQueryProvider({ children }: { children: ReactNode }) {
             staleTime: 5 * 60 * 1000,
             // Cache data for 30 minutes
             gcTime: 30 * 60 * 1000,
-            // Retry failed requests 2 times
+            // Retry if failed requests 2 times
             retry: 2,
             // Don't refetch on window focus in production
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
             // Don't refetch on mount if data is fresh
             refetchOnMount: false,
           },

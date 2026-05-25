@@ -212,9 +212,7 @@ function PaymentFormDialog({
   const [unpaidItems, setUnpaidItems] = React.useState<PaymentItemData[]>([]);
 
   // Fetch unpaid items when student is selected
-  const { data: unpaidItemsData = [], isLoading: isLoadingUnpaid } = usePaymentItemsUnpaidStudent(selectedStudentId, {
-    enabled: !!selectedStudentId,
-  });
+  const { data: unpaidItemsData = [], isLoading: isLoadingUnpaid } = usePaymentItemsUnpaidStudent(selectedStudentId);
 
   const {
     register,

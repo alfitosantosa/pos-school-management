@@ -322,10 +322,6 @@ model PaymentItems {
   quantity        Int
   amount          Int
   subtotal        Int
-  isActive        Boolean     @default(true)
-  isFixedAmount   Boolean
-  isFixedQuantity Boolean
-  isMonthly       Boolean     @default(false)
   isPaid          Boolean     @default(false)
   month           String
   name            String
@@ -334,8 +330,8 @@ model PaymentItems {
   payment         Payment?    @relation(fields: [paymentId], references: [id], onDelete: SetNull) 
   PaymentType     PaymentType @relation(fields: [paymentTypeId], references: [id])
   student         UserData    @relation(fields: [studentId], references: [id])
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 
   @@map("payment_items")
 }

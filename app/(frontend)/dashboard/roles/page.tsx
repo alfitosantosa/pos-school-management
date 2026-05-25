@@ -137,6 +137,10 @@ const availablePermissions = [
     id: "/dashboard/bendahara/billing",
     label: "Data Billing (Bendahara)",
   },
+  {
+    id: "/dashboard/bendahara/billing/upload",
+    label: "Upload Billing (Bendahara)",
+  },
 ];
 
 // Create/Edit Dialog Component
@@ -252,7 +256,11 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
               Batal
             </Button>
             <Button type="submit" disabled={createRole.isPending || updateRole.isPending}>
-              {createRole.isPending || updateRole.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createRole.isPending || updateRole.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -367,15 +375,13 @@ function RoleDataTable() {
         const permissions = (row.getValue("permissions") as string[]) || [];
         return (
           <div className="flex flex-wrap gap-1">
-            {permissions.length > 0 ? (
+            {permissions.length > 0 ?
               permissions.slice(0, 3).map((permission) => (
                 <Badge key={permission} variant="outline" className="text-xs">
                   {availablePermissions.find((p) => p.id === permission)?.label || permission}
                 </Badge>
               ))
-            ) : (
-              <span className="text-muted-foreground text-sm">Tidak ada</span>
-            )}
+            : <span className="text-muted-foreground text-sm">Tidak ada</span>}
             {permissions.length > 3 && (
               <Badge variant="outline" className="text-xs">
                 +{permissions.length - 3} lainnya
@@ -523,7 +529,7 @@ function RoleDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {table.getRowModel().rows?.length ?
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -531,13 +537,12 @@ function RoleDataTable() {
                     ))}
                   </TableRow>
                 ))
-              ) : (
-                <TableRow>
+              : <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     Tidak ada data role.
                   </TableCell>
                 </TableRow>
-              )}
+              }
             </TableBody>
           </Table>
         </div>
