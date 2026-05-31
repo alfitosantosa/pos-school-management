@@ -12,11 +12,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 
 // Import hooks
-import { useGetUsers } from "@/app/(hooks)/hooks/Users/useUsers";
 import { useGetBetterAuth } from "@/app/(hooks)/hooks/Users/useBetterAuth";
 
 // Import dialog components
-import { UserFormDialog, DeleteUserDialog, UserData, BetterAuthUser, DeleteUserBulkDialog } from "@/components/dialog/DialogUser";
+import { DeleteUserDialog, UserData, BetterAuthUser, DeleteUserBulkDialog } from "@/components/dialog/DialogUser";
+import { StudentFormDialog } from "@/components/dialog/DialogUserBendahara";
 import Image from "next/image";
 import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
@@ -61,10 +61,6 @@ function UserDashboard({ id }: { id: string }) {
   // Get unique values for filters
   const uniqueRoles = React.useMemo(() => {
     return Array.from(new Set(usersData.map((user: UserData) => user.role?.name).filter(Boolean)));
-  }, [usersData]);
-
-  const uniqueClasses = React.useMemo(() => {
-    return Array.from(new Set(usersData.map((user: UserData) => user.class?.name).filter(Boolean)));
   }, [usersData]);
 
   const { data: classesData, isLoading: isLoadingClasses } = useGetClasses();
@@ -639,7 +635,7 @@ function UserDashboard({ id }: { id: string }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -647,13 +643,12 @@ function UserDashboard({ id }: { id: string }) {
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data user.
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>
@@ -672,8 +667,8 @@ function UserDashboard({ id }: { id: string }) {
         </div>
       </div>
 
-      <UserFormDialog open={createDialogOpen} onOpenChange={handleCloseCreateDialog} onSuccess={handleSuccess} />
-      <UserFormDialog open={editDialogOpen} onOpenChange={handleCloseEditDialog} editData={selectedUser} onSuccess={handleSuccess} />
+      <StudentFormDialog majorId={id} open={createDialogOpen} onOpenChange={handleCloseCreateDialog} onSuccess={handleSuccess} />
+      <StudentFormDialog open={editDialogOpen} onOpenChange={handleCloseEditDialog} editData={selectedUser} onSuccess={handleSuccess} majorId={id} />
       <DeleteUserDialog open={deleteDialogOpen} onOpenChange={handleCloseDeleteDialog} userData={selectedUser} onSuccess={handleSuccess} />
       <DeleteUserBulkDialog open={deleteBulkDialogOpen} onOpenChange={handleCloseBulkDeleteDialog} userDatas={table.getSelectedRowModel().rows.map((row) => row.original)} onSuccess={handleSuccess} />
     </div>

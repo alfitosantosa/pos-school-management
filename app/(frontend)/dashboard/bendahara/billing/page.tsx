@@ -23,6 +23,7 @@ import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, us
 
 import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
+import { StudentCombobox } from "@/components/ui/student-combobox";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
@@ -156,7 +157,7 @@ function SingleItemDialog({
   onOpenChange: (open: boolean) => void;
   editData?: PaymentItemData | null;
   onSuccess: () => void;
-  allStudents: { id: string; name: string }[];
+  allStudents: any[];
   allPaymentTypes: PaymentTypeData[];
 }) {
   const createItem = useCreatePaymentItems();
@@ -317,24 +318,15 @@ function SingleItemDialog({
               name="studentId"
               control={control}
               render={({ field }) => (
-                <Select
+                <StudentCombobox
+                  students={allStudents}
                   value={field.value}
                   onValueChange={(v) => {
                     field.onChange(v);
                     setValue("paymentId", "");
                   }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih Siswa" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    {allStudents.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="Pilih Siswa"
+                />
               )}
             />
             {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}

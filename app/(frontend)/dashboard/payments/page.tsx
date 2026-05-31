@@ -29,6 +29,7 @@ import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
 import { useGetAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
 import { useGetPaymentTypes } from "@/app/(hooks)/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
+import { StudentCombobox } from "@/components/ui/student-combobox";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
@@ -184,7 +185,7 @@ function PaymentFormDialog({
   onOpenChange: (open: boolean) => void;
   editData?: PaymentData | null;
   onSuccess: () => void;
-  allStudents: { id: string; name: string }[];
+  allStudents: any[];
   allMajors: { id: string; name: string }[];
   allAccountBanks: {
     id: string;
@@ -385,18 +386,12 @@ function PaymentFormDialog({
                 name="studentId"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih Siswa" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      {allStudents?.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <StudentCombobox
+                    students={allStudents}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Pilih Siswa"
+                  />
                 )}
               />
               {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}

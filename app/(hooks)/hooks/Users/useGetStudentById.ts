@@ -31,3 +31,18 @@ export const useGetStudentByIdMajor = (id: string) => {
     enabled: !!id,
   });
 };
+
+export const useGetStudentByIdMajorActive = (id: string) => {
+  return useQuery({
+    queryKey: ["students", id, "active"],
+    queryFn: async () => {
+      try {
+        const res = await apiGet(`/api/students/major/${id}/active`);
+        return res.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    enabled: !!id,
+  });
+};
