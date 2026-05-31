@@ -60,6 +60,7 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/bendahara/paymenttype": "Data Jenis Pembayaran",
   "/dashboard/bendahara/billing": "Data Billing",
   "/dashboard/bendahara/billing/upload": "Upload Billing",
+  "/dashboard/bendahara/users/upload": "Upload Data Murid",
 };
 
 export default function Navbar() {

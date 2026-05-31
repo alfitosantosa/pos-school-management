@@ -141,6 +141,10 @@ const availablePermissions = [
     id: "/dashboard/bendahara/billing/upload",
     label: "Upload Billing (Bendahara)",
   },
+  {
+    id: "/dashboard/bendahara/users/upload",
+    label: "Upload Data Users (Bendahara)",
+  },
 ];
 
 // Create/Edit Dialog Component

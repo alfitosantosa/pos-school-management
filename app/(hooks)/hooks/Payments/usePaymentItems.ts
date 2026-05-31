@@ -177,7 +177,7 @@ export const BulkUploadPaymentItems = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: any) => {
-      const res = await apiPost("/api/payment/items/bulk", data);
+      const res = await apiPost("/api/payment/items/bulk/upload", data);
       return res.data;
     },
     onSuccess: () => {

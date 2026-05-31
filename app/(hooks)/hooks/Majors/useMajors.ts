@@ -67,3 +67,17 @@ export const useDeleteMajor = () => {
     },
   });
 };
+
+export const useGetMajorById = (id: string) => {
+  return useQuery({
+    queryKey: ["major", id],
+    queryFn: async () => {
+      try {
+        const res = await apiGet(`/api/major/${id}`);
+        return res.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+  });
+};
