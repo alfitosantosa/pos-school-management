@@ -14,7 +14,11 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ majorI
         majorId: majorId,
       },
       include: {
-        student: true,
+        student: {
+          include: {
+            class: true,
+          },
+        },
         major: true,
         accountBank: true,
         createdBy: true,

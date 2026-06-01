@@ -38,7 +38,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { code, name, description, isActive } = await request.json();
+    const { code, name, description, isActive, phone, address } = await request.json();
     if (!code || !name) {
       return NextResponse.json({ error: "Code and name are required" }, { status: 400 });
     }
@@ -48,6 +48,8 @@ export async function POST(request: NextRequest) {
         code,
         name,
         description,
+        phone,
+        address,
         isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
       },
     });

@@ -30,7 +30,11 @@ export async function GET() {
   try {
     const payments = await prisma.payment.findMany({
       include: {
-        student: true,
+        student: {
+          include: {
+            class: true,
+          },
+        },
         major: true,
         accountBank: true,
         createdBy: true,

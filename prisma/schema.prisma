@@ -9,7 +9,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 model User {
   id            String    @id @unique
   name          String
@@ -171,6 +170,8 @@ model Major {
   name        String
   description String?
   isActive    Boolean       @default(true)
+  address     String?
+  phone       String?
   accountBank AccountBank[]
   classes     Class[]
   paymenttype PaymentType[]
@@ -294,7 +295,7 @@ model Violation {
 
 model PaymentType {
   id              String         @id @default(cuid())
-  name            String         
+  name            String
   description     String
   amount          Decimal
   isMonthly       Boolean        @default(false)
@@ -315,23 +316,23 @@ model PaymentType {
 }
 
 model PaymentItems {
-  id              String      @id @default(uuid())
-  paymentId       String?
-  studentId       String
-  paymentTypeId   String
-  quantity        Int
-  amount          Int
-  subtotal        Int
-  isPaid          Boolean     @default(false)
-  month           String
-  name            String
-  year            String
-  skuType         String
-  payment         Payment?    @relation(fields: [paymentId], references: [id], onDelete: SetNull) 
-  PaymentType     PaymentType @relation(fields: [paymentTypeId], references: [id])
-  student         UserData    @relation(fields: [studentId], references: [id])
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
+  id            String      @id @default(uuid())
+  paymentId     String?
+  studentId     String
+  paymentTypeId String
+  quantity      Int
+  amount        Int
+  subtotal      Int
+  isPaid        Boolean     @default(false)
+  month         String
+  name          String
+  year          String
+  skuType       String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  payment       Payment?    @relation(fields: [paymentId], references: [id])
+  PaymentType   PaymentType @relation(fields: [paymentTypeId], references: [id])
+  student       UserData    @relation(fields: [studentId], references: [id])
 
   @@map("payment_items")
 }
@@ -347,10 +348,10 @@ model Payment {
   paymentDate        DateTime
   receiptNumber      String              @unique
   accountBankId      String
-  bankRef            String?
   majorId            String
   month              String
   bendaharaId        String
+  bankRef            String?
   paymentItems       PaymentItems[]
   paymentTransaction PaymentTransaction?
   accountBank        AccountBank         @relation(fields: [accountBankId], references: [id])

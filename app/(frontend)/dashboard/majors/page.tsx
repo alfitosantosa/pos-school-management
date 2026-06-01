@@ -32,6 +32,8 @@ export type MajorData = {
   id: string;
   code: string;
   name: string;
+  address: string;
+  phone: string;
   description: string | null;
   isActive: boolean;
   _count: {
@@ -47,6 +49,8 @@ const majorSchema = z.object({
   code: z.string().min(1, "Kode Branch wajib diisi").max(10, "Kode maksimal 10 karakter"),
   name: z.string().min(1, "Nama Branch wajib diisi").max(100, "Nama maksimal 100 karakter"),
   description: z.string().optional(),
+  address: z.string().optional(),
+  phone: z.string().optional(),
   isActive: z.boolean(), // Removed .default(true) to make it required
 });
 
@@ -70,6 +74,8 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
       code: "",
       name: "",
       description: "",
+      address: "",
+      phone: "",
       isActive: true, // Explicitly set default value here
     },
   });
@@ -81,12 +87,16 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
       setValue("code", editData.code);
       setValue("name", editData.name);
       setValue("description", editData.description || "");
+      setValue("address", editData.address || "");
+      setValue("phone", editData.phone || "");
       setValue("isActive", editData.isActive);
     } else {
       reset({
         code: "",
         name: "",
         description: "",
+        phone: "",
+        address: "",
         isActive: true, // Explicitly set default value here too
       });
     }
@@ -134,6 +144,16 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
             <Textarea id="description" placeholder="Deskripsi singkat tentang Branch..." rows={3} {...register("description")} />
             {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="address">Alamat (Opsional)</Label>
+            <Textarea id="address" placeholder="Alamat lengkap branch..." rows={2} {...register("address")} />
+            {errors.address && <p className="text-sm text-red-500">{errors.address.message}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Nomor Telepon (Opsional)</Label>
+            <Input id="phone" placeholder="Nomor telepon branch..." {...register("phone")} />
+            {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
+          </div>
 
           <div className="flex items-center space-x-2">
             <Switch id="isActive" checked={isActive} onCheckedChange={(checked) => setValue("isActive", checked)} />
@@ -145,7 +165,11 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
               Batal
             </Button>
             <Button type="submit" disabled={createMajor.isPending || updateMajor.isPending}>
-              {createMajor.isPending || updateMajor.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createMajor.isPending || updateMajor.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -188,6 +212,20 @@ function MajorDetailDialog({ open, onOpenChange, majorData }: { open: boolean; o
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Deskripsi</Label>
               <p className="text-sm text-muted-foreground mt-1">{majorData.description}</p>
+            </div>
+          )}
+
+          {majorData.address && (
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">Alamat</Label>
+              <p className="text-sm text-muted-foreground mt-1">{majorData.address}</p>
+            </div>
+          )}
+
+          {majorData.phone && (
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">Telepon</Label>
+              <p className="text-sm text-muted-foreground mt-1">{majorData.phone}</p>
             </div>
           )}
 
@@ -240,23 +278,28 @@ function DeleteMajorDialog({ open, onOpenChange, majorData, onSuccess }: { open:
         <AlertDialogHeader>
           <AlertDialogTitle>Hapus Branch</AlertDialogTitle>
           <AlertDialogDescription>
-            {hasRelatedData ? (
+            {hasRelatedData ?
               <div className="space-y-2">
                 <p>
                   Brnach <strong>{majorData?.name}</strong> memiliki data terkait:
                 </p>
                 <ul className="list-disc list-inside text-sm space-y-1">
-                  {majorData?._count?.classes ? <li>{majorData._count.classes} kelas</li> : null}
-                  {majorData?._count?.students ? <li>{majorData._count.students} siswa</li> : null}
-                  {majorData?._count?.subjects ? <li>{majorData._count.subjects} mata pelajaran</li> : null}
+                  {majorData?._count?.classes ?
+                    <li>{majorData._count.classes} kelas</li>
+                  : null}
+                  {majorData?._count?.students ?
+                    <li>{majorData._count.students} siswa</li>
+                  : null}
+                  {majorData?._count?.subjects ?
+                    <li>{majorData._count.subjects} mata pelajaran</li>
+                  : null}
                 </ul>
                 <p className="text-red-600 font-medium">Menghapus Branch akan menghapus semua data terkait. Tindakan ini tidak dapat dibatalkan.</p>
               </div>
-            ) : (
-              <p>
+            : <p>
                 Apakah Anda yakin ingin menghapus branch <strong>{majorData?.name}</strong>? Tindakan ini tidak dapat dibatalkan.
               </p>
-            )}
+            }
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -328,6 +371,22 @@ function MajorDataTable() {
       cell: ({ row }) => {
         const description = row.getValue("description") as string;
         return <div className="max-w-[200px] truncate text-sm text-muted-foreground">{description || "Tidak ada deskripsi"}</div>;
+      },
+    },
+    {
+      accessorKey: "address",
+      header: "Alamat",
+      cell: ({ row }) => {
+        const address = row.getValue("address") as string;
+        return <div className="max-w-[200px] truncate text-sm text-muted-foreground">{address || "Tidak ada alamat"}</div>;
+      },
+    },
+    {
+      accessorKey: "phone",
+      header: "Telepon",
+      cell: ({ row }) => {
+        const phone = row.getValue("phone") as string;
+        return <div className="text-sm text-muted-foreground">{phone || "-"}</div>;
       },
     },
     {
@@ -502,7 +561,7 @@ function MajorDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length ?
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -510,13 +569,12 @@ function MajorDataTable() {
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
+                : <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data Branch.
                     </TableCell>
                   </TableRow>
-                )}
+                }
               </TableBody>
             </Table>
           </div>

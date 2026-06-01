@@ -230,7 +230,9 @@ export const MajorScalarFieldEnum = {
   code: 'code',
   name: 'name',
   description: 'description',
-  isActive: 'isActive'
+  isActive: 'isActive',
+  address: 'address',
+  phone: 'phone'
 } as const
 
 export type MajorScalarFieldEnum = (typeof MajorScalarFieldEnum)[keyof typeof MajorScalarFieldEnum]
@@ -371,10 +373,10 @@ export const PaymentScalarFieldEnum = {
   paymentDate: 'paymentDate',
   receiptNumber: 'receiptNumber',
   accountBankId: 'accountBankId',
-  bankRef: 'bankRef',
   majorId: 'majorId',
   month: 'month',
-  bendaharaId: 'bendaharaId'
+  bendaharaId: 'bendaharaId',
+  bankRef: 'bankRef'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
