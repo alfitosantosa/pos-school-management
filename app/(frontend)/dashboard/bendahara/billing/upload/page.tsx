@@ -6,17 +6,11 @@ import { useGetRoles } from "@/app/(hooks)/hooks/Roles/useRoles";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
-import {
-  Table, TableBody, TableCaption, TableCell,
-  TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import {
-  FileText, X, Upload, Download, AlertCircle,
-  CheckCircle2, Info, Users, CreditCard, Calendar,
-} from "lucide-react";
+import { FileText, X, Upload, Download, AlertCircle, CheckCircle2, Info, Users, CreditCard, Calendar } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
@@ -25,7 +19,7 @@ import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersById
 import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
 import { useGetStudentByIdMajorActive } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
-import { useCreatePaymentItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { BulkUploadPaymentItems, useCreatePaymentItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type typeData = {
@@ -69,9 +63,18 @@ type PreviewRow = {
 
 // ─── Month helpers ────────────────────────────────────────────────────────────
 const MONTH_LABELS: Record<string, string> = {
-  "1": "Januari", "2": "Februari", "3": "Maret", "4": "April",
-  "5": "Mei", "6": "Juni", "7": "Juli", "8": "Agustus",
-  "9": "September", "10": "Oktober", "11": "November", "12": "Desember",
+  "1": "Januari",
+  "2": "Februari",
+  "3": "Maret",
+  "4": "April",
+  "5": "Mei",
+  "6": "Juni",
+  "7": "Juli",
+  "8": "Agustus",
+  "9": "September",
+  "10": "Oktober",
+  "11": "November",
+  "12": "Desember",
 };
 
 const currentYear = new Date().getFullYear();
@@ -80,17 +83,18 @@ const YEARS = Array.from({ length: 12 }, (_, i) => String(currentYear - 2 + i));
 // ─── Main Upload Component ─────────────────────────────────────────────────────
 function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: string }) {
   const [files, setFiles] = useState<File[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
   const [previewRows, setPreviewRows] = useState<PreviewRow[]>([]);
   const [uploadResult, setUploadResult] = useState<{
-    count: number; skipped: number; total: number;
+    count: number;
+    skipped: number;
+    total: number;
   } | null>(null);
 
   // ── Data hooks ────────────────────────────────────────────────────────────
   const { data: students = [] } = useGetStudentByIdMajorActive(majorId);
   const { data: paymentTypes = [] } = useGetPaymentTypeByIdMajor(majorId);
 
-  const createPaymentItems = useCreatePaymentItems();
+  const bulkUploadMutation = BulkUploadPaymentItems();
 
   // Build lookup maps for validation & display
   const studentMap = useMemo(() => {
@@ -120,9 +124,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
     if (!e.target.files) return;
 
     const newFiles = Array.from(e.target.files);
-    const excelFiles = newFiles.filter(
-      (f) => f.name.endsWith(".xlsx") || f.name.endsWith(".xls")
-    );
+    const excelFiles = newFiles.filter((f) => f.name.endsWith(".xlsx") || f.name.endsWith(".xls"));
 
     if (excelFiles.length !== newFiles.length) {
       toast.error("Hanya file Excel (.xlsx atau .xls) yang diperbolehkan");
@@ -222,7 +224,6 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
       return;
     }
 
-    setIsUploading(true);
     try {
       const payload = validRows.map((r) => ({
         studentId: r.studentId,
@@ -237,7 +238,9 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
         skuType: r.skuType,
       }));
 
-      const result = await createPaymentItems.mutateAsync(payload);
+      console.log("payload", payload);
+
+      const result = await bulkUploadMutation.mutateAsync(payload);
       setUploadResult(result);
       toast.success(`Berhasil membuat ${result.count ?? validRows.length} item tagihan!`);
       setFiles([]);
@@ -246,8 +249,6 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
       if (fileInput) fileInput.value = "";
     } catch (err: any) {
       toast.error(err?.message || "Gagal mengupload data");
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -262,11 +263,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
 
       const wsData = [
         // ── Row 1: Headers ──
-        [
-          "Student ID*", "Payment Type ID*", "Quantity*", "Amount*",
-          "Subtotal", "Month* (MM)", "Year* (YYYY)", "Name*",
-          "SKU Type", "Is Paid (true/false)",
-        ],
+        ["Student ID*", "Payment Type ID*", "Quantity*", "Amount*", "Subtotal", "Month* (MM)", "Year* (YYYY)", "Name*", "SKU Type", "Is Paid (true/false)"],
         // ── Row 2: Example ──
         [
           firstStudent?.id ?? "student-id-disini",
@@ -285,11 +282,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-      ws["!cols"] = [
-        { wch: 36 }, { wch: 36 }, { wch: 10 }, { wch: 12 },
-        { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 25 },
-        { wch: 15 }, { wch: 18 },
-      ];
+      ws["!cols"] = [{ wch: 36 }, { wch: 36 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 25 }, { wch: 15 }, { wch: 18 }];
 
       XLSX.utils.book_append_sheet(wb, ws, "Billing Template");
       XLSX.writeFile(wb, `billing-template-${majorName ?? majorId}.xlsx`);
@@ -304,12 +297,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
     try {
       const XLSX = await import("xlsx");
 
-      const wsData = [
-        ["ID (gunakan di kolom Student ID)", "Nama Siswa", "NISN", "Kelas"],
-        ...(students as any[]).map((s) => [
-          s.id, s.name, s.nisn ?? "-", s.class?.name ?? "-",
-        ]),
-      ];
+      const wsData = [["ID (gunakan di kolom Student ID)", "Nama Siswa", "NISN", "Kelas"], ...(students as any[]).map((s) => [s.id, s.name, s.nisn ?? "-", s.class?.name ?? "-"])];
 
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -328,24 +316,13 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
       const XLSX = await import("xlsx");
 
       const wsData = [
-        [
-          "ID (gunakan di kolom Payment Type ID)", "Nama", "Nominal",
-          "SKU Type (owner)", "Bulanan?", "Nominal Tetap?", "Qty Tetap?",
-        ],
-        ...(paymentTypes as PaymentTypeData[]).map((pt) => [
-          pt.id, pt.name, parseFloat(pt.amount),
-          pt.owner, pt.isMonthly ? "Ya" : "Tidak",
-          pt.isFixedAmount ? "Ya" : "Tidak",
-          pt.isFixedQuantity ? "Ya" : "Tidak",
-        ]),
+        ["ID (gunakan di kolom Payment Type ID)", "Nama", "Nominal", "SKU Type (owner)", "Bulanan?", "Nominal Tetap?", "Qty Tetap?"],
+        ...(paymentTypes as PaymentTypeData[]).map((pt) => [pt.id, pt.name, parseFloat(pt.amount), pt.owner, pt.isMonthly ? "Ya" : "Tidak", pt.isFixedAmount ? "Ya" : "Tidak", pt.isFixedQuantity ? "Ya" : "Tidak"]),
       ];
 
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
-      ws["!cols"] = [
-        { wch: 36 }, { wch: 25 }, { wch: 14 },
-        { wch: 15 }, { wch: 10 }, { wch: 14 }, { wch: 12 },
-      ];
+      ws["!cols"] = [{ wch: 36 }, { wch: 25 }, { wch: 14 }, { wch: 15 }, { wch: 10 }, { wch: 14 }, { wch: 12 }];
       XLSX.utils.book_append_sheet(wb, ws, "Jenis Tagihan");
       XLSX.writeFile(wb, `jenis-tagihan-${majorName ?? majorId}.xlsx`);
       toast.success("Daftar jenis tagihan berhasil diexport");
@@ -359,7 +336,6 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
 
   return (
     <div className="min-h-screen w-full max-w-7xl mx-auto my-8 p-6 space-y-6">
-
       {/* ── Page Header ── */}
       <div>
         <div className="font-bold text-3xl mb-1">Upload Tagihan (Billing)</div>
@@ -377,9 +353,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
           <div>
             <p className="font-semibold text-green-800 dark:text-green-200">Upload Berhasil!</p>
             <p className="text-sm text-green-700 dark:text-green-300 mt-0.5">
-              {uploadResult.count} item tagihan dibuat ·{" "}
-              {uploadResult.skipped > 0 && `${uploadResult.skipped} dilewati (duplikat) ·`}{" "}
-              {uploadResult.total} total baris diproses
+              {uploadResult.count} item tagihan dibuat · {uploadResult.skipped > 0 && `${uploadResult.skipped} dilewati (duplikat) ·`} {uploadResult.total} total baris diproses
             </p>
           </div>
         </div>
@@ -391,9 +365,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
           <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">1</div>
           <div className="text-lg font-semibold">Export Data Referensi</div>
         </div>
-        <p className="text-sm text-muted-foreground mb-4">
-          Download daftar siswa dan jenis tagihan untuk mendapatkan ID yang dibutuhkan saat mengisi template.
-        </p>
+        <p className="text-sm text-muted-foreground mb-4">Download daftar siswa dan jenis tagihan untuk mendapatkan ID yang dibutuhkan saat mengisi template.</p>
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" onClick={exportStudentList} disabled={!(students as any[]).length}>
             <Users className="h-4 w-4 mr-2" />
@@ -425,16 +397,36 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
             <div className="text-sm text-blue-900 dark:text-blue-100 space-y-1">
               <p className="font-semibold">Petunjuk Pengisian Template:</p>
               <ul className="list-disc list-inside space-y-0.5 text-blue-800 dark:text-blue-200">
-                <li><strong>Student ID</strong> — ambil dari export Daftar Siswa di Langkah 1</li>
-                <li><strong>Payment Type ID</strong> — ambil dari export Jenis Tagihan di Langkah 1</li>
-                <li><strong>Quantity</strong> — jumlah item (angka bulat, minimal 1)</li>
-                <li><strong>Amount</strong> — nominal per satuan (angka, tanpa titik/koma)</li>
-                <li><strong>Subtotal</strong> — boleh dikosongkan, otomatis = Qty × Amount</li>
-                <li><strong>Month</strong> — format 2 digit: 01 s/d 12</li>
-                <li><strong>Year</strong> — format 4 digit: mis. {currentYear}</li>
-                <li><strong>Name</strong> — nama item tagihan (mis. "SPP Januari {currentYear}")</li>
-                <li><strong>SKU Type</strong> — lihat tabel SKU Type di bawah (opsional)</li>
-                <li><strong>Is Paid</strong> — true / false (default: false)</li>
+                <li>
+                  <strong>Student ID</strong> — ambil dari export Daftar Siswa di Langkah 1
+                </li>
+                <li>
+                  <strong>Payment Type ID</strong> — ambil dari export Jenis Tagihan di Langkah 1
+                </li>
+                <li>
+                  <strong>Quantity</strong> — jumlah item (angka bulat, minimal 1)
+                </li>
+                <li>
+                  <strong>Amount</strong> — nominal per satuan (angka, tanpa titik/koma)
+                </li>
+                <li>
+                  <strong>Subtotal</strong> — boleh dikosongkan, otomatis = Qty × Amount
+                </li>
+                <li>
+                  <strong>Month</strong> — format 2 digit: 01 s/d 12
+                </li>
+                <li>
+                  <strong>Year</strong> — format 4 digit: mis. {currentYear}
+                </li>
+                <li>
+                  <strong>Name</strong> — nama item tagihan (mis. "SPP Januari {currentYear}")
+                </li>
+                <li>
+                  <strong>SKU Type</strong> — lihat tabel SKU Type di bawah (opsional)
+                </li>
+                <li>
+                  <strong>Is Paid</strong> — true / false (default: false)
+                </li>
               </ul>
             </div>
           </div>
@@ -455,13 +447,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
 
         <div className="space-y-4">
           <div>
-            <Input
-              id="billing-file-upload"
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={handleFileChange}
-              className="bg-background"
-            />
+            <Input id="billing-file-upload" type="file" accept=".xlsx,.xls" onChange={handleFileChange} className="bg-background" />
             <p className="text-sm text-muted-foreground mt-1">Format: .xlsx atau .xls</p>
           </div>
 
@@ -473,14 +459,9 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">{file.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      ({(file.size / 1024).toFixed(1)} KB)
-                    </span>
+                    <span className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(1)} KB)</span>
                   </div>
-                  <Button
-                    variant="ghost" size="icon" className="h-6 w-6"
-                    onClick={() => removeFile(i)} disabled={isUploading}
-                  >
+                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeFile(i)} disabled={bulkUploadMutation.isPending}>
                     <X className="h-3 w-3" />
                   </Button>
                 </div>
@@ -497,11 +478,11 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                   Preview Data ({previewRows.length} baris)
                 </div>
                 <div className="flex gap-2">
-                  {validCount > 0 && (
-                    <Badge className="bg-green-600 text-white text-xs">{validCount} valid</Badge>
-                  )}
+                  {validCount > 0 && <Badge className="bg-green-600 text-white text-xs">{validCount} valid</Badge>}
                   {errorCount > 0 && (
-                    <Badge variant="destructive" className="text-xs">{errorCount} error</Badge>
+                    <Badge variant="destructive" className="text-xs">
+                      {errorCount} error
+                    </Badge>
                   )}
                 </div>
               </div>
@@ -523,12 +504,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                   </thead>
                   <tbody>
                     {previewRows.map((row) => (
-                      <tr
-                        key={row.rowNum}
-                        className={`border-b ${row._errors.length > 0
-                          ? "bg-red-50 dark:bg-red-950/20"
-                          : "hover:bg-muted/30"}`}
-                      >
+                      <tr key={row.rowNum} className={`border-b ${row._errors.length > 0 ? "bg-red-50 dark:bg-red-950/20" : "hover:bg-muted/30"}`}>
                         <td className="p-2 text-muted-foreground">{row.rowNum}</td>
                         <td className="p-2">
                           <div className="font-medium truncate max-w-[140px]">{row._studentName}</div>
@@ -536,105 +512,56 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                         </td>
                         <td className="p-2">
                           <div className="truncate max-w-[140px]">{row._paymentTypeName}</div>
-                          <Badge variant="outline" className="text-xs mt-0.5">{row.skuType}</Badge>
+                          <Badge variant="outline" className="text-xs mt-0.5">
+                            {row.skuType}
+                          </Badge>
                         </td>
                         <td className="p-2 truncate max-w-[120px]">{row.name}</td>
                         <td className="p-2 text-right">{row.quantity}</td>
-                        <td className="p-2 text-right tabular-nums">
-                          {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(row.amount)}
-                        </td>
-                        <td className="p-2 text-right tabular-nums font-medium">
-                          {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(row.subtotal)}
-                        </td>
+                        <td className="p-2 text-right tabular-nums">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(row.amount)}</td>
+                        <td className="p-2 text-right tabular-nums font-medium">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(row.subtotal)}</td>
                         <td className="p-2 text-center">
                           {MONTH_LABELS[row.month] ?? row.month} {row.year}
                         </td>
                         <td className="p-2 text-center">
-                          {row.isPaid
-                            ? <Badge className="bg-green-600 text-white text-xs">Lunas</Badge>
-                            : <Badge variant="outline" className="text-xs">Belum</Badge>}
+                          {row.isPaid ?
+                            <Badge className="bg-green-600 text-white text-xs">Lunas</Badge>
+                          : <Badge variant="outline" className="text-xs">
+                              Belum
+                            </Badge>
+                          }
                         </td>
                         <td className="p-2">
-                          {row._errors.length > 0 ? (
+                          {row._errors.length > 0 ?
                             <div className="text-red-600 text-xs space-y-0.5">
-                              {row._errors.map((e, i) => <div key={i}>⚠ {e}</div>)}
+                              {row._errors.map((e, i) => (
+                                <div key={i}>⚠ {e}</div>
+                              ))}
                             </div>
-                          ) : (
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
-                          )}
+                          : <CheckCircle2 className="h-4 w-4 text-green-600" />}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              {errorCount > 0 && (
-                <div className="px-4 py-2 bg-red-50 dark:bg-red-950/20 border-t text-xs text-red-700 dark:text-red-300">
-                  ⚠ Baris dengan error akan dilewati saat upload. Perbaiki file Excel lalu upload ulang.
-                </div>
-              )}
+              {errorCount > 0 && <div className="px-4 py-2 bg-red-50 dark:bg-red-950/20 border-t text-xs text-red-700 dark:text-red-300">⚠ Baris dengan error akan dilewati saat upload. Perbaiki file Excel lalu upload ulang.</div>}
             </div>
           )}
 
-          <Button
-            onClick={handleUpload}
-            disabled={validCount === 0 || isUploading}
-          >
+          <Button onClick={handleUpload} disabled={validCount === 0 || bulkUploadMutation.isPending}>
             <Upload className="h-4 w-4 mr-2" />
-            {isUploading
-              ? "Mengupload..."
-              : validCount > 0
-              ? `Upload ${validCount} Item Tagihan`
-              : "Pilih file terlebih dahulu"}
+            {bulkUploadMutation.isPending ?
+              "Mengupload..."
+            : validCount > 0 ?
+              `Upload ${validCount} Item Tagihan`
+            : "Pilih file terlebih dahulu"}
           </Button>
         </div>
       </Card>
 
       {/* ── Reference Tables ── */}
       <div className="grid gap-6">
-
-        {/* Students */}
-        {/* <Card className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-500" />
-              <div className="text-lg font-bold">Daftar Siswa</div>
-              <Badge variant="secondary">{(students as any[]).length} siswa</Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">Copy ID → paste ke kolom Student ID di template</p>
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nama Siswa</TableHead>
-                  <TableHead>NISN</TableHead>
-                  <TableHead>Kelas</TableHead>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Copy</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(students as any[]).map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="font-medium">{s.name}</TableCell>
-                    <TableCell>{s.nisn ?? "-"}</TableCell>
-                    <TableCell>{s.class?.name ?? "-"}</TableCell>
-                    <TableCell className="font-mono text-xs text-muted-foreground">{s.id}</TableCell>
-                    <TableCell>
-                      <CopyButton
-                        variant="secondary"
-                        content={s.id}
-                        onClick={() => toast.success(`ID ${s.name} berhasil dicopy`)}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </Card> */}
-
         {/* Payment Types */}
         <Card className="p-4">
           <div className="flex items-center justify-between mb-3">
@@ -662,24 +589,23 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                 {(paymentTypes as PaymentTypeData[]).map((pt) => (
                   <TableRow key={pt.id}>
                     <TableCell className="font-medium">{pt.name}</TableCell>
-                    <TableCell className="tabular-nums">
-                      {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(parseFloat(pt.amount))}
+                    <TableCell className="tabular-nums">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(parseFloat(pt.amount))}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-xs">
+                        {pt.owner}
+                      </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="text-xs">{pt.owner}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {pt.isMonthly
-                        ? <Badge className="bg-blue-600 text-white text-xs">Bulanan</Badge>
-                        : <Badge variant="secondary" className="text-xs">Sekali</Badge>}
+                      {pt.isMonthly ?
+                        <Badge className="bg-blue-600 text-white text-xs">Bulanan</Badge>
+                      : <Badge variant="secondary" className="text-xs">
+                          Sekali
+                        </Badge>
+                      }
                     </TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground">{pt.id}</TableCell>
                     <TableCell>
-                      <CopyButton
-                        variant="secondary"
-                        content={pt.id}
-                        onClick={() => toast.success(`ID ${pt.name} berhasil dicopy`)}
-                      />
+                      <CopyButton variant="secondary" content={pt.id} onClick={() => toast.success(`ID ${pt.name} berhasil dicopy`)} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -701,12 +627,10 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
             <div className="flex flex-wrap gap-2">
               {skuTypes.map((sku) => (
                 <div key={sku} className="flex items-center gap-1.5">
-                  <Badge variant="outline" className="font-mono text-sm px-3 py-1">{sku}</Badge>
-                  <CopyButton
-                    variant="ghost"
-                    content={sku}
-                    onClick={() => toast.success(`SKU "${sku}" berhasil dicopy`)}
-                  />
+                  <Badge variant="outline" className="font-mono text-sm px-3 py-1">
+                    {sku}
+                  </Badge>
+                  <CopyButton variant="ghost" content={sku} onClick={() => toast.success(`SKU "${sku}" berhasil dicopy`)} />
                 </div>
               ))}
             </div>
@@ -730,11 +654,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                       <span className="text-muted-foreground">{name}</span>
                       <div className="flex items-center gap-1">
                         <code className="font-mono font-bold">{num}</code>
-                        <CopyButton
-                          variant="ghost"
-                          content={num}
-                          onClick={() => toast.success(`Bulan ${name} (${num}) berhasil dicopy`)}
-                        />
+                        <CopyButton variant="ghost" content={num} onClick={() => toast.success(`Bulan ${name} (${num}) berhasil dicopy`)} />
                       </div>
                     </div>
                   );
@@ -749,11 +669,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                     <span className="text-muted-foreground">Tahun {y}</span>
                     <div className="flex items-center gap-1">
                       <code className="font-mono font-bold">{y}</code>
-                      <CopyButton
-                        variant="ghost"
-                        content={y}
-                        onClick={() => toast.success(`Tahun ${y} berhasil dicopy`)}
-                      />
+                      <CopyButton variant="ghost" content={y} onClick={() => toast.success(`Tahun ${y} berhasil dicopy`)} />
                     </div>
                   </div>
                 ))}
@@ -780,10 +696,5 @@ export default function UploadBillingPage() {
     return null;
   }
 
-  return (
-    <UploadBilling
-      majorId={userData?.major?.id ?? ""}
-      majorName={userData?.major?.name}
-    />
-  );
+  return <UploadBilling majorId={userData?.major?.id ?? ""} majorName={userData?.major?.name} />;
 }
