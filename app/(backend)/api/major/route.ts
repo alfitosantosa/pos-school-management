@@ -22,7 +22,13 @@ export async function GET() {
         _count: {
           select: {
             classes: true,
-            students: true,
+            students: {
+              where: {
+                role: {
+                  name: "Student",
+                },
+              },
+            },
             subjects: true,
             paymenttype: true,
           },
@@ -50,7 +56,8 @@ export async function POST(request: NextRequest) {
         description,
         phone,
         address,
-        isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
+        isActive: isActive !== undefined ? isActive : true,
+        // Default to true if not provided
       },
     });
 
