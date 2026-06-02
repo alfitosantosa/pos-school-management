@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, code, name, description, isActive } = await request.json();
+    const { id, code, name, description, isActive, phone, address } = await request.json();
     if (!id || !code || !name) {
       return NextResponse.json({ error: "ID, code, and name are required" }, { status: 400 });
     }
@@ -74,6 +74,8 @@ export async function PUT(request: NextRequest) {
         code,
         name,
         description,
+        phone,
+        address,
         isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
       },
     });
