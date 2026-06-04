@@ -33,12 +33,12 @@ ENV NEXT_TELEMETRY_DISABLED=1 \
 
 # Generate Prisma & Build dalam single layer dengan cleanup
 RUN npx prisma generate \
-    && npm run build \
-    && rm -rf /tmp/* \
-    && rm -rf .next/cache \
-    && rm -rf node_modules/.cache \
-    && find . -name "*.map" -type f -delete \
-    && find . -name "*.test.*" -type f -delete
+    npm run build \
+    rm -rf /tmp/* \
+    rm -rf .next/cache \
+    rm -rf node_modules/.cache \
+    find . -name "*.map" -type f -delete \
+    find . -name "*.test.*" -type f -delete
 
 # ==========================================
 # Stage 3: Production Runner (Ultra minimal)
