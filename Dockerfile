@@ -32,12 +32,12 @@ ENV NEXT_TELEMETRY_DISABLED=1 \
     SKIP_ENV_VALIDATION=1
 
 # Generate Prisma & Build dalam single layer dengan cleanup
-RUN npx prisma generate \
-    npm run build \
-    rm -rf /tmp/* \
-    rm -rf .next/cache \
-    rm -rf node_modules/.cache \
-    find . -name "*.map" -type f -delete \
+RUN npx prisma generate && \
+    npm run build && \
+    rm -rf /tmp/* && \
+    rm -rf .next/cache && \
+    rm -rf node_modules/.cache && \
+    find . -name "*.map" -type f -delete && \
     find . -name "*.test.*" -type f -delete
 
 # ==========================================
@@ -58,6 +58,9 @@ RUN apk add --no-cache curl \
 RUN addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nextjs
 
+# Copy only production dependencies
+COPY --from=deps /app/node_modules ./node_modules
+
 # Copy hanya file yang dibutuhkan
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
@@ -65,10 +68,6 @@ COPY --from=builder /app/package.json ./package.json
 # Copy standalone build
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma (hanya yang diperlukan)
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma/client ./node_modules/@prisma/client
 
 # Switch to non-root user
 USER nextjs
