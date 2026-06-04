@@ -1,4 +1,5 @@
-# 
+# pull repository
+git pull
 
 # Hapus image lama
 docker rmi rahmaniyah-web:latest
