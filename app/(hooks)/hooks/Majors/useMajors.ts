@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { CACHE_STRATEGIES } from "@/app/client/providers";
 
 export const useGetMajors = () => {
   return useQuery({
@@ -12,6 +13,8 @@ export const useGetMajors = () => {
         console.error(error);
       }
     },
+    // ✅ Majors are static - cache for 1 hour (rarely change during a session)
+    ...CACHE_STRATEGIES.static,
   });
 };
 
