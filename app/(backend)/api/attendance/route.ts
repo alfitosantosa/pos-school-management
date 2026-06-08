@@ -19,15 +19,29 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // ✅ Optimized: Field-selection to reduce N+1 risk from 3-level include
+    // Dropping: academicYear (not accessed), full student/schedule objects
+    // Keeping: only fields accessed by UI
     const attendances = await prisma.attendance.findMany({
-      include: {
-        student: true,
+      select: {
+        id: true,
+        status: true,
+        notes: true,
+        date: true,
+        createdAt: true,
+        student: {
+          select: { id: true, name: true, email: true, nisn: true },
+        },
         schedule: {
-          include: {
-            class: true,
-            subject: true,
-            teacher: true,
-            academicYear: true,
+          select: {
+            id: true,
+            startTime: true,
+            endTime: true,
+            dayOfWeek: true,
+            room: true,
+            class: { select: { id: true, name: true } },
+            subject: { select: { id: true, name: true, code: true } },
+            teacher: { select: { id: true, name: true } },
           },
         },
       },

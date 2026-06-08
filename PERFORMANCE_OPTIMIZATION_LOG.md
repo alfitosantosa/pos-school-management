@@ -3,9 +3,11 @@
 ## 🎯 Session Overview
 
 **Branch**: `feat/performance-optimize`  
-**Commit**: `741b79ef` - "perf: optimize API routes with field-selection"  
-**Status**: ✅ Phase 1 Complete (Non-breaking field-selection optimizations)  
-**Testing**: Pending user verification
+**Commits**:
+- `741b79ef` - Phase 1: API field-selection + database indexes
+- `ed516d3a` - Phase 2A: Hook static cache strategies  
+**Status**: ✅ Phase 1 & 2A Complete  
+**Testing**: In progress (user local testing)
 
 ---
 
