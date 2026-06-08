@@ -2,12 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
 export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Allow /api/auth endpoints without authentication
+  if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
   const sessionCookie = getSessionCookie(request);
   // console.log("Middleware - Session cookie:", sessionCookie);
 
   if (!sessionCookie && process.env.NODE_ENV === "production") {
     // Check if this is an API route
-    if (request.nextUrl.pathname.startsWith("/api")) {
+    if (pathname.startsWith("/api")) {
       // Return 401 Unauthorized for API routes
       return NextResponse.json({ error: "Unauthorized", message: "Authentication required" }, { status: 401 });
     }

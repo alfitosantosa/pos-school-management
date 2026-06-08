@@ -59,7 +59,6 @@ export async function GET() {
         accountBank: {
           select: {
             id: true,
-            bankName: true,
             accountNumber: true,
             accountName: true,
             accountBank: true,
@@ -72,8 +71,8 @@ export async function GET() {
             paymentTypeId: true,
             amount: true,
             quantity: true,
-            sku: true,
-            paymentType: {
+            skuType: true,
+            PaymentType: {
               select: {
                 id: true,
                 name: true,
