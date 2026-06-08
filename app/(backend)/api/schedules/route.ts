@@ -28,8 +28,26 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // ✅ Optimized: Field-selection to reduce payload, no N+1 risk (all 1-level includes)
     const schedules = await prisma.schedule.findMany({
-      include: { class: true, subject: true, teacher: true, academicYear: true, tahfidzGroup: true },
+      select: {
+        id: true,
+        classId: true,
+        tahfidzGroupId: true,
+        subjectId: true,
+        teacherId: true,
+        academicYearId: true,
+        dayOfWeek: true,
+        startTime: true,
+        endTime: true,
+        room: true,
+        isActive: true,
+        class: { select: { id: true, name: true } },
+        subject: { select: { id: true, name: true, code: true } },
+        teacher: { select: { id: true, name: true } },
+        academicYear: { select: { id: true, year: true } },
+        tahfidzGroup: { select: { id: true, name: true } },
+      },
       orderBy: { startTime: "asc" },
     });
     return NextResponse.json(schedules);

@@ -14,8 +14,17 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // ✅ Optimized: Use select to drop unused createdAt/updatedAt
+    // Fields used: id, name, description, isActive, permissions, _count.userData
     const roles = await prisma.role.findMany({
-      include: { _count: { select: { userData: true } } },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        isActive: true,
+        permissions: true,
+        _count: { select: { userData: true } },
+      },
       orderBy: { name: "asc" },
     });
     return NextResponse.json(roles);

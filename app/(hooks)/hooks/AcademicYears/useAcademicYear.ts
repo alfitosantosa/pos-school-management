@@ -1,6 +1,7 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { CACHE_STRATEGIES } from "@/app/client/providers";
 
 export const useGetAcademicYears = () => {
   return useQuery({
@@ -13,6 +14,8 @@ export const useGetAcademicYears = () => {
         console.error(error);
       }
     },
+    // ✅ Academic years are static - cache for 1 hour (change only at semester boundaries)
+    ...CACHE_STRATEGIES.static,
   });
 };
 

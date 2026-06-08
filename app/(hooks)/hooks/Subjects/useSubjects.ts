@@ -1,6 +1,7 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { CACHE_STRATEGIES } from "@/app/client/providers";
 
 export const useGetSubjects = () => {
   return useQuery({
@@ -9,6 +10,8 @@ export const useGetSubjects = () => {
       const response = await apiGet("/api/subjects");
       return response.data;
     },
+    // ✅ Subjects are static - cache for 1 hour
+    ...CACHE_STRATEGIES.static,
   });
 };
 

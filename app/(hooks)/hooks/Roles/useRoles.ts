@@ -1,8 +1,7 @@
 "use client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
-
-
+import { CACHE_STRATEGIES } from "@/app/client/providers";
 
 export const useGetRoles = () => {
   return useQuery({
@@ -15,6 +14,8 @@ export const useGetRoles = () => {
         throw new Error(error?.response?.data?.message || "Failed to fetch roles");
       }
     },
+    // ✅ Roles are static - cache for 1 hour
+    ...CACHE_STRATEGIES.static,
   });
 };
 

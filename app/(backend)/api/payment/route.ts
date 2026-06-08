@@ -28,17 +28,59 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // ✅ Optimized: Use select to fetch only needed fields
+    // - Dropped: student.class (never accessed), createdBy (only bendaharaId used)
+    // - Kept: all fields accessed in UI (student.name, major.name, accountBank, paymentItems with paymentType)
     const payments = await prisma.payment.findMany({
-      include: {
+      select: {
+        id: true,
+        amount: true,
+        status: true,
+        createdAt: true,
+        dueDate: true,
+        receiptNumber: true,
+        month: true,
+        bankRef: true,
+        notes: true,
         student: {
-          include: {
-            class: true,
+          select: {
+            id: true,
+            name: true,
+            email: true,
           },
         },
-        major: true,
-        accountBank: true,
-        createdBy: true,
-        paymentItems: true,
+        major: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        accountBank: {
+          select: {
+            id: true,
+            bankName: true,
+            accountNumber: true,
+            accountName: true,
+            accountBank: true,
+          },
+        },
+        paymentItems: {
+          select: {
+            id: true,
+            paymentId: true,
+            paymentTypeId: true,
+            amount: true,
+            quantity: true,
+            sku: true,
+            paymentType: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
