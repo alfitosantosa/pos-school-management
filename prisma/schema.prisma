@@ -130,6 +130,13 @@ model UserData {
   user                    User?                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   violations              Violation[]            @relation("StudentViolation")
 
+  @@index([academicYearId])
+  @@index([classId])
+  @@index([majorId])
+  @@index([roleId])
+  @@index([tahfidzGroupId])
+  @@index([status])
+  @@index([email])
   @@map("user_data")
 }
 
@@ -243,6 +250,12 @@ model Schedule {
   teacher        UserData      @relation("TeacherSchedule", fields: [teacherId], references: [id])
 
   @@unique([classId, subjectId, teacherId, dayOfWeek, startTime])
+  @@index([classId])
+  @@index([subjectId])
+  @@index([teacherId])
+  @@index([academicYearId])
+  @@index([dayOfWeek])
+  @@index([tahfidzGroupId])
   @@map("schedules")
 }
 
@@ -258,6 +271,10 @@ model Attendance {
   student    UserData @relation("StudentAttendance", fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, scheduleId, date])
+  @@index([studentId])
+  @@index([scheduleId])
+  @@index([date])
+  @@index([status])
   @@map("attendances")
 }
 
@@ -290,6 +307,11 @@ model Violation {
   student         UserData      @relation("StudentViolation", fields: [studentId], references: [id], onDelete: Cascade)
   violationType   ViolationType @relation(fields: [violationTypeId], references: [id])
 
+  @@index([studentId])
+  @@index([violationTypeId])
+  @@index([classId])
+  @@index([status])
+  @@index([date])
   @@map("violations")
 }
 
@@ -334,6 +356,10 @@ model PaymentItems {
   PaymentType   PaymentType @relation(fields: [paymentTypeId], references: [id])
   student       UserData    @relation(fields: [studentId], references: [id])
 
+  @@index([paymentId])
+  @@index([studentId])
+  @@index([paymentTypeId])
+  @@index([isPaid])
   @@map("payment_items")
 }
 
@@ -359,6 +385,13 @@ model Payment {
   major              Major               @relation(fields: [majorId], references: [id])
   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
 
+  @@index([studentId])
+  @@index([majorId])
+  @@index([accountBankId])
+  @@index([bendaharaId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([month])
   @@map("payments")
 }
 

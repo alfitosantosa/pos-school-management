@@ -18,13 +18,18 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
     try {
+        // ✅ Optimized: Explicit select for clarity and future-proofing
+        // Fields used: id, name, grade, capacity, isActive, _count.students
         const tahfidzGroups = await prisma.tahfidzGroup.findMany({
-          include: {
-            _count: { select:{
-              students: true,
-            }},
+          select: {
+            id: true,
+            name: true,
+            grade: true,
+            capacity: true,
+            isActive: true,
+            _count: { select: { students: true } },
           },
-            orderBy: { grade: "asc" },
+          orderBy: { grade: "asc" },
         });
         return NextResponse.json(tahfidzGroups);
     } catch (error) {

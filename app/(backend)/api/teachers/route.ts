@@ -61,12 +61,18 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // ✅ Optimized: Use select to fetch only fields accessed by consumers
+    // Fields used: id, name, email, position (per workflow mapping)
     const users = await prisma.userData.findMany({
-      include: {
-        role: true,
-        class: true,
-        major: true,
-        academicYear: true,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        position: true,
+        roleId: true,
+        classId: true,
+        majorId: true,
+        academicYearId: true,
       },
       where: {
         role: {

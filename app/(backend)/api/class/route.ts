@@ -21,11 +21,24 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // ✅ Optimized: Field-selection to keep only accessed fields
+    // Dropping: _count.schedules, _count.violations (not accessed)
+    // Keeping: id, name, grade, capacity, majorId, academicYearId, major.id/name, academicYear.id/year, _count.students
     const classes = await prisma.class.findMany({
-      include: {
-        major: true,
-        academicYear: true,
-        _count: { select: { students: true, schedules: true, violations: true } },
+      select: {
+        id: true,
+        name: true,
+        grade: true,
+        capacity: true,
+        majorId: true,
+        academicYearId: true,
+        major: {
+          select: { id: true, name: true },
+        },
+        academicYear: {
+          select: { id: true, year: true },
+        },
+        _count: { select: { students: true } },
       },
       orderBy: { grade: "asc" },
     });

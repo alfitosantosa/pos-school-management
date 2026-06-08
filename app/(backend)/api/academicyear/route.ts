@@ -20,8 +20,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // ✅ Optimized: Drop unused createdAt/updatedAt, keep all accessed fields and _count
     const academicYears = await prisma.academicYear.findMany({
-      include: {
+      select: {
+        id: true,
+        year: true,
+        startDate: true,
+        endDate: true,
+        isActive: true,
         _count: { select: { students: true, schedules: true, calendarEvents: true, classes: true } },
       },
       orderBy: { startDate: "asc" },

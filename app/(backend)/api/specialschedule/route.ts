@@ -18,9 +18,22 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // ✅ Optimized: Select only accessed fields from academicYear relation
+    // Fields used: id, title, description, eventDate, eventType, isPublished, academicYearId, createdAt, updatedAt, academicYear.year, academicYear.semester
     const specialSchedules = await prisma.calendarEvent.findMany({
-      include: {
-        academicYear: true,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        eventDate: true,
+        eventType: true,
+        isPublished: true,
+        academicYearId: true,
+        createdAt: true,
+        updatedAt: true,
+        academicYear: {
+          select: { id: true, year: true },
+        },
       },
     });
     return NextResponse.json(specialSchedules);
