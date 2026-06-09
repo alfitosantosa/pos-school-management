@@ -26,18 +26,48 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { users } = body;
 
+    console.log("[Bulk Create] Request received:", {
+      timestamp: new Date().toISOString(),
+      usersCount: users?.length || 0,
+      hasUsers: !!users,
+      isArray: Array.isArray(users),
+      bodyKeys: Object.keys(body),
+    });
+
     // Validate input
     if (!users || !Array.isArray(users) || users.length === 0) {
-      return NextResponse.json({ error: "Users array is required and must not be empty" }, { status: 400 });
+      console.log("[Bulk Create] Validation failed: Empty or invalid users array", { users });
+      return NextResponse.json(
+        {
+          error: "Users array is required and must not be empty",
+          details: "Provide at least one user object in the 'users' array",
+          received: {
+            users:
+              users ?
+                Array.isArray(users) ?
+                  `${users.length} items`
+                : typeof users
+              : "undefined",
+          },
+        },
+        { status: 400 },
+      );
     }
 
     // Validate each user has required field (name)
-    const invalidUsers = users.filter((user) => !user.name);
+    const invalidUsers = users.filter((user) => !user.name || (typeof user.name === "string" && !user.name.trim()));
     if (invalidUsers.length > 0) {
+      console.log("[Bulk Create] Validation failed: Missing name field", {
+        invalidCount: invalidUsers.length,
+        totalUsers: users.length,
+        examples: invalidUsers.slice(0, 3),
+      });
       return NextResponse.json(
         {
           error: "All users must have a name",
           invalidCount: invalidUsers.length,
+          totalUsers: users.length,
+          details: "Check that the 'name' field is filled and not empty for all users",
         },
         { status: 400 },
       );
@@ -84,77 +114,99 @@ export async function POST(request: NextRequest) {
 
     const classIds = cleanedUsers.map((u) => u.classId).filter((id): id is string => id !== null);
 
-    const tahfidzGroupIds = cleanedUsers.map((u) => u.tahfidzGroupId).filter((id): id is string => id !== null);
-
     const majorIds = cleanedUsers.map((u) => u.majorId).filter((id): id is string => id !== null);
 
+    // ✅ NOTE: tahfidzGroupId is OPTIONAL - can be null/empty, no validation needed
+
     // Check if referenced records exist
-    const [roles, academicYears, classes, majors, tahfidzGroups] = await Promise.all([
-      roleIds.length > 0
-        ? prisma.role.findMany({
-            where: { id: { in: roleIds } },
-            select: { id: true },
-          })
-        : [],
-      academicYearIds.length > 0
-        ? prisma.academicYear.findMany({
-            where: { id: { in: academicYearIds } },
-            select: { id: true },
-          })
-        : [],
-      classIds.length > 0
-        ? prisma.class.findMany({
-            where: { id: { in: classIds } },
-            select: { id: true },
-          })
-        : [],
-      tahfidzGroupIds.length > 0
-        ? prisma.tahfidzGroup.findMany({
-            where: { id: { in: tahfidzGroupIds } },
-            select: { id: true },
-          })
-        : [],
-      majorIds.length > 0
-        ? prisma.major.findMany({
-            where: { id: { in: majorIds } },
-            select: { id: true },
-          })
-        : [],
+    const [roles, academicYears, classes, majors] = await Promise.all([
+      roleIds.length > 0 ?
+        prisma.role.findMany({
+          where: { id: { in: roleIds } },
+          select: { id: true },
+        })
+      : [],
+      academicYearIds.length > 0 ?
+        prisma.academicYear.findMany({
+          where: { id: { in: academicYearIds } },
+          select: { id: true },
+        })
+      : [],
+      classIds.length > 0 ?
+        prisma.class.findMany({
+          where: { id: { in: classIds } },
+          select: { id: true },
+        })
+      : [],
+      majorIds.length > 0 ?
+        prisma.major.findMany({
+          where: { id: { in: majorIds } },
+          select: { id: true },
+        })
+      : [],
     ]);
 
     // Check for invalid references
     const foundRoleIds = new Set(roles.map((r) => r.id));
     const foundAcademicYearIds = new Set(academicYears.map((a) => a.id));
     const foundClassIds = new Set(classes.map((c) => c.id));
-    const foundTahfidzGroupIds = new Set(tahfidzGroups.map((t) => t.id));
     const foundMajorIds = new Set(majors.map((m) => m.id));
 
     const invalidRoles = roleIds.filter((id) => !foundRoleIds.has(id));
     const invalidAcademicYears = academicYearIds.filter((id) => !foundAcademicYearIds.has(id));
     const invalidClasses = classIds.filter((id) => !foundClassIds.has(id));
-    const invalidTahfidzGroups = tahfidzGroupIds.filter((id) => !foundTahfidzGroupIds.has(id));
     const invalidMajors = majorIds.filter((id) => !foundMajorIds.has(id));
 
-    if (invalidRoles.length > 0 || invalidAcademicYears.length > 0 || invalidClasses.length > 0 || invalidTahfidzGroups.length > 0 || invalidMajors.length > 0) {
+    if (invalidRoles.length > 0 || invalidAcademicYears.length > 0 || invalidClasses.length > 0 || invalidMajors.length > 0) {
+      console.log("[Bulk Create] Foreign key validation failed:", {
+        invalidRoles: { count: invalidRoles.length, ids: invalidRoles.slice(0, 3) },
+        invalidAcademicYears: { count: invalidAcademicYears.length, ids: invalidAcademicYears.slice(0, 3) },
+        invalidClasses: { count: invalidClasses.length, ids: invalidClasses.slice(0, 3) },
+        invalidMajors: { count: invalidMajors.length, ids: invalidMajors.slice(0, 3) },
+        availableRecords: {
+          roles: foundRoleIds.size,
+          academicYears: foundAcademicYearIds.size,
+          classes: foundClassIds.size,
+          majors: foundMajorIds.size,
+        },
+      });
       return NextResponse.json(
         {
           error: "Invalid foreign key references found",
           details: {
-            invalidRoles: invalidRoles.length > 0 ? invalidRoles : undefined,
-            invalidAcademicYears: invalidAcademicYears.length > 0 ? invalidAcademicYears : undefined,
-            invalidClasses: invalidClasses.length > 0 ? invalidClasses : undefined,
-            invalidTahfidzGroups: invalidTahfidzGroups.length > 0 ? invalidTahfidzGroups : undefined,
-            invalidMajors: invalidMajors.length > 0 ? invalidMajors : undefined,
+            invalidRoles: invalidRoles.length > 0 ? { count: invalidRoles.length, samples: invalidRoles.slice(0, 3) } : undefined,
+            invalidAcademicYears: invalidAcademicYears.length > 0 ? { count: invalidAcademicYears.length, samples: invalidAcademicYears.slice(0, 3) } : undefined,
+            invalidClasses: invalidClasses.length > 0 ? { count: invalidClasses.length, samples: invalidClasses.slice(0, 3) } : undefined,
+            invalidMajors: invalidMajors.length > 0 ? { count: invalidMajors.length, samples: invalidMajors.slice(0, 3) } : undefined,
           },
+          availableRecords: {
+            roles: foundRoleIds.size,
+            academicYears: foundAcademicYearIds.size,
+            classes: foundClassIds.size,
+            majors: foundMajorIds.size,
+          },
+          suggestion: "Verify that all IDs in your Excel file match the available options shown in the tables on the upload page. Note: tahfidzGroupId is optional and can be left empty.",
         },
         { status: 400 },
       );
     }
+    console.log(cleanedUsers);
+
+    console.log("[Bulk Create] Validation passed, creating users:", {
+      count: cleanedUsers.length,
+      timestamp: new Date().toISOString(),
+    });
 
     // Bulk create users
     const result = await prisma.userData.createMany({
       data: cleanedUsers,
       skipDuplicates: false, // Set to true if you want to skip duplicates
+    });
+
+    console.log("[Bulk Create] Success:", {
+      created: result.count,
+      total: users.length,
+      timestamp: new Date().toISOString(),
     });
 
     return NextResponse.json(
@@ -166,36 +218,54 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error: any) {
-    console.error("Error creating users:", error);
+    console.error("[Bulk Create] Error caught:", {
+      message: error.message,
+      code: error.code,
+      meta: error.meta,
+      timestamp: new Date().toISOString(),
+    });
 
     // Handle Prisma-specific errors
     if (error.code === "P2002") {
+      console.log("[Bulk Create] Duplicate entry detected:", {
+        field: error.meta?.target,
+        target: error.meta?.target?.[0],
+      });
       return NextResponse.json(
         {
           error: "Duplicate entry found",
           details: "Some users may already exist with the same unique fields (email, NIK, NISN, etc.)",
-          field: error.meta?.target,
+          field: error.meta?.target?.[0],
+          suggestion: `Check if any ${error.meta?.target?.[0]} values already exist in the database`,
         },
         { status: 409 },
       );
     }
 
     if (error.code === "P2003") {
+      console.log("[Bulk Create] Foreign key constraint failed:", {
+        field: error.meta?.field_name,
+      });
       return NextResponse.json(
         {
           error: "Foreign key constraint failed",
           details: "Invalid reference to role, class, major, or academic year",
           field: error.meta?.field_name,
+          suggestion: "Verify all foreign key IDs match the available options",
         },
         { status: 400 },
       );
     }
 
     if (error.code === "P2000") {
+      console.log("[Bulk Create] Value too long for column:", {
+        column: error.meta?.column_name,
+      });
       return NextResponse.json(
         {
           error: "Value too long for column",
           details: error.meta?.column_name,
+          suggestion: `Check that the ${error.meta?.column_name} value is not too long`,
         },
         { status: 400 },
       );
@@ -206,6 +276,7 @@ export async function POST(request: NextRequest) {
         error: "Failed to create users",
         details: error.message,
         code: error.code,
+        suggestion: "Check the error code and message above for details",
       },
       { status: 500 },
     );
