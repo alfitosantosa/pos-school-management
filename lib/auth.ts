@@ -35,7 +35,6 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    nextCookies(),
     openAPI(),
     admin({
       // Optional: configure admin settings
@@ -45,5 +44,6 @@ export const auth = betterAuth({
       studentRole: "student",
       parentRole: "parent",
     }),
+    nextCookies(), // ✅ MOVED: Cookie plugin MUST be last
   ],
 });

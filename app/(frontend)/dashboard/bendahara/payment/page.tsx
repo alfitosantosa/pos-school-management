@@ -498,8 +498,8 @@ function PaymentFormDialog({
                         <SelectValue placeholder="Pilih Status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pending">Menunggu</SelectItem>
                         <SelectItem value="paid">Lunas</SelectItem>
+                        <SelectItem value="pending">Menunggu</SelectItem>
                         <SelectItem value="overdue">Terlambat</SelectItem>
                       </SelectContent>
                     </Select>
