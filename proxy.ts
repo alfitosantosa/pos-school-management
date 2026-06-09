@@ -4,8 +4,8 @@ import { getSessionCookie } from "better-auth/cookies";
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Allow /api/auth endpoints without authentication
-  if (pathname.startsWith("/api/auth")) {
+  // Allow public endpoints without authentication
+  if (pathname.startsWith("/api/auth") || pathname === "/api/health") {
     return NextResponse.next();
   }
 
