@@ -220,17 +220,16 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
                 <SelectValue placeholder="Pilih branch" />
               </SelectTrigger>
               <SelectContent>
-                {majorsLoading ? (
+                {majorsLoading ?
                   <SelectItem value="" disabled>
                     Loading...
                   </SelectItem>
-                ) : (
-                  majors.map((major: any) => (
+                : majors.map((major: any) => (
                     <SelectItem key={major.id} value={major.id}>
                       {major.name}
                     </SelectItem>
                   ))
-                )}
+                }
               </SelectContent>
             </Select>
             {errors.majorId && <p className="text-sm text-red-500">{errors.majorId.message}</p>}
@@ -329,7 +328,11 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
               Batal
             </Button>
             <Button type="submit" disabled={createPaymentType.isPending || updatePaymentType.isPending}>
-              {createPaymentType.isPending || updatePaymentType.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createPaymentType.isPending || updatePaymentType.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -629,7 +632,7 @@ function PaymentTypeDataTable() {
           {/* Add Button */}
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Tambah Jenis Pembayaran
+            Tambah Katalog
           </Button>
         </div>
       </div>
@@ -647,7 +650,7 @@ function PaymentTypeDataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -655,13 +658,12 @@ function PaymentTypeDataTable() {
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data jenis pembayaran.
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>

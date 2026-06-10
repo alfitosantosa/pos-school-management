@@ -601,7 +601,7 @@ function PaymentFormDialog({
               <>
                 <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground px-1">
                   <div className="col-span-1 text-center">Pilih</div>
-                  <div className="col-span-3">Jenis Pembayaran</div>
+                  <div className="col-span-3">Jenis Transaksi</div>
                   <div className="col-span-2 text-center">Bulan/Tahun</div>
                   <div className="col-span-2">Nominal (Rp)</div>
                   <div className="col-span-2 text-center">Qty</div>
