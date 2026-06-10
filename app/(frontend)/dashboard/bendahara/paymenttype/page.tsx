@@ -70,7 +70,7 @@ const OWNER_OPTIONS = [
 ] as const;
 
 const COLUMN_LABELS = {
-  name: "Nama Pembayaran",
+  name: "Nama Transaksi",
   description: "Deskripsi",
   amount: "Jumlah",
   quantity: "Quantity",
@@ -201,10 +201,10 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
 
       if (editData) {
         await updatePaymentType.mutateAsync({ id: editData.id, ...payload } as any);
-        toast.success("Jenis pembayaran berhasil diperbarui!");
+        toast.success("Jenis Transaksi berhasil diperbarui!");
       } else {
         await createPaymentType.mutateAsync(payload as any);
-        toast.success("Jenis pembayaran berhasil dibuat!");
+        toast.success("Jenis Transaksi berhasil dibuat!");
       }
 
       reset();
@@ -337,7 +337,11 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
               Batal
             </Button>
             <Button type="submit" disabled={createPaymentType.isPending || updatePaymentType.isPending}>
-              {createPaymentType.isPending || updatePaymentType.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createPaymentType.isPending || updatePaymentType.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -610,7 +614,7 @@ function PaymentTypeDataTable({ id }: { id: string }) {
           {/* Add Button */}
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Tambah Jenis Pembayaran
+            Tambah Katalog
           </Button>
         </div>
       </div>
@@ -628,7 +632,7 @@ function PaymentTypeDataTable({ id }: { id: string }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -636,13 +640,12 @@ function PaymentTypeDataTable({ id }: { id: string }) {
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data jenis pembayaran.
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>

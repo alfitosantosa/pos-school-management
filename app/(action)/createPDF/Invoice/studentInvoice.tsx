@@ -454,7 +454,7 @@ function KwitansiDocument({ data }: { data: KwitansiPDFData }) {
 
             {/* Right: document title */}
             <View style={S.headerRight}>
-              <Text style={S.headerDocLabel}>Bukti Pembayaran</Text>
+              <Text style={S.headerDocLabel}>Bukti Transaksi</Text>
               <Text style={S.headerDocTitle}>KWITANSI</Text>
               <Text style={S.headerDocNo}>No. {data.receiptNumber}</Text>
             </View>
@@ -488,7 +488,7 @@ function KwitansiDocument({ data }: { data: KwitansiPDFData }) {
           <View style={S.tableWrap}>
             <View style={S.tableHead}>
               <Text style={[S.th, S.cNo]}>#</Text>
-              <Text style={[S.th, S.cName]}>Keterangan Pembayaran</Text>
+              <Text style={[S.th, S.cName]}>Keterangan Transaksi</Text>
               <Text style={[S.th, S.cPeriod]}>Periode</Text>
               <Text style={[S.th, S.cType]}>Jenis</Text>
               <Text style={[S.th, S.cQty]}>Qty</Text>
@@ -566,7 +566,7 @@ function KwitansiDocument({ data }: { data: KwitansiPDFData }) {
             <View style={[S.footerSection, { flex: 2 }]}>
               <Text style={S.footerSectionLabel}>Keterangan</Text>
               <Text style={S.footerText}>
-                Bukti pembayaran ini sah tanpa tanda tangan dan stempel basah apabila{"\n"}
+                Bukti Transaksi ini sah tanpa tanda tangan dan stempel basah apabila{"\n"}
                 tercatat dalam sistem informasi keuangan sekolah.
               </Text>
             </View>

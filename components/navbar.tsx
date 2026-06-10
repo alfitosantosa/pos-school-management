@@ -26,8 +26,8 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/attendance": "Absensi Management",
   "/dashboard/typeviolations": "Jenis Pelanggaran Management",
   "/dashboard/violations": "Pelanggaran Management",
-  "/dashboard/paymenttypes": "Tipe Pembayaran Management",
-  "/dashboard/payments": "Pembayaran Management",
+  "/dashboard/paymenttypes": "Katalog Management",
+  "/dashboard/payments": "Transaksi Management",
   "/dashboard/specialschedule": "Jadwal Khusus",
   "/dashboard/calender": "Kalender",
   "/dashboard/calender/teacher": "Kalender untuk Guru",
@@ -54,13 +54,13 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/profile": "Profile",
   "/dashboard/accountbank": "Account Bank Management",
   //for bendahara
-  "/dashboard/bendahara/payment": "Data Pembayaran",
-  "/dashboard/bendahara/users": "Data Murid",
+  "/dashboard/bendahara/payment": "Data Transaksi",
+  "/dashboard/bendahara/users": "Data Siswa",
   "/dashboard/bendahara/class": "Data Kelas",
-  "/dashboard/bendahara/paymenttype": "Data Jenis Pembayaran",
-  "/dashboard/bendahara/billing": "Data Billing",
-  "/dashboard/bendahara/billing/upload": "Upload Billing",
-  "/dashboard/bendahara/users/upload": "Upload Data Murid",
+  "/dashboard/bendahara/paymenttype": "Katalog",
+  "/dashboard/bendahara/billing": "Data Tagihan",
+  "/dashboard/bendahara/billing/upload": "Upload Tagihan",
+  "/dashboard/bendahara/users/upload": "Upload Data Siswa",
 };
 
 export default function Navbar() {

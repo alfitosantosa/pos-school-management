@@ -115,7 +115,7 @@ const availablePermissions = [
   // for bendahara
   {
     id: "/dashboard/bendahara/users",
-    label: "Data Murid (Bendahara)",
+    label: "Data Siswa (Bendahara)",
   },
   {
     id: "/dashboard/bendahara/class",
@@ -123,7 +123,7 @@ const availablePermissions = [
   },
   {
     id: "/dashboard/bendahara/paymenttype",
-    label: "Jenis Pembayaran (Bendahara)",
+    label: "Katalog (Bendahara)",
   },
   {
     id: "/dashboard/bendahara/payment",
