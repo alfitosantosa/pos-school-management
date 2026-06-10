@@ -134,7 +134,7 @@ const singleItemSchema = z.object({
   month: z.string().min(1, "Bulan wajib dipilih"),
   year: z.string().min(1, "Tahun wajib dipilih"),
   quantity: z.number().min(1, "Jumlah minimal 1"),
-  amount: z.number().min(0, "Nominal tidak boleh negatif"),
+  amount: z.number().optional(),
   subtotal: z.number(),
   isFixedAmount: z.boolean().default(false),
   isFixedQuantity: z.boolean().default(false),
@@ -438,7 +438,7 @@ function SingleItemDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="amount">Nominal (Rp)</Label>
-              <Input id="amount" type="number" min={0} disabled={watch("isFixedAmount")} value={watch("amount") ?? 0} onChange={(e) => handleAmountChange(Number(e.target.value))} />
+              <Input id="amount" type="number" disabled={watch("isFixedAmount")} value={watch("amount") ?? 0} onChange={(e) => handleAmountChange(Number(e.target.value))} />
               {watch("isFixedAmount") && <p className="text-xs text-muted-foreground">Nominal tetap</p>}
             </div>
             <div className="space-y-2">
