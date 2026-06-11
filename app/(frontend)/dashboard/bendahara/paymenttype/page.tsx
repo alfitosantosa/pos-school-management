@@ -382,7 +382,10 @@ function DeletePaymentTypeDialog({ open, onOpenChange, paymentTypeData, onSucces
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deletePaymentType.isPending} className="bg-red-600 hover:bg-red-700">
+          {/* <AlertDialogAction onClick={handleDelete} disabled={deletePaymentType.isPending} className="bg-red-600 hover:bg-red-700">
+            {deletePaymentType.isPending ? "Menghapus..." : "Hapus"}
+          </AlertDialogAction>   */}
+          <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
             {deletePaymentType.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
         </AlertDialogFooter>

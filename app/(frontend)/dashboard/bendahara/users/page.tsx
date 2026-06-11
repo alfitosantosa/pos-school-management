@@ -25,6 +25,7 @@ import { unauthorized } from "next/navigation";
 import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
 import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
 import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
+import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
 
 // Dashboard Component - Only rendered after role verification
 function UserDashboard({ id }: { id: string }) {
@@ -63,7 +64,7 @@ function UserDashboard({ id }: { id: string }) {
     return Array.from(new Set(usersData.map((user: UserData) => user.role?.name).filter(Boolean)));
   }, [usersData]);
 
-  const { data: classesData, isLoading: isLoadingClasses } = useGetClasses();
+  const { data: classesData, isLoading: isLoadingClasses } = useGetClassByIdMajor(id);
 
   const { data: tahfidzGroupsData, isLoading: isLoadingTahfidzGroups } = useGetTahfidzGroup();
 
@@ -352,6 +353,7 @@ function UserDashboard({ id }: { id: string }) {
                     setDeleteDialogOpen(true);
                   }}
                   className="text-red-600"
+                  disabled={true}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Hapus
