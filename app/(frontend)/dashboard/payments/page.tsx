@@ -229,7 +229,11 @@ function PaymentFormDialog({
   const selectedStatus = watch("status");
 
   // Compute grand total from items - recalculate on every render
-  const grandTotal = watchedItems?.reduce((sum, item) => sum + (item.subtotal || 0), 0) ?? 0;
+  const grandTotal =
+    watchedItems?.reduce((sum, item) => {
+      const subtotal = parseFloat(String(item.subtotal || 0));
+      return sum + (isNaN(subtotal) ? 0 : subtotal);
+    }, 0) ?? 0;
 
   // Auto-populate amount when payment type selected
   const handlePaymentTypeChange = (index: number, paymentTypeId: string) => {
@@ -382,18 +386,7 @@ function PaymentFormDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Siswa</Label>
-              <Controller
-                name="studentId"
-                control={control}
-                render={({ field }) => (
-                  <StudentCombobox
-                    students={allStudents}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    placeholder="Pilih Siswa"
-                  />
-                )}
-              />
+              <Controller name="studentId" control={control} render={({ field }) => <StudentCombobox students={allStudents} value={field.value} onValueChange={field.onChange} placeholder="Pilih Siswa" />} />
               {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}
             </div>
 
@@ -627,7 +620,11 @@ function PaymentFormDialog({
               Batal
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -731,7 +728,9 @@ function PaymentDataTable({ userDataId }: { userDataId?: string }) {
           <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs px-2" onClick={() => toggleExpand(p.id)}>
             <Package className="h-3.5 w-3.5" />
             {itemCount}
-            {isExpanded ? <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" /> : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
+            {isExpanded ?
+              <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" />
+            : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
           </Button>
         );
       },
@@ -1049,7 +1048,7 @@ function PaymentDataTable({ userDataId }: { userDataId?: string }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
                   <TableRow data-state={row.getIsSelected() && "selected"}>
@@ -1067,8 +1066,7 @@ function PaymentDataTable({ userDataId }: { userDataId?: string }) {
                   )}
                 </React.Fragment>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1090,7 +1088,7 @@ function PaymentDataTable({ userDataId }: { userDataId?: string }) {
                   </div>
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>

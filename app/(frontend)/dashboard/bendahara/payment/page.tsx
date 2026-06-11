@@ -291,8 +291,16 @@ function PaymentFormDialog({
     setTotalTransfer("");
   }, [memoizedUnpaidItems.length]);
 
+  // Compute grand total from selected items
   const grandTotal = React.useMemo(() => {
-    return watchedItems?.filter((item) => item.selected)?.reduce((sum, item) => sum + (item.subtotal || 0), 0) ?? 0;
+    return (
+      watchedItems
+        ?.filter((item) => item.selected)
+        ?.reduce((sum, item) => {
+          const subtotal = parseFloat(String(item.subtotal || 0));
+          return sum + (isNaN(subtotal) ? 0 : subtotal);
+        }, 0) ?? 0
+    );
   }, [watchedItems?.map((item) => item.selected).join(","), watchedItems?.map((item) => item.subtotal).join(",")]);
 
   // ✅ Reset totalTransfer saat grandTotal berubah (item dicentang/uncentang)

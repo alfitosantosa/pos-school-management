@@ -199,8 +199,12 @@ export async function POST(request: NextRequest) {
 
     // Bulk create users
     const result = await prisma.userData.createMany({
-      data: cleanedUsers,
-      skipDuplicates: false, // Set to true if you want to skip duplicates
+      data: cleanedUsers.map((user) => ({
+        ...user,
+        // ✅ Ensure tahfidzGroupId is null if empty string (Prisma constraint)
+        tahfidzGroupId: user.tahfidzGroupId === "" ? null : user.tahfidzGroupId,
+      })),
+      skipDuplicates: false,
     });
 
     console.log("[Bulk Create] Success:", {

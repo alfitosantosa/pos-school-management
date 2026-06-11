@@ -420,7 +420,7 @@ function KwitansiDocument({ data }: { data: KwitansiPDFData }) {
   const isDiff = subTotal !== total;
 
   const institution = {
-    name: "YAYASAN PENDIDIKAN RAHMANIYAH",
+    name: "YAYASAN PENDIDIKAN RAHMANY",
     address: "Jl. Lapangan Member, Blok C No.11 Sukmajaya - Depok 16412",
     phone: "(021) 77833598",
     fax: "(021) 77835420",

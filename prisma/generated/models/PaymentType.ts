@@ -28,13 +28,13 @@ export type AggregatePaymentType = {
 
 export type PaymentTypeAvgAggregateOutputType = {
   amount: runtime.Decimal | null
-  quantity: runtime.Decimal | null
+  quantity: number | null
   subtotal: runtime.Decimal | null
 }
 
 export type PaymentTypeSumAggregateOutputType = {
   amount: runtime.Decimal | null
-  quantity: runtime.Decimal | null
+  quantity: number | null
   subtotal: runtime.Decimal | null
 }
 
@@ -47,7 +47,7 @@ export type PaymentTypeMinAggregateOutputType = {
   isActive: boolean | null
   isFixedAmount: boolean | null
   isFixedQuantity: boolean | null
-  quantity: runtime.Decimal | null
+  quantity: number | null
   subtotal: runtime.Decimal | null
   owner: string | null
   majorId: string | null
@@ -63,7 +63,7 @@ export type PaymentTypeMaxAggregateOutputType = {
   isActive: boolean | null
   isFixedAmount: boolean | null
   isFixedQuantity: boolean | null
-  quantity: runtime.Decimal | null
+  quantity: number | null
   subtotal: runtime.Decimal | null
   owner: string | null
   majorId: string | null
@@ -244,7 +244,7 @@ export type PaymentTypeGroupByOutputType = {
   isActive: boolean
   isFixedAmount: boolean
   isFixedQuantity: boolean
-  quantity: runtime.Decimal
+  quantity: number
   subtotal: runtime.Decimal
   owner: string
   majorId: string
@@ -283,7 +283,7 @@ export type PaymentTypeWhereInput = {
   isActive?: Prisma.BoolFilter<"PaymentType"> | boolean
   isFixedAmount?: Prisma.BoolFilter<"PaymentType"> | boolean
   isFixedQuantity?: Prisma.BoolFilter<"PaymentType"> | boolean
-  quantity?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFilter<"PaymentType"> | number
   subtotal?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFilter<"PaymentType"> | string
   majorId?: Prisma.StringFilter<"PaymentType"> | string
@@ -322,7 +322,7 @@ export type PaymentTypeWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"PaymentType"> | boolean
   isFixedAmount?: Prisma.BoolFilter<"PaymentType"> | boolean
   isFixedQuantity?: Prisma.BoolFilter<"PaymentType"> | boolean
-  quantity?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFilter<"PaymentType"> | number
   subtotal?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFilter<"PaymentType"> | string
   majorId?: Prisma.StringFilter<"PaymentType"> | string
@@ -364,7 +364,7 @@ export type PaymentTypeScalarWhereWithAggregatesInput = {
   isActive?: Prisma.BoolWithAggregatesFilter<"PaymentType"> | boolean
   isFixedAmount?: Prisma.BoolWithAggregatesFilter<"PaymentType"> | boolean
   isFixedQuantity?: Prisma.BoolWithAggregatesFilter<"PaymentType"> | boolean
-  quantity?: Prisma.DecimalWithAggregatesFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatWithAggregatesFilter<"PaymentType"> | number
   subtotal?: Prisma.DecimalWithAggregatesFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringWithAggregatesFilter<"PaymentType"> | string
   majorId?: Prisma.StringWithAggregatesFilter<"PaymentType"> | string
@@ -380,7 +380,7 @@ export type PaymentTypeCreateInput = {
   isActive?: boolean
   isFixedAmount: boolean
   isFixedQuantity: boolean
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: number
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   owner: string
   skuType: string
@@ -397,7 +397,7 @@ export type PaymentTypeUncheckedCreateInput = {
   isActive?: boolean
   isFixedAmount: boolean
   isFixedQuantity: boolean
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: number
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   owner: string
   majorId: string
@@ -414,7 +414,7 @@ export type PaymentTypeUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   skuType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -431,7 +431,7 @@ export type PaymentTypeUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   majorId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -448,7 +448,7 @@ export type PaymentTypeCreateManyInput = {
   isActive?: boolean
   isFixedAmount: boolean
   isFixedQuantity: boolean
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: number
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   owner: string
   majorId: string
@@ -464,7 +464,7 @@ export type PaymentTypeUpdateManyMutationInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   skuType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -479,7 +479,7 @@ export type PaymentTypeUncheckedUpdateManyInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   majorId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -611,6 +611,14 @@ export type DecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type PaymentTypeCreateNestedOneWithoutPaymentItemsInput = {
   create?: Prisma.XOR<Prisma.PaymentTypeCreateWithoutPaymentItemsInput, Prisma.PaymentTypeUncheckedCreateWithoutPaymentItemsInput>
   connectOrCreate?: Prisma.PaymentTypeCreateOrConnectWithoutPaymentItemsInput
@@ -634,7 +642,7 @@ export type PaymentTypeCreateWithoutMajorInput = {
   isActive?: boolean
   isFixedAmount: boolean
   isFixedQuantity: boolean
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: number
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   owner: string
   skuType: string
@@ -650,7 +658,7 @@ export type PaymentTypeUncheckedCreateWithoutMajorInput = {
   isActive?: boolean
   isFixedAmount: boolean
   isFixedQuantity: boolean
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: number
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   owner: string
   skuType: string
@@ -695,7 +703,7 @@ export type PaymentTypeScalarWhereInput = {
   isActive?: Prisma.BoolFilter<"PaymentType"> | boolean
   isFixedAmount?: Prisma.BoolFilter<"PaymentType"> | boolean
   isFixedQuantity?: Prisma.BoolFilter<"PaymentType"> | boolean
-  quantity?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFilter<"PaymentType"> | number
   subtotal?: Prisma.DecimalFilter<"PaymentType"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFilter<"PaymentType"> | string
   majorId?: Prisma.StringFilter<"PaymentType"> | string
@@ -711,7 +719,7 @@ export type PaymentTypeCreateWithoutPaymentItemsInput = {
   isActive?: boolean
   isFixedAmount: boolean
   isFixedQuantity: boolean
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: number
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   owner: string
   skuType: string
@@ -727,7 +735,7 @@ export type PaymentTypeUncheckedCreateWithoutPaymentItemsInput = {
   isActive?: boolean
   isFixedAmount: boolean
   isFixedQuantity: boolean
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: number
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   owner: string
   majorId: string
@@ -759,7 +767,7 @@ export type PaymentTypeUpdateWithoutPaymentItemsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   skuType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -775,7 +783,7 @@ export type PaymentTypeUncheckedUpdateWithoutPaymentItemsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   majorId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -791,7 +799,7 @@ export type PaymentTypeCreateManyMajorInput = {
   isActive?: boolean
   isFixedAmount: boolean
   isFixedQuantity: boolean
-  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity: number
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   owner: string
   skuType: string
@@ -806,7 +814,7 @@ export type PaymentTypeUpdateWithoutMajorInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   skuType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -822,7 +830,7 @@ export type PaymentTypeUncheckedUpdateWithoutMajorInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   skuType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -838,7 +846,7 @@ export type PaymentTypeUncheckedUpdateManyWithoutMajorInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedAmount?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isFixedQuantity?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   owner?: Prisma.StringFieldUpdateOperationsInput | string
   skuType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -972,7 +980,7 @@ export type $PaymentTypePayload<ExtArgs extends runtime.Types.Extensions.Interna
     isActive: boolean
     isFixedAmount: boolean
     isFixedQuantity: boolean
-    quantity: runtime.Decimal
+    quantity: number
     subtotal: runtime.Decimal
     owner: string
     majorId: string
@@ -1410,7 +1418,7 @@ export interface PaymentTypeFieldRefs {
   readonly isActive: Prisma.FieldRef<"PaymentType", 'Boolean'>
   readonly isFixedAmount: Prisma.FieldRef<"PaymentType", 'Boolean'>
   readonly isFixedQuantity: Prisma.FieldRef<"PaymentType", 'Boolean'>
-  readonly quantity: Prisma.FieldRef<"PaymentType", 'Decimal'>
+  readonly quantity: Prisma.FieldRef<"PaymentType", 'Float'>
   readonly subtotal: Prisma.FieldRef<"PaymentType", 'Decimal'>
   readonly owner: Prisma.FieldRef<"PaymentType", 'String'>
   readonly majorId: Prisma.FieldRef<"PaymentType", 'String'>
