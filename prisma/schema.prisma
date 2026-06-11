@@ -324,7 +324,7 @@ model PaymentType {
   isActive        Boolean        @default(true)
   isFixedAmount   Boolean
   isFixedQuantity Boolean
-  quantity        Decimal
+  quantity        Float
   subtotal        Decimal
   owner           String
   majorId         String
@@ -342,9 +342,9 @@ model PaymentItems {
   paymentId     String?
   studentId     String
   paymentTypeId String
-  quantity      Int
-  amount        Int
-  subtotal      Int
+  quantity      Decimal
+  amount        Decimal
+  subtotal      Decimal
   isPaid        Boolean     @default(false)
   month         String
   name          String

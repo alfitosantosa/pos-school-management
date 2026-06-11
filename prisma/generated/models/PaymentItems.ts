@@ -27,15 +27,15 @@ export type AggregatePaymentItems = {
 }
 
 export type PaymentItemsAvgAggregateOutputType = {
-  quantity: number | null
-  amount: number | null
-  subtotal: number | null
+  quantity: runtime.Decimal | null
+  amount: runtime.Decimal | null
+  subtotal: runtime.Decimal | null
 }
 
 export type PaymentItemsSumAggregateOutputType = {
-  quantity: number | null
-  amount: number | null
-  subtotal: number | null
+  quantity: runtime.Decimal | null
+  amount: runtime.Decimal | null
+  subtotal: runtime.Decimal | null
 }
 
 export type PaymentItemsMinAggregateOutputType = {
@@ -43,9 +43,9 @@ export type PaymentItemsMinAggregateOutputType = {
   paymentId: string | null
   studentId: string | null
   paymentTypeId: string | null
-  quantity: number | null
-  amount: number | null
-  subtotal: number | null
+  quantity: runtime.Decimal | null
+  amount: runtime.Decimal | null
+  subtotal: runtime.Decimal | null
   isPaid: boolean | null
   month: string | null
   name: string | null
@@ -60,9 +60,9 @@ export type PaymentItemsMaxAggregateOutputType = {
   paymentId: string | null
   studentId: string | null
   paymentTypeId: string | null
-  quantity: number | null
-  amount: number | null
-  subtotal: number | null
+  quantity: runtime.Decimal | null
+  amount: runtime.Decimal | null
+  subtotal: runtime.Decimal | null
   isPaid: boolean | null
   month: string | null
   name: string | null
@@ -246,9 +246,9 @@ export type PaymentItemsGroupByOutputType = {
   paymentId: string | null
   studentId: string
   paymentTypeId: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal
+  amount: runtime.Decimal
+  subtotal: runtime.Decimal
   isPaid: boolean
   month: string
   name: string
@@ -286,9 +286,9 @@ export type PaymentItemsWhereInput = {
   paymentId?: Prisma.StringNullableFilter<"PaymentItems"> | string | null
   studentId?: Prisma.StringFilter<"PaymentItems"> | string
   paymentTypeId?: Prisma.StringFilter<"PaymentItems"> | string
-  quantity?: Prisma.IntFilter<"PaymentItems"> | number
-  amount?: Prisma.IntFilter<"PaymentItems"> | number
-  subtotal?: Prisma.IntFilter<"PaymentItems"> | number
+  quantity?: Prisma.DecimalFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFilter<"PaymentItems"> | boolean
   month?: Prisma.StringFilter<"PaymentItems"> | string
   name?: Prisma.StringFilter<"PaymentItems"> | string
@@ -329,9 +329,9 @@ export type PaymentItemsWhereUniqueInput = Prisma.AtLeast<{
   paymentId?: Prisma.StringNullableFilter<"PaymentItems"> | string | null
   studentId?: Prisma.StringFilter<"PaymentItems"> | string
   paymentTypeId?: Prisma.StringFilter<"PaymentItems"> | string
-  quantity?: Prisma.IntFilter<"PaymentItems"> | number
-  amount?: Prisma.IntFilter<"PaymentItems"> | number
-  subtotal?: Prisma.IntFilter<"PaymentItems"> | number
+  quantity?: Prisma.DecimalFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFilter<"PaymentItems"> | boolean
   month?: Prisma.StringFilter<"PaymentItems"> | string
   name?: Prisma.StringFilter<"PaymentItems"> | string
@@ -374,9 +374,9 @@ export type PaymentItemsScalarWhereWithAggregatesInput = {
   paymentId?: Prisma.StringNullableWithAggregatesFilter<"PaymentItems"> | string | null
   studentId?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
   paymentTypeId?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
-  quantity?: Prisma.IntWithAggregatesFilter<"PaymentItems"> | number
-  amount?: Prisma.IntWithAggregatesFilter<"PaymentItems"> | number
-  subtotal?: Prisma.IntWithAggregatesFilter<"PaymentItems"> | number
+  quantity?: Prisma.DecimalWithAggregatesFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalWithAggregatesFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalWithAggregatesFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolWithAggregatesFilter<"PaymentItems"> | boolean
   month?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
   name?: Prisma.StringWithAggregatesFilter<"PaymentItems"> | string
@@ -388,9 +388,9 @@ export type PaymentItemsScalarWhereWithAggregatesInput = {
 
 export type PaymentItemsCreateInput = {
   id?: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -408,9 +408,9 @@ export type PaymentItemsUncheckedCreateInput = {
   paymentId?: string | null
   studentId: string
   paymentTypeId: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -422,9 +422,9 @@ export type PaymentItemsUncheckedCreateInput = {
 
 export type PaymentItemsUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -442,9 +442,9 @@ export type PaymentItemsUncheckedUpdateInput = {
   paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -459,9 +459,9 @@ export type PaymentItemsCreateManyInput = {
   paymentId?: string | null
   studentId: string
   paymentTypeId: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -473,9 +473,9 @@ export type PaymentItemsCreateManyInput = {
 
 export type PaymentItemsUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -490,9 +490,9 @@ export type PaymentItemsUncheckedUpdateManyInput = {
   paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -703,9 +703,9 @@ export type PaymentItemsUncheckedUpdateManyWithoutPaymentNestedInput = {
 
 export type PaymentItemsCreateWithoutStudentInput = {
   id?: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -721,9 +721,9 @@ export type PaymentItemsUncheckedCreateWithoutStudentInput = {
   id?: string
   paymentId?: string | null
   paymentTypeId: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -767,9 +767,9 @@ export type PaymentItemsScalarWhereInput = {
   paymentId?: Prisma.StringNullableFilter<"PaymentItems"> | string | null
   studentId?: Prisma.StringFilter<"PaymentItems"> | string
   paymentTypeId?: Prisma.StringFilter<"PaymentItems"> | string
-  quantity?: Prisma.IntFilter<"PaymentItems"> | number
-  amount?: Prisma.IntFilter<"PaymentItems"> | number
-  subtotal?: Prisma.IntFilter<"PaymentItems"> | number
+  quantity?: Prisma.DecimalFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFilter<"PaymentItems"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFilter<"PaymentItems"> | boolean
   month?: Prisma.StringFilter<"PaymentItems"> | string
   name?: Prisma.StringFilter<"PaymentItems"> | string
@@ -781,9 +781,9 @@ export type PaymentItemsScalarWhereInput = {
 
 export type PaymentItemsCreateWithoutPaymentTypeInput = {
   id?: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -799,9 +799,9 @@ export type PaymentItemsUncheckedCreateWithoutPaymentTypeInput = {
   id?: string
   paymentId?: string | null
   studentId: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -839,9 +839,9 @@ export type PaymentItemsUpdateManyWithWhereWithoutPaymentTypeInput = {
 
 export type PaymentItemsCreateWithoutPaymentInput = {
   id?: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -857,9 +857,9 @@ export type PaymentItemsUncheckedCreateWithoutPaymentInput = {
   id?: string
   studentId: string
   paymentTypeId: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -899,9 +899,9 @@ export type PaymentItemsCreateManyStudentInput = {
   id?: string
   paymentId?: string | null
   paymentTypeId: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -913,9 +913,9 @@ export type PaymentItemsCreateManyStudentInput = {
 
 export type PaymentItemsUpdateWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -931,9 +931,9 @@ export type PaymentItemsUncheckedUpdateWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -947,9 +947,9 @@ export type PaymentItemsUncheckedUpdateManyWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -963,9 +963,9 @@ export type PaymentItemsCreateManyPaymentTypeInput = {
   id?: string
   paymentId?: string | null
   studentId: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -977,9 +977,9 @@ export type PaymentItemsCreateManyPaymentTypeInput = {
 
 export type PaymentItemsUpdateWithoutPaymentTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -995,9 +995,9 @@ export type PaymentItemsUncheckedUpdateWithoutPaymentTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1011,9 +1011,9 @@ export type PaymentItemsUncheckedUpdateManyWithoutPaymentTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1027,9 +1027,9 @@ export type PaymentItemsCreateManyPaymentInput = {
   id?: string
   studentId: string
   paymentTypeId: string
-  quantity: number
-  amount: number
-  subtotal: number
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: boolean
   month: string
   name: string
@@ -1041,9 +1041,9 @@ export type PaymentItemsCreateManyPaymentInput = {
 
 export type PaymentItemsUpdateWithoutPaymentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1059,9 +1059,9 @@ export type PaymentItemsUncheckedUpdateWithoutPaymentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1075,9 +1075,9 @@ export type PaymentItemsUncheckedUpdateManyWithoutPaymentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   paymentTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  subtotal?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   month?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1195,9 +1195,9 @@ export type $PaymentItemsPayload<ExtArgs extends runtime.Types.Extensions.Intern
     paymentId: string | null
     studentId: string
     paymentTypeId: string
-    quantity: number
-    amount: number
-    subtotal: number
+    quantity: runtime.Decimal
+    amount: runtime.Decimal
+    subtotal: runtime.Decimal
     isPaid: boolean
     month: string
     name: string
@@ -1635,9 +1635,9 @@ export interface PaymentItemsFieldRefs {
   readonly paymentId: Prisma.FieldRef<"PaymentItems", 'String'>
   readonly studentId: Prisma.FieldRef<"PaymentItems", 'String'>
   readonly paymentTypeId: Prisma.FieldRef<"PaymentItems", 'String'>
-  readonly quantity: Prisma.FieldRef<"PaymentItems", 'Int'>
-  readonly amount: Prisma.FieldRef<"PaymentItems", 'Int'>
-  readonly subtotal: Prisma.FieldRef<"PaymentItems", 'Int'>
+  readonly quantity: Prisma.FieldRef<"PaymentItems", 'Decimal'>
+  readonly amount: Prisma.FieldRef<"PaymentItems", 'Decimal'>
+  readonly subtotal: Prisma.FieldRef<"PaymentItems", 'Decimal'>
   readonly isPaid: Prisma.FieldRef<"PaymentItems", 'Boolean'>
   readonly month: Prisma.FieldRef<"PaymentItems", 'String'>
   readonly name: Prisma.FieldRef<"PaymentItems", 'String'>

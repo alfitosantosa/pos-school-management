@@ -1,25 +1,22 @@
 "use client";
 
-import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
-import { useGetMajorById } from "@/app/(hooks)/hooks/Majors/useMajors";
-import { useGetRoles } from "@/app/(hooks)/hooks/Roles/useRoles";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { FileText, X, Upload, Download, AlertCircle, CheckCircle2, Info, Users, CreditCard, Calendar } from "lucide-react";
+import { FileText, X, Upload, Download, AlertCircle, CheckCircle2, Info, Users, CreditCard, Calendar, Layers } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import Loading from "@/components/loading";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
 import { useGetStudentByIdMajorActive } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
-import { BulkUploadPaymentItems, useCreatePaymentItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { BulkUploadPaymentItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type typeData = {
@@ -89,6 +86,9 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
     skipped: number;
     total: number;
   } | null>(null);
+  const [availableSheets, setAvailableSheets] = useState<string[]>([]);
+  const [selectedSheet, setSelectedSheet] = useState<string>("");
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
 
   // ── Data hooks ────────────────────────────────────────────────────────────
   const { data: students = [] } = useGetStudentByIdMajorActive(majorId);
@@ -121,6 +121,10 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
   // ── File handling ─────────────────────────────────────────────────────────
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setUploadResult(null);
+    setPreviewRows([]);
+    setAvailableSheets([]);
+    setSelectedSheet("");
+
     if (!e.target.files) return;
 
     const newFiles = Array.from(e.target.files);
@@ -133,23 +137,72 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
     setFiles(excelFiles);
 
     if (excelFiles.length > 0) {
-      await parseAndPreview(excelFiles[0]);
+      setCurrentFile(excelFiles[0]);
+      await detectSheets(excelFiles[0]);
     } else {
       setPreviewRows([]);
+      setCurrentFile(null);
     }
   };
 
   const removeFile = (index: number) => {
     const next = files.filter((_, i) => i !== index);
     setFiles(next);
-    if (next.length === 0) setPreviewRows([]);
+    if (next.length === 0) {
+      setPreviewRows([]);
+      setAvailableSheets([]);
+      setSelectedSheet("");
+      setCurrentFile(null);
+    }
+  };
+
+  // ── Detect all sheets in Excel ────────────────────────────────────────────
+  const detectSheets = async (file: File) => {
+    try {
+      const XLSX = await import("xlsx");
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+      const sheetNames = workbook.SheetNames;
+      setAvailableSheets(sheetNames);
+
+      if (sheetNames.length > 0) {
+        setSelectedSheet(sheetNames[0]);
+        await parseAndPreview(file, sheetNames[0]);
+
+        if (sheetNames.length > 1) {
+          toast.success(`Ditemukan ${sheetNames.length} sheet. Pilih sheet di dropdown untuk melihat data.`);
+        } else {
+          toast.success(`File berhasil dibaca`);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Gagal membaca file Excel");
+    }
+  };
+
+  // ── Handle sheet selection change ─────────────────────────────────────────
+  const handleSheetChange = async (sheetName: string) => {
+    setSelectedSheet(sheetName);
+    if (currentFile) {
+      await parseAndPreview(currentFile, sheetName);
+    }
   };
 
   // ── Parse Excel → PreviewRow[] ────────────────────────────────────────────
-  const parseAndPreview = async (file: File) => {
+  const parseAndPreview = async (file: File, sheetName?: string) => {
     try {
-      const readXlsxFile = (await import("read-excel-file")).default;
-      const rows = await readXlsxFile(file);
+      const XLSX = await import("xlsx");
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+      // Use specified sheet or first sheet
+      const targetSheet = sheetName || workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[targetSheet];
+
+      // Convert sheet to array of arrays
+      const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
 
       const parsed: PreviewRow[] = [];
 
@@ -205,9 +258,9 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
 
       const errorCount = parsed.filter((r) => r._errors.length > 0).length;
       if (errorCount > 0) {
-        toast.warning(`${parsed.length} baris ditemukan, ${errorCount} baris memiliki error`);
+        toast.warning(`Sheet "${targetSheet}": ${parsed.length} baris ditemukan, ${errorCount} baris memiliki error`);
       } else {
-        toast.success(`${parsed.length} baris siap diupload`);
+        toast.success(`Sheet "${targetSheet}": ${parsed.length} baris siap diupload`);
       }
     } catch (err) {
       console.error(err);
@@ -469,13 +522,56 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
             </div>
           )}
 
+          {/* Sheet selector */}
+          {availableSheets.length > 1 && (
+            <Card className="p-4 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-3">
+                <Layers className="h-5 w-5 text-blue-600" />
+                <div className="font-semibold text-blue-900 dark:text-blue-100">Pilih Sheet Excel</div>
+                <Badge variant="secondary" className="text-xs">
+                  {availableSheets.length} sheet tersedia
+                </Badge>
+              </div>
+              <Select value={selectedSheet} onValueChange={handleSheetChange}>
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Pilih sheet..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableSheets.map((sheet) => (
+                    <SelectItem key={sheet} value={sheet}>
+                      <div className="flex items-center gap-2">
+                        <Layers className="h-3 w-3" />
+                        {sheet}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">ℹ️ File Excel ini memiliki {availableSheets.length} sheet. Pilih sheet yang ingin dibaca untuk melihat preview data.</p>
+            </Card>
+          )}
+
+          {/* Single sheet info */}
+          {availableSheets.length === 1 && selectedSheet && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Layers className="h-4 w-4" />
+              <span>
+                Sheet: <strong>{selectedSheet}</strong>
+              </span>
+            </div>
+          )}
+
           {/* Preview table */}
           {previewRows.length > 0 && (
             <div className="border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between px-4 py-2 bg-muted/40 border-b">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <Info className="h-4 w-4" />
-                  Preview Data ({previewRows.length} baris)
+                  Preview Data dari Sheet:{" "}
+                  <Badge variant="secondary" className="ml-1">
+                    {selectedSheet}
+                  </Badge>
+                  <span className="text-muted-foreground">({previewRows.length} baris)</span>
                 </div>
                 <div className="flex gap-2">
                   {validCount > 0 && <Badge className="bg-green-600 text-white text-xs">{validCount} valid</Badge>}

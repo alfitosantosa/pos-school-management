@@ -291,8 +291,16 @@ function PaymentFormDialog({
     setTotalTransfer("");
   }, [memoizedUnpaidItems.length]);
 
+  // Compute grand total from selected items
   const grandTotal = React.useMemo(() => {
-    return watchedItems?.filter((item) => item.selected)?.reduce((sum, item) => sum + (item.subtotal || 0), 0) ?? 0;
+    return (
+      watchedItems
+        ?.filter((item) => item.selected)
+        ?.reduce((sum, item) => {
+          const subtotal = parseFloat(String(item.subtotal || 0));
+          return sum + (isNaN(subtotal) ? 0 : subtotal);
+        }, 0) ?? 0
+    );
   }, [watchedItems?.map((item) => item.selected).join(","), watchedItems?.map((item) => item.subtotal).join(",")]);
 
   // ✅ Reset totalTransfer saat grandTotal berubah (item dicentang/uncentang)
@@ -788,7 +796,10 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deletePayment.isPending} className="bg-red-600 hover:bg-red-700">
+          {/* <AlertDialogAction onClick={handleDelete} disabled={deletePayment.isPending} className="bg-red-600 hover:bg-red-700">
+            {deletePayment.isPending ? "Menghapus..." : "Hapus"}
+          </AlertDialogAction> */}
+          <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
             {deletePayment.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
         </AlertDialogFooter>

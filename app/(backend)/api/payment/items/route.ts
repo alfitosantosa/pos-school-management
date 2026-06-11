@@ -25,6 +25,8 @@ export async function POST(request: NextRequest) {
 
     const { studentId, paymentTypeId, quantity, amount, subtotal, month, name, year, skuType } = body;
 
+    console.log("[PaymentItems] Creating with quantity:", quantity, "type:", typeof quantity);
+
     const createPaymentItems = await prisma.paymentItems.create({
       data: {
         studentId,
@@ -38,6 +40,8 @@ export async function POST(request: NextRequest) {
         skuType,
       },
     });
+
+    console.log("[PaymentItems] Created with quantity:", createPaymentItems.quantity);
 
     return NextResponse.json(createPaymentItems);
   } catch (error) {

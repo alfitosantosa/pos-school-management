@@ -40,7 +40,7 @@ export type PaymentTypeData = {
   isActive: boolean;
   isFixedAmount: boolean;
   isFixedQuantity: boolean;
-  quantity: string;
+  quantity: number;
   subtotal: string;
   owner: string;
   skuType: string;
@@ -133,7 +133,7 @@ const singleItemSchema = z.object({
   skuType: z.string().optional(),
   month: z.string().min(1, "Bulan wajib dipilih"),
   year: z.string().min(1, "Tahun wajib dipilih"),
-  quantity: z.number().min(1, "Jumlah minimal 1"),
+  quantity: z.number().optional(),
   amount: z.number().optional(),
   subtotal: z.number(),
   isFixedAmount: z.boolean().default(false),
@@ -206,7 +206,7 @@ function SingleItemDialog({
       const pt = allPaymentTypes.find((p) => p.id === ptId);
       if (pt) {
         const amount = parseFloat(pt.amount) || 0;
-        const qty = pt.isFixedQuantity ? parseInt(pt.quantity) || 1 : (watch("quantity") ?? 1);
+        const qty = pt.isFixedQuantity ? parseFloat(String(pt.quantity)) || 1 : (watch("quantity") ?? 1);
         setValue("paymentTypeId", ptId);
         setValue("name", pt.name);
         setValue("skuType", pt.owner || "default");
@@ -241,24 +241,36 @@ function SingleItemDialog({
 
   // ✅ FIX #3: Use editData.id instead of entire editData object to prevent unnecessary resets
   React.useEffect(() => {
-    if (editData) {
+    if (editData && open) {
+      // Convert month number to month name for display
+      let monthName = editData.month;
+
+      // If month is a number, convert to name
+      if (!isNaN(parseInt(editData.month))) {
+        const monthIndex = parseInt(editData.month) - 1;
+        monthName = MONTHS[monthIndex] || editData.month;
+      }
+
+      // Ensure year is a string
+      const yearValue = String(editData.year);
+
       reset({
         studentId: editData.studentId,
         paymentTypeId: editData.paymentTypeId,
         name: editData.name,
         skuType: editData.skuType || "default",
-        month: editData.month,
-        year: editData.year,
-        quantity: editData.quantity,
-        amount: editData.amount,
-        subtotal: editData.subtotal,
+        month: monthName,
+        year: yearValue,
+        quantity: parseFloat(String(editData.quantity)),
+        amount: parseFloat(String(editData.amount)),
+        subtotal: parseFloat(String(editData.subtotal)),
         isFixedAmount: editData.isFixedAmount,
         isFixedQuantity: editData.isFixedQuantity,
         isMonthly: editData.isMonthly,
         isPaid: editData.isPaid,
         isActive: editData.isActive,
       });
-    } else {
+    } else if (open && !editData) {
       reset({
         quantity: 1,
         amount: 0,
@@ -273,7 +285,7 @@ function SingleItemDialog({
         year: String(currentYear),
       });
     }
-  }, [editData?.id, open]);
+  }, [editData?.id, open, reset]);
 
   const onSubmit = async (data: SingleItemFormValues) => {
     try {
@@ -443,7 +455,28 @@ function SingleItemDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="quantity">Jumlah</Label>
-              <Input id="quantity" type="number" min={1} disabled={watch("isFixedQuantity")} value={watch("quantity") ?? 1} onChange={(e) => handleQtyChange(Number(e.target.value))} />
+              <div className="space-y-2">
+                <Input id="quantity" type="number" step="0.01" disabled={watch("isFixedQuantity")} value={watch("quantity") ?? 1} onChange={(e) => handleQtyChange(parseFloat(e.target.value) || 0)} placeholder="Masukkan jumlah" />
+                {!watch("isFixedQuantity") && (
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="outline" size="sm" className="h-8 px-2 text-xs" onClick={() => handleQtyChange(0.5)}>
+                      0,5
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" className="h-8 px-2 text-xs" onClick={() => handleQtyChange(1)}>
+                      1
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" className="h-8 px-2 text-xs" onClick={() => handleQtyChange(1.5)}>
+                      1,5
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" className="h-8 px-2 text-xs" onClick={() => handleQtyChange(2)}>
+                      2
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" className="h-8 px-2 text-xs" onClick={() => handleQtyChange(2.5)}>
+                      2,5
+                    </Button>
+                  </div>
+                )}
+              </div>
               {watch("isFixedQuantity") && <p className="text-xs text-muted-foreground">Jumlah tetap</p>}
             </div>
           </div>
@@ -458,7 +491,7 @@ function SingleItemDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Batal
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || !watch("studentId") || !watch("paymentTypeId") || !watch("name") || !watch("month") || !watch("year")}>
               {isPending ?
                 "Menyimpan..."
               : editData ?
@@ -466,6 +499,18 @@ function SingleItemDialog({
               : "Simpan"}
             </Button>
           </div>
+
+          {/* Debug: Show validation errors */}
+          {Object.keys(errors).length > 0 && (
+            <div className="text-xs text-red-500 space-y-1">
+              <p className="font-semibold">Validation errors:</p>
+              {Object.entries(errors).map(([key, error]) => (
+                <p key={key}>
+                  • {key}: {error?.message as string}
+                </p>
+              ))}
+            </div>
+          )}
         </form>
       </DialogContent>
     </Dialog>
@@ -499,7 +544,10 @@ function DeleteItemDialog({ open, onOpenChange, itemData, onSuccess }: { open: b
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deleteItem.isPending} className="bg-red-600 hover:bg-red-700">
+          {/* <AlertDialogAction onClick={handleDelete} disabled={deleteItem.isPending} className="bg-red-600 hover:bg-red-700">
+            {deleteItem.isPending ? "Menghapus..." : "Hapus"}
+          </AlertDialogAction> */}
+          <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
             {deleteItem.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -739,7 +787,10 @@ function BillingDataTable({ majorId }: { majorId: string }) {
 
   const filteredRows = table.getFilteredRowModel().rows;
   const totalItems = (paymentItems as any[]).length;
-  const totalSubtotal = filteredRows.reduce((sum, r) => sum + (r.original.subtotal ?? 0), 0);
+  const totalSubtotal = filteredRows.reduce((sum, r) => {
+    const subtotal = parseFloat(String(r.original.subtotal ?? 0));
+    return sum + (isNaN(subtotal) ? 0 : subtotal);
+  }, 0);
   const paidCount = filteredRows.filter((r) => r.original.isPaid).length;
   const unpaidCount = filteredRows.filter((r) => !r.original.isPaid).length;
 

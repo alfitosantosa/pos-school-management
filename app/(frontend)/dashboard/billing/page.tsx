@@ -546,7 +546,14 @@ function BulkCreateDialog({
 
   const filteredPayments = React.useMemo(() => (watchedStudentId ? allPayments.filter((p) => p.studentId === watchedStudentId) : allPayments), [allPayments, watchedStudentId]);
 
-  const grandTotal = React.useMemo(() => watchedItems?.reduce((sum, item) => sum + (item.subtotal || 0), 0) ?? 0, [watchedItems]);
+  const grandTotal = React.useMemo(() => {
+    return (
+      watchedItems?.reduce((sum, item) => {
+        const subtotal = parseFloat(String(item.subtotal || 0));
+        return sum + (isNaN(subtotal) ? 0 : subtotal);
+      }, 0) ?? 0
+    );
+  }, [watchedItems]);
 
   const handlePaymentTypeChange = (index: number, ptId: string) => {
     const pt = allPaymentTypes.find((p) => p.id === ptId);
@@ -1121,7 +1128,10 @@ function BillingDataTable() {
 
   const filteredRows = table.getFilteredRowModel().rows;
   const totalItems = (paymentItems as any[]).length;
-  const totalSubtotal = filteredRows.reduce((sum, r) => sum + (r.original.subtotal ?? 0), 0);
+  const totalSubtotal = filteredRows.reduce((sum, r) => {
+    const subtotal = parseFloat(String(r.original.subtotal ?? 0));
+    return sum + (isNaN(subtotal) ? 0 : subtotal);
+  }, 0);
   const paidCount = filteredRows.filter((r) => r.original.isPaid).length;
   const unpaidCount = filteredRows.filter((r) => !r.original.isPaid).length;
 

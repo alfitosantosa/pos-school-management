@@ -280,7 +280,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
           <div className="flex items-center justify-between space-x-2">
             <div className="space-y-0.5">
               <Label htmlFor="isFixedAmount">Edit Amount</Label>
-              <p className="text-sm text-muted-foreground">Aktifkan untuk mengubah jumlah pembayaran</p>
+              <p className="text-sm text-muted-foreground">Aktifkan untuk Mengunci jumlah pembayaran</p>
             </div>
             <Switch id="isFixedAmount" checked={isFixedAmount} onCheckedChange={(checked) => setValue("isFixedAmount", checked)} />
           </div>
@@ -295,7 +295,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
           <div className="flex items-center justify-between space-x-2">
             <div className="space-y-0.5">
               <Label htmlFor="isFixedQuantity">Edit Quantity</Label>
-              <p className="text-sm text-muted-foreground">Aktifkan untuk mengubah jumlah quantity</p>
+              <p className="text-sm text-muted-foreground">Aktifkan untuk Mengunci jumlah quantity</p>
             </div>
             <Switch id="isFixedQuantity" checked={isFixedQuantity} onCheckedChange={(checked) => setValue("isFixedQuantity", checked)} />
           </div>
@@ -382,7 +382,10 @@ function DeletePaymentTypeDialog({ open, onOpenChange, paymentTypeData, onSucces
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deletePaymentType.isPending} className="bg-red-600 hover:bg-red-700">
+          {/* <AlertDialogAction onClick={handleDelete} disabled={deletePaymentType.isPending} className="bg-red-600 hover:bg-red-700">
+            {deletePaymentType.isPending ? "Menghapus..." : "Hapus"}
+          </AlertDialogAction>   */}
+          <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
             {deletePaymentType.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
         </AlertDialogFooter>

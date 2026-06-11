@@ -135,7 +135,11 @@ function ClassFormDialog({ id, open, onOpenChange, editData, onSuccess }: { id: 
               Batal
             </Button>
             <Button type="submit" disabled={createClass.isPending || updateClass.isPending}>
-              {createClass.isPending || updateClass.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createClass.isPending || updateClass.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -174,7 +178,10 @@ function DeleteClassDialog({ open, onOpenChange, classData, onSuccess }: { open:
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deleteClass.isPending} className="bg-red-600 hover:bg-red-700">
+          {/* <AlertDialogAction onClick={handleDelete} disabled={deleteClass.isPending} className="bg-red-600 hover:bg-red-700">
+            {deleteClass.isPending ? "Menghapus..." : "Hapus"}
+          </AlertDialogAction> */}
+          <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
             {deleteClass.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -439,7 +446,7 @@ function ClassDataTable({ id }: { id: string }) {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length ?
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -447,13 +454,12 @@ function ClassDataTable({ id }: { id: string }) {
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
+                : <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data kelas.
                     </TableCell>
                   </TableRow>
-                )}
+                }
               </TableBody>
             </Table>
           </div>
