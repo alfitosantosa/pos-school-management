@@ -54,7 +54,7 @@ const accountBankSchema = z.object({
 type AccountBankFormValues = z.infer<typeof accountBankSchema>;
 
 // Common Indonesian banks list
-const indonesianBanks = ["BCA", "BRI", "BNI", "Mandiri", "BTN", "CIMB Niaga", "Danamon", "Permata", "Maybank", "OCBC NISP", "Panin Bank", "Bank Syariah Indonesia (BSI)", "Bank Mega", "Bank Bukopin", "Bank Sinarmas", "Lainnya"];
+const indonesianBanks = ["BCA", "BRI", "BNI", "Mandiri", "BTN", "CIMB Niaga", "Danamon", "Permata", "Maybank", "Muamalat", "OCBC NISP", "Panin Bank", "Bank Syariah Indonesia (BSI)", "Bank Mega", "Bank Bukopin", "Bank Sinarmas", "Lainnya"];
 
 // Statistics Card Component
 function StatisticsCards({ accounts }: { accounts: AccountBankData[] }) {
@@ -224,7 +224,11 @@ function AccountBankFormDialog({ open, onOpenChange, editData, onSuccess }: { op
               Batal
             </Button>
             <Button type="submit" disabled={createAccountBank.isPending || updateAccountBank.isPending}>
-              {createAccountBank.isPending || updateAccountBank.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createAccountBank.isPending || updateAccountBank.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -484,7 +488,7 @@ function AccountBankDashboard() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length ?
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -492,13 +496,12 @@ function AccountBankDashboard() {
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
+                : <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data rekening bank.
                     </TableCell>
                   </TableRow>
-                )}
+                }
               </TableBody>
             </Table>
           </div>

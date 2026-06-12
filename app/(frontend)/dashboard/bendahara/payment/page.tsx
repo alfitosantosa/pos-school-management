@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -117,12 +117,13 @@ function formatRupiah(value: number | string) {
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 // ─── Form Schema ──────────────────────────────────────────────────────────────
+// ✅ Schema fix
 const paymentItemSchema = z.object({
   id: z.string(),
   name: z.string(),
-  amount: z.number(),
-  quantity: z.number(),
-  subtotal: z.number(),
+  amount: z.coerce.number(), // ← "150000" → 150000
+  quantity: z.coerce.number(), // ← "1" → 1
+  subtotal: z.coerce.number(), // ← "150000" → 150000
   month: z.string(),
   year: z.string(),
   selected: z.boolean().default(true),
@@ -182,7 +183,6 @@ function ExpandedItemsRow({ items }: { items: PaymentItemData[] }) {
 
 // ─── Form Dialog ──────────────────────────────────────────────────────────────
 // ─── Di dalam PaymentFormDialog ──────────────────────────────────────────────
-
 function PaymentFormDialog({
   open,
   onOpenChange,
@@ -213,23 +213,18 @@ function PaymentFormDialog({
   const setPaidMutation = userPaymentItemsSetPaid();
   const [selectedStudentId, setSelectedStudentId] = React.useState<string>("");
 
-  // ✅ totalTransfer state — dikelola di dalam dialog, bukan di DataTable
   const [totalTransfer, setTotalTransfer] = React.useState<number | "">("");
 
-  // Reset totalTransfer saat dialog dibuka/tutup
+  // Reset saat dialog tutup
   React.useEffect(() => {
     if (!open) {
       setTotalTransfer("");
+      setSelectedStudentId("");
     }
   }, [open]);
 
-  React.useEffect(() => {
-    if (selectedStudentId) {
-      refetchPaymentItemsStudent();
-    }
-  }, [selectedStudentId]);
-
-  const { data: unpaidItemsData = [], isLoading: isLoadingUnpaid, refetch: refetchPaymentItemsStudent } = usePaymentItemsUnpaidStudent(selectedStudentId);
+  // ✅ FIX 1: Fetch unpaid items — aktif saat selectedStudentId ada
+  const { data: unpaidItemsData = [], isLoading: isLoadingUnpaid } = usePaymentItemsUnpaidStudent(selectedStudentId);
 
   const [unpaidItems, setUnpaidItems] = React.useState<PaymentItemData[]>([]);
 
@@ -246,24 +241,35 @@ function PaymentFormDialog({
     defaultValues: {
       status: "pending",
       paymentDate: new Date().toISOString().split("T")[0],
+      month: MONTHS[new Date().getMonth()],
       bendaharaId: userDataId || "",
       majorId: userDataMajorId || "",
       items: [],
+      receiptNumber: "",
+      bankRef: "",
     },
   });
 
   const { fields, replace } = useFieldArray({ control, name: "items" });
   const watchedItems = watch("items");
 
+  // Generate receipt number saat dialog dibuka untuk mode create
   React.useEffect(() => {
     if (open && !editData) {
       const newReceiptNumber = `KWT-${uuidv4().substring(0, 8).toUpperCase()}`;
       setValue("receiptNumber", newReceiptNumber);
+      setValue("month", MONTHS[new Date().getMonth()]);
     } else if (editData) {
       setValue("receiptNumber", editData.receiptNumber);
       setValue("bankRef", editData.bankRef);
+      setValue("studentId", editData.studentId);
+      setValue("bankRef", editData.bankRef);
+      setValue("status", editData.status);
     }
   }, [open, editData?.id, setValue]);
+
+  // Stable key — hanya trigger ulang jika ID data benar-benar berbeda
+  const unpaidItemsKey = unpaidItemsData?.map((i: PaymentItemData) => i.id).join(",") ?? "";
 
   const memoizedUnpaidItems = React.useMemo(() => {
     if (!unpaidItemsData?.length) return [];
@@ -277,21 +283,24 @@ function PaymentFormDialog({
       year: item.year,
       selected: true,
     }));
-  }, [unpaidItemsData?.length, unpaidItemsData?.[0]?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unpaidItemsKey]);
 
   React.useEffect(() => {
     if (memoizedUnpaidItems.length > 0) {
       replace(memoizedUnpaidItems);
       setUnpaidItems(unpaidItemsData);
-    } else {
+    } else if (!editData) {
+      // ✅ Jangan replace jika mode edit dan unpaid kosong
       replace([]);
       setUnpaidItems([]);
     }
-    // ✅ Reset totalTransfer saat items berubah (ganti siswa)
     setTotalTransfer("");
-  }, [memoizedUnpaidItems.length]);
+  }, [unpaidItemsKey]);
 
-  // Compute grand total from selected items
+  // Stable serialized key — hanya berubah jika selected/subtotal benar-benar berbeda
+  const itemsKey = watchedItems?.map((item) => `${item.selected}:${item.subtotal}`).join("|") ?? "";
+
   const grandTotal = React.useMemo(() => {
     return (
       watchedItems
@@ -301,11 +310,16 @@ function PaymentFormDialog({
           return sum + (isNaN(subtotal) ? 0 : subtotal);
         }, 0) ?? 0
     );
-  }, [watchedItems?.map((item) => item.selected).join(","), watchedItems?.map((item) => item.subtotal).join(",")]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemsKey]);
 
-  // ✅ Reset totalTransfer saat grandTotal berubah (item dicentang/uncentang)
+  // Auto-fill totalTransfer saat grandTotal berubah
   React.useEffect(() => {
-    setTotalTransfer("");
+    if (grandTotal > 0) {
+      setTotalTransfer(grandTotal);
+    } else {
+      setTotalTransfer("");
+    }
   }, [grandTotal]);
 
   const toggleItemSelection = React.useCallback(
@@ -316,6 +330,7 @@ function PaymentFormDialog({
     [watchedItems, setValue],
   );
 
+  // ✅ FIX 5: editData reset — tambah setSelectedStudentId agar query unpaid terpanggil
   React.useEffect(() => {
     if (editData) {
       reset({
@@ -344,12 +359,21 @@ function PaymentFormDialog({
             }))
           : [],
       });
-      // ✅ Saat edit, pre-fill totalTransfer dengan amount yang sudah ada
+      // ✅ Set selectedStudentId agar query unpaid aktif saat mode edit
+      setSelectedStudentId(editData.studentId || "");
       setTotalTransfer(Number(editData.amount) || "");
     } else {
+      const newReceiptNumber = `KWT-${uuidv4().substring(0, 8).toUpperCase()}`;
       reset({
+        studentId: "",
+        accountBankId: "",
+        month: MONTHS[new Date().getMonth()],
         status: "pending",
         paymentDate: new Date().toISOString().split("T")[0],
+        dueDate: "",
+        receiptNumber: newReceiptNumber,
+        bankRef: "",
+        notes: "",
         bendaharaId: userDataId || "",
         majorId: userDataMajorId || "",
         items: [],
@@ -358,9 +382,8 @@ function PaymentFormDialog({
       setUnpaidItems([]);
       setTotalTransfer("");
     }
-  }, [editData, userDataId, userDataMajorId]);
+  }, [editData?.id, userDataId, userDataMajorId, reset]);
 
-  // ✅ Validasi apakah jumlah transfer sudah sesuai dengan grandTotal
   const totalTransferNum = typeof totalTransfer === "number" ? totalTransfer : 0;
   const isTransferValid = grandTotal > 0 && totalTransferNum === grandTotal;
   const isTransferEmpty = totalTransfer === "" || totalTransfer === 0;
@@ -374,11 +397,6 @@ function PaymentFormDialog({
 
       if (selectedItems.length === 0) {
         toast.error("Pilih minimal satu item pembayaran!");
-        return;
-      }
-
-      if (!isTransferValid) {
-        toast.error("Jumlah transfer harus sama dengan total pembayaran!");
         return;
       }
 
@@ -417,7 +435,7 @@ function PaymentFormDialog({
         }
         toast.success("Pembayaran berhasil dibuat!");
       }
-
+      console.log(data);
       reset();
       setSelectedStudentId("");
       setUnpaidItems([]);
@@ -431,14 +449,14 @@ function PaymentFormDialog({
 
   const isPending = createPayment.isPending || updatePayment.isPending || setPaidMutation.isPending;
 
-  // ✅ Kondisi disable button submit
-  const isSubmitDisabled = isPending || selectedItemsCount === 0 || !isTransferValid;
+  const isSubmitDisabled = isPending || selectedItemsCount === 0 || totalTransfer === grandTotal;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editData ? "Edit Pembayaran" : "Tambah Pembayaran Baru"}</DialogTitle>
+          <DialogDescription>{editData ? "Perbarui informasi pembayaran siswa" : "Buat pembayaran baru untuk siswa dengan memilih item tagihan yang belum dibayar"}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -572,7 +590,7 @@ function PaymentFormDialog({
 
           <Separator />
 
-          {/* Payment Items (Unpaid Items) */}
+          {/* Payment Items */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-base font-semibold">
@@ -668,18 +686,17 @@ function PaymentFormDialog({
             </div>
           )}
 
-          {/* ✅ Jumlah Ditransfer — dengan validasi visual */}
+          {/* Jumlah Ditransfer */}
           {selectedItemsCount > 0 && (
             <div className="space-y-2">
               <Label htmlFor="totalTransfer">
-                Jumlah Ditransfer <span className="text-red-500">*</span>
+                Jumlah Ditransfer <span className="text-xs text-muted-foreground">(opsional - untuk verifikasi)</span>
               </Label>
 
               <div className="relative">
                 <Input
                   id="totalTransfer"
                   type="number"
-                  min={0}
                   placeholder={`Masukkan ${formatRupiah(grandTotal)}`}
                   value={totalTransfer}
                   onChange={(e) => {
@@ -693,8 +710,6 @@ function PaymentFormDialog({
                     : "border-red-500 focus-visible:ring-red-500"
                   }
                 />
-
-                {/* Icon indikator di kanan input */}
                 {!isTransferEmpty && (
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {isTransferValid ?
@@ -704,7 +719,6 @@ function PaymentFormDialog({
                 )}
               </div>
 
-              {/* Pesan validasi */}
               {isTransferEmpty && grandTotal > 0 && <p className="text-xs text-muted-foreground">Masukkan jumlah yang ditransfer untuk melanjutkan</p>}
               {isTransferMismatch && (
                 <div className="flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-3 py-2">
@@ -733,29 +747,18 @@ function PaymentFormDialog({
           </div>
 
           <div className="flex items-center justify-between pt-2">
-            {/* Hint di kiri */}
             <div className="text-xs text-muted-foreground">
               {selectedItemsCount === 0 && <span>Pilih minimal 1 item untuk melanjutkan</span>}
-              {selectedItemsCount > 0 && !isTransferValid && <span>Jumlah transfer harus sama dengan total tagihan</span>}
-              {selectedItemsCount > 0 && isTransferValid && <span className="text-green-600 font-medium">✓ Semua validasi terpenuhi</span>}
+              {selectedItemsCount > 0 && isTransferMismatch && <span className="text-yellow-600">⚠ Jumlah transfer tidak sesuai dengan total</span>}
+              {selectedItemsCount > 0 && isTransferValid && <span className="text-green-600 font-medium">✓ Jumlah transfer sesuai</span>}
+              {selectedItemsCount > 0 && isTransferEmpty && <span className="text-blue-600">ℹ Isi jumlah ditransfer untuk verifikasi</span>}
             </div>
 
             <div className="flex gap-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
                 Batal
               </Button>
-
-              {/* ✅ Button disabled jika: loading, tidak ada item, atau transfer tidak sesuai */}
-              <Button
-                type="submit"
-                disabled={isSubmitDisabled}
-                title={
-                  selectedItemsCount === 0 ? "Pilih minimal 1 item"
-                  : !isTransferValid ?
-                    "Jumlah transfer belum sesuai"
-                  : undefined
-                }
-              >
+              <Button type="submit" disabled={!isSubmitDisabled} title={selectedItemsCount === 0 ? "Pilih minimal 1 item" : undefined}>
                 {isPending ?
                   "Menyimpan..."
                 : editData ?
@@ -764,11 +767,24 @@ function PaymentFormDialog({
               </Button>
             </div>
           </div>
+
+          {/* Debug: validation errors (development only) */}
+          {process.env.NODE_ENV === "development" && Object.keys(errors).length > 0 && (
+            <div className="text-xs text-red-500 space-y-1 p-3 bg-red-50 rounded border border-red-200">
+              <p className="font-semibold">❌ Validation Errors:</p>
+              {Object.entries(errors).map(([key, error]) => (
+                <p key={key}>
+                  • {key}: {error?.message as string}
+                </p>
+              ))}
+            </div>
+          )}
         </form>
       </DialogContent>
     </Dialog>
   );
 }
+
 // ─── Delete Dialog ────────────────────────────────────────────────────────────
 function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; paymentData: PaymentData | null; onSuccess: () => void }) {
   const deletePayment = useDeletePayment();
