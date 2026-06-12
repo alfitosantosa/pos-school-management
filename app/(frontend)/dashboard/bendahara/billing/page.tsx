@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, BadgeCheck, Clock, Package, Layers, Calendar } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, BadgeCheck, Clock, Package, Layers, Calendar, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -29,6 +29,7 @@ import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { useGetPaymentByIdMajor } from "@/app/(hooks)/hooks/Payments/usePayment";
 import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
+import { useGetClassById, useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -103,25 +104,29 @@ const YEARS = Array.from({ length: 5 }, (_, i) => String(currentYear - 2 + i));
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function PaidBadge({ isPaid }: { isPaid: boolean }) {
-  return isPaid ?
-      <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
-        <BadgeCheck className="h-3 w-3" />
-        Lunas
-      </Badge>
-    : <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
-        <Clock className="h-3 w-3" />
-        Belum Lunas
-      </Badge>;
+  return isPaid ? (
+    <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
+      <BadgeCheck className="h-3 w-3" />
+      Lunas
+    </Badge>
+  ) : (
+    <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
+      <Clock className="h-3 w-3" />
+      Belum Lunas
+    </Badge>
+  );
 }
 
 function ActiveBadge({ isActive }: { isActive: boolean }) {
-  return isActive ?
-      <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
-        Aktif
-      </Badge>
-    : <Badge variant="outline" className="text-gray-400 text-xs">
-        Nonaktif
-      </Badge>;
+  return isActive ? (
+    <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+      Aktif
+    </Badge>
+  ) : (
+    <Badge variant="outline" className="text-gray-400 text-xs">
+      Nonaktif
+    </Badge>
+  );
 }
 
 // ─── Single Item Form Schema ──────────────────────────────────────────────────
@@ -493,13 +498,7 @@ function SingleItemDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Batal
             </Button>
-            <Button type="submit">
-              {isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
-            </Button>
+            <Button type="submit">{isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}</Button>
           </div>
 
           {/* Debug: Show current form values */}
@@ -581,6 +580,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
   const [paidFilter, setPaidFilter] = React.useState<string>("all");
+  const [classFilter, setClassFilter] = React.useState<string>("all");
   const [monthFilter, setMonthFilter] = React.useState<string>("all");
   const [yearFilter, setYearFilter] = React.useState<string>("all");
 
@@ -592,6 +592,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   const { data: paymentItems = [], isLoading, refetch } = usePaymentItemsByMajorId(majorId);
   const { data: allStudents = [] } = useGetStudentByIdMajor(majorId);
   const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorId);
+  const { data: allClassById = [] } = useGetClassByIdMajor(majorId);
   const handleSuccess = () => refetch();
 
   const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
@@ -601,6 +602,15 @@ function BillingDataTable({ majorId }: { majorId: string }) {
     return text.includes(filterValue.toLowerCase());
   }, []);
 
+  // ✅ FIX: Get students in selected class
+  const studentsInSelectedClass = React.useMemo(() => {
+    if (classFilter === "all") return null;
+    const selectedClass = allClassById.find((c: any) => c.id === classFilter);
+    if (!selectedClass) return [];
+    // Assuming class has students array or we match by student.classId
+    return (selectedClass.students || []).map((s: any) => s.id);
+  }, [classFilter, allClassById]);
+
   const columns: ColumnDef<PaymentItemData>[] = [
     {
       id: "select",
@@ -608,6 +618,20 @@ function BillingDataTable({ majorId }: { majorId: string }) {
       cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(v) => row.toggleSelected(!!v)} aria-label="Select row" />,
       enableSorting: false,
       enableHiding: false,
+    },
+    {
+      id: "class",
+      accessorFn: (row) => {
+        const studentClass = allClassById.find((c: any) => c.students?.some((s: any) => s.id === row.studentId));
+        return studentClass ? studentClass.name : "-";
+      },
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Building className="mr-2 h-4 w-4" />
+          Kelas
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
     },
     {
       id: "student",
@@ -620,6 +644,10 @@ function BillingDataTable({ majorId }: { majorId: string }) {
         </Button>
       ),
       cell: ({ row }) => <div className="font-medium">{row.original.student?.name ?? "-"}</div>,
+      filterFn: (row, _id, filterValue) => {
+        if (filterValue === "all" || !filterValue) return true;
+        return row.original.studentId === filterValue || studentsInSelectedClass?.includes(row.original.studentId);
+      },
     },
     {
       accessorKey: "name",
@@ -793,6 +821,10 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   }, [paidFilter, table]);
 
   React.useEffect(() => {
+    table.getColumn("student")?.setFilterValue(classFilter !== "all" ? classFilter : undefined);
+  }, [classFilter, table]);
+
+  React.useEffect(() => {
     table.getColumn("month")?.setFilterValue(monthFilter !== "all" ? monthFilter : undefined);
   }, [monthFilter, table]);
 
@@ -823,11 +855,12 @@ function BillingDataTable({ majorId }: { majorId: string }) {
     receipt: "Kwitansi",
   };
 
-  const hasActiveFilter = globalFilter || paidFilter !== "all" || monthFilter !== "all" || yearFilter !== "all";
+  const hasActiveFilter = globalFilter || paidFilter !== "all" || classFilter !== "all" || monthFilter !== "all" || yearFilter !== "all";
 
   const resetFilters = () => {
     setGlobalFilter("");
     setPaidFilter("all");
+    setClassFilter("all");
     setMonthFilter("all");
     setYearFilter("all");
     table.resetColumnFilters();
@@ -845,6 +878,20 @@ function BillingDataTable({ majorId }: { majorId: string }) {
             <Input placeholder="Cari siswa, item, kwitansi..." value={globalFilter ?? ""} onChange={(e) => setGlobalFilter(e.target.value)} className="max-w-xs pl-8" />
           </div>
 
+          <Select value={classFilter} onValueChange={setClassFilter}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Filter Kelas" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Kelas</SelectItem>
+              {allClassById.map((m: any) => (
+                <SelectItem key={m.id} value={m.id}>
+                  {m.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Select value={paidFilter} onValueChange={setPaidFilter}>
             <SelectTrigger className="w-36">
               <SelectValue placeholder="Status Bayar" />
@@ -858,7 +905,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
 
           <Select value={monthFilter} onValueChange={setMonthFilter}>
             <SelectTrigger className="w-36">
-              <SelectValue placeholder="Filter Bulan" />
+              <SelectValue placeholder="Filter B/ulan" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Bulan</SelectItem>
@@ -934,6 +981,12 @@ function BillingDataTable({ majorId }: { majorId: string }) {
               <X className="h-3 w-3 cursor-pointer" onClick={() => setPaidFilter("all")} />
             </Badge>
           )}
+          {classFilter !== "all" && (
+            <Badge variant="secondary" className="gap-1">
+              Kelas: {allClassById.find((c: any) => c.id === classFilter)?.name ?? classFilter}
+              <X className="h-3 w-3 cursor-pointer" onClick={() => setClassFilter("all")} />
+            </Badge>
+          )}
           {monthFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
               Bulan: {monthFilter}
@@ -962,7 +1015,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -970,7 +1023,8 @@ function BillingDataTable({ majorId }: { majorId: string }) {
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -983,7 +1037,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
                   </div>
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>
