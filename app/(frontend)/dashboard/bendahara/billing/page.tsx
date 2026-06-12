@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -169,10 +169,11 @@ function SingleItemDialog({
     control,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
     reset,
   } = useForm<SingleItemFormValues>({
     resolver: zodResolver(singleItemSchema as any),
+    mode: "onChange", // ✅ Enable validation on change
     defaultValues: {
       quantity: 1,
       amount: 0,
@@ -318,9 +319,10 @@ function SingleItemDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent aria-describedby="Test" className="max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editData ? "Edit Item Tagihan" : "Tambah Item Tagihan"}</DialogTitle>
+          <DialogDescription>{editData ? "Perbarui item tagihan siswa" : "Buat item pembayaran baru untuk siswa "}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Student */}
@@ -491,7 +493,7 @@ function SingleItemDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Batal
             </Button>
-            <Button type="submit" disabled={isPending || !watch("studentId") || !watch("paymentTypeId") || !watch("name") || !watch("month") || !watch("year")}>
+            <Button type="submit">
               {isPending ?
                 "Menyimpan..."
               : editData ?
@@ -500,7 +502,22 @@ function SingleItemDialog({
             </Button>
           </div>
 
-          {/* Debug: Show validation errors */}
+          {/* Debug: Show current form values */}
+          {process.env.NODE_ENV === "development" && (
+            <div className="text-xs space-y-2 p-3 bg-gray-50 rounded border">
+              <p className="font-semibold">Debug Form State:</p>
+              <div className="space-y-1">
+                <p>• isValid: {isValid ? "✓ true" : "✗ false"}</p>
+                <p>• studentId: {watch("studentId") || "(empty)"}</p>
+                <p>• paymentTypeId: {watch("paymentTypeId") || "(empty)"}</p>
+                <p>• name: {watch("name") || "(empty)"}</p>
+                <p>• month: {watch("month") || "(empty)"}</p>
+                <p>• year: {watch("year") || "(empty)"}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Show validation errors */}
           {Object.keys(errors).length > 0 && (
             <div className="text-xs text-red-500 space-y-1">
               <p className="font-semibold">Validation errors:</p>
