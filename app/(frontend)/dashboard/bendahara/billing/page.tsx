@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Switch } from "@/components/ui/switch";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -27,9 +26,8 @@ import { StudentCombobox } from "@/components/ui/student-combobox";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetPaymentByIdMajor } from "@/app/(hooks)/hooks/Payments/usePayment";
 import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-import { useGetClassById, useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
+import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -47,6 +45,11 @@ export type PaymentTypeData = {
   skuType: string;
   majorId: string;
   major?: { id: string; name: string };
+  student: {
+    class: {
+      name: string;
+    };
+  };
 };
 
 export type PaymentItemData = {
@@ -67,7 +70,7 @@ export type PaymentItemData = {
   paymentId: string;
   studentId: string;
   PaymentType?: PaymentTypeData;
-  student?: { id: string; name: string };
+  student?: { id: string; name: string; class?: { name: string } };
   payment?: { id: string; receiptNumber: string; status: string };
 };
 
@@ -572,6 +575,57 @@ function DeleteItemDialog({ open, onOpenChange, itemData, onSuccess }: { open: b
   );
 }
 
+// ─── Export Excel Function ────────────────────────────────────────────────────
+async function exportToExcel(data: PaymentItemData[], filename: string = "Data_Tagihan.xlsx") {
+  try {
+    const XLSX = await import("xlsx");
+
+    // Prepare data for export
+    const exportData = data.map((item) => ({
+      Kelas: item.student?.class?.name ?? "-",
+      Siswa: item.student?.name ?? "-",
+      "Nama Item": item.name,
+      "Tipe SKU": item.skuType || "default",
+      Owner: item.PaymentType?.owner || "-",
+      Nominal: item.amount,
+      Qty: item.quantity,
+      Subtotal: item.subtotal,
+      Bulan: MONTHS[parseInt(item.month) - 1] ?? item.month,
+      Tahun: item.year,
+      "Status Bayar": item.isPaid ? "Lunas" : "Belum Lunas",
+      Kwitansi: item.payment?.receiptNumber ?? "-",
+    }));
+
+    // Create workbook and worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Tagihan");
+
+    // Set column widths
+    const colWidths = [
+      { wch: 12 }, // Kelas
+      { wch: 20 }, // Siswa
+      { wch: 25 }, // Nama Item
+      { wch: 12 }, // Tipe SKU
+      { wch: 12 }, // Owner
+      { wch: 12 }, // Nominal
+      { wch: 6 }, // Qty
+      { wch: 12 }, // Subtotal
+      { wch: 12 }, // Bulan
+      { wch: 6 }, // Tahun
+      { wch: 12 }, // Status Bayar
+      { wch: 15 }, // Kwitansi
+    ];
+    ws["!cols"] = colWidths;
+
+    // Write file
+    XLSX.writeFile(wb, filename);
+    toast.success("Data berhasil diexport ke Excel!");
+  } catch (error: any) {
+    toast.error("Gagal mengexport data: " + error.message);
+  }
+}
+
 // ─── Main DataTable ───────────────────────────────────────────────────────────
 function BillingDataTable({ majorId }: { majorId: string }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -583,6 +637,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   const [classFilter, setClassFilter] = React.useState<string>("all");
   const [monthFilter, setMonthFilter] = React.useState<string>("all");
   const [yearFilter, setYearFilter] = React.useState<string>("all");
+  const [isExporting, setIsExporting] = React.useState(false);
 
   const [singleDialogOpen, setSingleDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
@@ -621,10 +676,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
     },
     {
       id: "class",
-      accessorFn: (row) => {
-        const studentClass = allClassById.find((c: any) => c.students?.some((s: any) => s.id === row.studentId));
-        return studentClass ? studentClass.name : "-";
-      },
+      accessorFn: (row) => row.student?.class?.name ?? "-",
       header: ({ column }) => (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           <Building className="mr-2 h-4 w-4" />
@@ -958,6 +1010,18 @@ function BillingDataTable({ majorId }: { majorId: string }) {
                 ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            onClick={async () => {
+              setIsExporting(true);
+              await exportToExcel(paymentItems as PaymentItemData[]);
+              setIsExporting(false);
+            }}
+            disabled={isExporting}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            {isExporting ? "Mengexport..." : "Export Excel"}
+          </Button>
           <Button onClick={() => setSingleDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Item

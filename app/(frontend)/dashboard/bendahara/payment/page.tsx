@@ -108,6 +108,59 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+// ─── Export Excel Function ────────────────────────────────────────────────────
+async function exportToExcel(data: PaymentData[], filename: string = "Data_Pembayaran.xlsx") {
+  try {
+    const XLSX = await import("xlsx");
+
+    // Prepare data for export
+    const exportData = data.map((item) => ({
+      Siswa: item.student?.name ?? "-",
+      "No. Kwitansi": item.receiptNumber,
+      Bulan: item.month,
+      Tahun: new Date(item.paymentDate).getFullYear(),
+      Jumlah: item.amount,
+      Status: statusConfig[item.status]?.label ?? item.status,
+      "Tgl Bayar": item.paymentDate ? new Date(item.paymentDate).toLocaleDateString("id-ID") : "-",
+      "Jatuh Tempo": item.dueDate ? new Date(item.dueDate).toLocaleDateString("id-ID") : "-",
+      Bank: item.accountBank?.accountBank ?? "-",
+      "Nama Rekening": item.accountBank?.accountName ?? "-",
+      "No. Rekening": item.accountBank?.accountNumber ?? "-",
+      "Ref Bank": item.bankRef,
+      Keterangan: item.notes ?? "-",
+    }));
+
+    // Create workbook and worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Pembayaran");
+
+    // Set column widths
+    const colWidths = [
+      { wch: 20 }, // Siswa
+      { wch: 15 }, // No. Kwitansi
+      { wch: 12 }, // Bulan
+      { wch: 8 }, // Tahun
+      { wch: 12 }, // Jumlah
+      { wch: 12 }, // Status
+      { wch: 12 }, // Tgl Bayar
+      { wch: 12 }, // Jatuh Tempo
+      { wch: 12 }, // Bank
+      { wch: 20 }, // Nama Rekening
+      { wch: 15 }, // No. Rekening
+      { wch: 15 }, // Ref Bank
+      { wch: 20 }, // Keterangan
+    ];
+    ws["!cols"] = colWidths;
+
+    // Write file
+    XLSX.writeFile(wb, filename);
+    toast.success("Data berhasil diexport ke Excel!");
+  } catch (error: any) {
+    toast.error("Gagal mengexport data: " + error.message);
+  }
+}
+
 function formatRupiah(value: number | string) {
   const num = typeof value === "string" ? parseFloat(value) : value;
   if (isNaN(num)) return "Rp 0";
@@ -345,9 +398,8 @@ function PaymentFormDialog({
         notes: editData.notes || "",
         bendaharaId: userDataId || "",
         majorId: userDataMajorId || "",
-        items:
-          editData.paymentItems?.length ?
-            editData.paymentItems.map((item) => ({
+        items: editData.paymentItems?.length
+          ? editData.paymentItems.map((item) => ({
               id: item.id,
               name: item.name,
               amount: item.amount,
@@ -368,7 +420,7 @@ function PaymentFormDialog({
         studentId: "",
         accountBankId: "",
         month: MONTHS[new Date().getMonth()],
-        status: "pending",
+        status: "paid",
         paymentDate: new Date().toISOString().split("T")[0],
         dueDate: "",
         receiptNumber: newReceiptNumber,
@@ -703,20 +755,9 @@ function PaymentFormDialog({
                     const val = e.target.value;
                     setTotalTransfer(val === "" ? "" : Number(val));
                   }}
-                  className={
-                    isTransferEmpty ? ""
-                    : isTransferValid ?
-                      "border-green-500 focus-visible:ring-green-500"
-                    : "border-red-500 focus-visible:ring-red-500"
-                  }
+                  className={isTransferEmpty ? "" : isTransferValid ? "border-green-500 focus-visible:ring-green-500" : "border-red-500 focus-visible:ring-red-500"}
                 />
-                {!isTransferEmpty && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {isTransferValid ?
-                      <BadgeCheck className="h-4 w-4 text-green-600" />
-                    : <XCircle className="h-4 w-4 text-red-500" />}
-                  </div>
-                )}
+                {!isTransferEmpty && <div className="absolute right-3 top-1/2 -translate-y-1/2">{isTransferValid ? <BadgeCheck className="h-4 w-4 text-green-600" /> : <XCircle className="h-4 w-4 text-red-500" />}</div>}
               </div>
 
               {isTransferEmpty && grandTotal > 0 && <p className="text-xs text-muted-foreground">Masukkan jumlah yang ditransfer untuk melanjutkan</p>}
@@ -759,11 +800,7 @@ function PaymentFormDialog({
                 Batal
               </Button>
               <Button type="submit" disabled={!isSubmitDisabled} title={selectedItemsCount === 0 ? "Pilih minimal 1 item" : undefined}>
-                {isPending ?
-                  "Menyimpan..."
-                : editData ?
-                  "Perbarui"
-                : "Simpan"}
+                {isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
               </Button>
             </div>
           </div>
@@ -843,6 +880,7 @@ function PaymentDataTable({
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [monthFilter, setMonthFilter] = React.useState<string>("all");
   const [expandedRows, setExpandedRows] = React.useState<Set<string>>(new Set());
+  const [isExporting, setIsExporting] = React.useState(false);
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
@@ -892,9 +930,7 @@ function PaymentDataTable({
           <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs px-2" onClick={() => toggleExpand(p.id)}>
             <Package className="h-3.5 w-3.5" />
             {itemCount}
-            {isExpanded ?
-              <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" />
-            : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
+            {isExpanded ? <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" /> : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
           </Button>
         );
       },
@@ -1171,6 +1207,18 @@ function PaymentDataTable({
                 ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            onClick={async () => {
+              setIsExporting(true);
+              await exportToExcel(payments as PaymentData[]);
+              setIsExporting(false);
+            }}
+            disabled={isExporting}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            {isExporting ? "Mengexport..." : "Export Excel"}
+          </Button>
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Pembayaran
@@ -1216,7 +1264,7 @@ function PaymentDataTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
                   <TableRow data-state={row.getIsSelected() && "selected"}>
@@ -1234,7 +1282,8 @@ function PaymentDataTable({
                   )}
                 </React.Fragment>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1256,7 +1305,7 @@ function PaymentDataTable({
                   </div>
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>
