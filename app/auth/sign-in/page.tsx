@@ -31,7 +31,7 @@ export default function SignIn() {
               <Input
                 id="email"
                 type="email"
-                placeholder="user@fajarsentosa.com"
+                placeholder="user@rahmaniyah.com"
                 required
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -80,7 +80,7 @@ export default function SignIn() {
                     onResponse: (ctx) => {
                       setLoading(false);
                     },
-                  }
+                  },
                 );
               }}
             >
@@ -105,7 +105,7 @@ export default function SignIn() {
                       onResponse: (ctx) => {
                         setLoading(false);
                       },
-                    }
+                    },
                   );
                 }}
               >

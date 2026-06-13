@@ -138,6 +138,11 @@ const nextConfig: NextConfig = {
       // timeout: 10000, // 10 seconds// Increase timeout for external images in production
       // timeout: 10000, // 10 seconds// Increase timeout for external images in production
       // timeout: 10000, // 10 seconds// Increase timeout for external images in production
+      // timeout: 10000, // 10 seconds// Increase timeout for external images in production
+      // timeout: 10000, // 10 seconds// Increase timeout for external images in production
+      // timeout: 10000, // 10 seconds// Increase timeout for external images in production
+      // timeout: 10000, // 10 seconds// Increase timeout for external images in production
+      // timeout: 10000, // 10 seconds// Increase timeout for external images in production
       // timeout: 10000, // 10 seconds
     : {
         // Increase timeout for external images in production
@@ -178,6 +183,7 @@ const nextConfig: NextConfig = {
           "@radix-ui/react-tabs",
           "@tanstack/react-query",
           "@tanstack/react-table",
+          "@react-pdf/renderer",
         ],
         // Enable server actions for better performance
         serverActions: {
@@ -185,7 +191,6 @@ const nextConfig: NextConfig = {
         },
         authInterrupts: true,
         serverComponentsHmrCache: true,
-        serverComponentsExternalPackages: ["@react-pdf/renderer"],
       },
     }
   : {}),
