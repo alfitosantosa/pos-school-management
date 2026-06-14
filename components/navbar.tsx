@@ -55,6 +55,7 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/accountbank": "Account Bank Management",
   //for admin
   "/dashboard/billing": " Tagihan Management",
+  "/dashboard/studentinformation": "Informasi Siswa",
   //for bendahara
   "/dashboard/bendahara/payment": "Data Transaksi",
   "/dashboard/bendahara/users": "Data Siswa",
@@ -63,6 +64,7 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/bendahara/billing": "Data Tagihan",
   "/dashboard/bendahara/billing/upload": "Upload Tagihan",
   "/dashboard/bendahara/users/upload": "Upload Data Siswa",
+  "/dashboard/bendahara/studentinformation": "Informasi Siswa",
 };
 
 export default function Navbar() {

@@ -528,6 +528,8 @@ function PaymentFormDialog({
                   onValueChange={(value) => {
                     field.onChange(value);
                     setSelectedStudentId(value);
+                    const selectedStudent = allStudents.find((student) => student.id === value);
+                    setValue("majorId", selectedStudent?.major?.id || "");
                   }}
                   disabled={!!editData}
                   placeholder="Pilih Siswa"
