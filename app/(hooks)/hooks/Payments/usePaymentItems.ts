@@ -101,15 +101,17 @@ export const useGetPaymentItemsById = (id: string) => {
 
 export const useGetPaymentByStudentId = (studentId: string) => {
   return useQuery({
-    queryKey: ["payment-by-id", "midtransTransaction"],
+    queryKey: ["payment-by-id", studentId],
     queryFn: async () => {
       try {
         const res = await apiGet(`/api/payment/student/${studentId}`);
+        // localhost:3000/api/payment/student/cmpthwv86000201mvsv7fy3s6
         return res.data;
       } catch (error: any) {
         throw new Error(error?.response?.data?.message || "Failed to fetch payment");
       }
     },
+    enabled: !!studentId, // Prevent request when studentId is empty
   });
 };
 
@@ -155,6 +157,7 @@ export const usePaymentItemsByMajorId = (majorId: string) => {
         throw new Error(error?.response?.data?.message || "Failed to fetch payment");
       }
     },
+    enabled: !!majorId, // Prevent request when majorId is empty
   });
 };
 
@@ -184,5 +187,20 @@ export const BulkUploadPaymentItems = () => {
       queryClient.invalidateQueries({ queryKey: ["paymentItems"] });
       queryClient.invalidateQueries({ queryKey: ["unpaid-students"] });
     },
+  });
+};
+
+export const usePaymentItemsByStudentId = (id: string) => {
+  return useQuery({
+    queryKey: ["payment-by-id-student", id],
+    queryFn: async () => {
+      try {
+        const res = await apiGet(`/api/payment/items/student/${id}`);
+        return res.data;
+      } catch (error: any) {
+        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
+      }
+    },
+    enabled: !!id, // Prevent request when id is empty
   });
 };
