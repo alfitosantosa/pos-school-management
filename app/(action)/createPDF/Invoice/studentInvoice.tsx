@@ -583,12 +583,12 @@ function KwitansiDocument({ data }: { data: KwitansiPDFData }) {
                 <Text style={S.totalLabel}>Jumlah Item</Text>
                 <Text style={S.totalValue}>{items.length} item</Text>
               </View>
-              {isDiff && (
+              {/* {isDiff && (
                 <View style={S.totalRow}>
                   <Text style={S.totalLabel}>Subtotal</Text>
                   <Text style={S.totalValue}>Rp {fmt(subTotal)}</Text>
                 </View>
-              )}
+              )} */}
               {data.bankRef && (
                 <View style={S.totalRow}>
                   <Text style={S.totalLabel}>Metode</Text>
