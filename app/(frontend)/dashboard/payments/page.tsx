@@ -85,7 +85,11 @@ export type PaymentData = {
   accountBankId: string;
   majorId: string;
   month: string;
-  student?: { id: string; name: string };
+  student?: {
+    id: string;
+    name: string;
+    parentPhone: string;
+  };
   major?: { id: string; name: string };
   accountBank?: { id: string; accountName: string; accountBank?: string; accountNumber: string };
   paymentItems?: PaymentItemData[];
@@ -113,51 +117,132 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
   try {
     const XLSX = await import("xlsx");
 
-    // Prepare data for export
+    // ── 1. Siapkan data ───────────────────────────────────────────────────
     const exportData = data.map((item) => ({
-      Siswa: item.student?.name ?? "-",
+      "Branch": item.major?.name ?? "-",
+      "Nama Siswa": item.student?.name ?? "-",
+      "No. HP Orang Tua": item.student?.parentPhone ?? "-",
       "No. Kwitansi": item.receiptNumber,
       Bulan: item.month,
-      Tahun: new Date(item.paymentDate).getFullYear(),
-      Jumlah: item.amount,
+      Tahun: new Date(item.createdAt).getFullYear(),
+      "Jumlah (Rp)": Number(item.amount),
       Status: statusConfig[item.status]?.label ?? item.status,
-      "Tgl Bayar": item.paymentDate ? new Date(item.paymentDate).toLocaleDateString("id-ID") : "-",
+      "Tanggal Bayar": item.paymentDate ? new Date(item.paymentDate).toLocaleDateString("id-ID") : "-",
       "Jatuh Tempo": item.dueDate ? new Date(item.dueDate).toLocaleDateString("id-ID") : "-",
       Bank: item.accountBank?.accountBank ?? "-",
       "Nama Rekening": item.accountBank?.accountName ?? "-",
       "No. Rekening": item.accountBank?.accountNumber ?? "-",
-      "Ref Bank": item.bankRef,
+      "Referensi Bank": item.bankRef ?? "-",
       Keterangan: item.notes ?? "-",
     }));
 
-    // Create workbook and worksheet
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Pembayaran");
+    const totalCols = 15;
+    const now = new Date();
+    const exportDateStr = now.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
 
-    // Set column widths
-    const colWidths = [
-      { wch: 20 }, // Siswa
-      { wch: 15 }, // No. Kwitansi
-      { wch: 12 }, // Bulan
-      { wch: 8 }, // Tahun
-      { wch: 12 }, // Jumlah
-      { wch: 12 }, // Status
-      { wch: 12 }, // Tgl Bayar
-      { wch: 12 }, // Jatuh Tempo
-      { wch: 12 }, // Bank
-      { wch: 20 }, // Nama Rekening
-      { wch: 15 }, // No. Rekening
-      { wch: 15 }, // Ref Bank
-      { wch: 20 }, // Keterangan
+    // ── 2. Buat worksheet kosong dulu ─────────────────────────────────────
+    const ws = XLSX.utils.aoa_to_sheet([
+      // Baris 1 — judul (placeholder, nanti diisi manual)
+      ["LAPORAN DATA PEMBAYARAN"],
+      // Baris 2 — sub-judul
+      [`Diekspor pada: ${exportDateStr}  ·  Total: ${data.length} transaksi`],
+    ]);
+
+    // ── 3. Tambahkan data mulai baris ke-3 (index 2) ──────────────────────
+    // ✅ FIX: gunakan sheet_add_json dengan `origin` sebagai argument terpisah
+    XLSX.utils.sheet_add_json(ws, exportData, {
+      skipHeader: false,
+    });
+
+    // Karena sheet_add_json default mulai dari A1 (overwrite),
+    // kita shift data ke bawah dengan menambah offset manual via aoa
+    // Cara lebih clean: buat worksheet dari aoa terlebih dahulu
+    const headerRow = Object.keys(exportData[0] ?? {});
+    const dataRows = exportData.map((row) => Object.values(row));
+
+    // ✅ Rebuild worksheet dengan judul + header + data sekaligus via aoa_to_sheet
+    const allRows = [
+      // Baris 1: judul
+      ["LAPORAN DATA PEMBAYARAN", ...Array(totalCols - 1).fill("")],
+      // Baris 2: sub-judul
+      [`Diekspor pada: ${exportDateStr}  ·  Total: ${data.length} transaksi`, ...Array(totalCols - 1).fill("")],
+      // Baris 3: header kolom
+      headerRow,
+      // Baris 4+: data
+      ...dataRows,
     ];
-    ws["!cols"] = colWidths;
 
-    // Write file
+    const ws2 = XLSX.utils.aoa_to_sheet(allRows);
+
+    // ── 4. Merge judul & sub-judul ────────────────────────────────────────
+    ws2["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: totalCols - 1 } },
+    ];
+
+    // ── 5. Format tipe data kolom numerik ─────────────────────────────────
+    // Jumlah (Rp) ada di kolom index 6, data mulai baris index 3
+    exportData.forEach((_, rowIdx) => {
+      const excelRowIdx = rowIdx + 3; // baris data mulai di index 3 (baris Excel ke-4)
+
+      // Jumlah (Rp) — kolom index 6
+      const jumlahCell = XLSX.utils.encode_cell({ r: excelRowIdx, c: 6 });
+      if (ws2[jumlahCell]) {
+        ws2[jumlahCell].t = "n";
+        ws2[jumlahCell].z = "#,##0";
+      }
+
+      // Tahun — kolom index 5
+      const tahunCell = XLSX.utils.encode_cell({ r: excelRowIdx, c: 5 });
+      if (ws2[tahunCell]) {
+        ws2[tahunCell].t = "n";
+        ws2[tahunCell].z = "0";
+      }
+    });
+
+    // ── 6. Lebar kolom ────────────────────────────────────────────────────
+    ws2["!cols"] = [
+      { wch: 22 }, // Branch / Jurusan
+      { wch: 28 }, // Nama Siswa
+      { wch: 18 }, // No. HP Orang Tua
+      { wch: 18 }, // No. Kwitansi
+      { wch: 14 }, // Bulan
+      { wch: 8 }, // Tahun
+      { wch: 18 }, // Jumlah (Rp)
+      { wch: 14 }, // Status
+      { wch: 14 }, // Tanggal Bayar
+      { wch: 14 }, // Jatuh Tempo
+      { wch: 16 }, // Bank
+      { wch: 24 }, // Nama Rekening
+      { wch: 18 }, // No. Rekening
+      { wch: 20 }, // Referensi Bank
+      { wch: 28 }, // Keterangan
+    ];
+
+    // ── 7. Tinggi baris ───────────────────────────────────────────────────
+    ws2["!rows"] = [
+      { hpt: 28 }, // baris 1 — judul
+      { hpt: 16 }, // baris 2 — sub-judul
+      { hpt: 20 }, // baris 3 — header kolom
+      ...exportData.map(() => ({ hpt: 16 })),
+    ];
+
+    // ── 8. Freeze pane: bekukan 3 baris header + 2 kolom kiri ─────────────
+    ws2["!freeze"] = { xSplit: 2, ySplit: 3 } as any;
+
+    // ── 9. Simpan ke file ─────────────────────────────────────────────────
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws2, "Data Pembayaran");
     XLSX.writeFile(wb, filename);
-    toast.success("Data berhasil diexport ke Excel!");
+
+    toast.success(`${data.length} data pembayaran berhasil diexport!`);
   } catch (error: any) {
-    toast.error("Gagal mengexport data: " + error.message);
+    console.error("Export error:", error);
+    toast.error("Gagal mengexport data: " + (error?.message ?? "Unknown error"));
   }
 }
 
@@ -398,8 +483,9 @@ function PaymentFormDialog({
         notes: editData.notes || "",
         bendaharaId: userDataId || "",
         majorId: userDataMajorId || "",
-        items: editData.paymentItems?.length
-          ? editData.paymentItems.map((item) => ({
+        items:
+          editData.paymentItems?.length ?
+            editData.paymentItems.map((item) => ({
               id: item.id,
               name: item.name,
               amount: item.amount,
@@ -487,7 +573,7 @@ function PaymentFormDialog({
         }
         toast.success("Pembayaran berhasil dibuat!");
       }
-      console.log(data);
+
       reset();
       setSelectedStudentId("");
       setUnpaidItems([]);
@@ -757,9 +843,20 @@ function PaymentFormDialog({
                     const val = e.target.value;
                     setTotalTransfer(val === "" ? "" : Number(val));
                   }}
-                  className={isTransferEmpty ? "" : isTransferValid ? "border-green-500 focus-visible:ring-green-500" : "border-red-500 focus-visible:ring-red-500"}
+                  className={
+                    isTransferEmpty ? ""
+                    : isTransferValid ?
+                      "border-green-500 focus-visible:ring-green-500"
+                    : "border-red-500 focus-visible:ring-red-500"
+                  }
                 />
-                {!isTransferEmpty && <div className="absolute right-3 top-1/2 -translate-y-1/2">{isTransferValid ? <BadgeCheck className="h-4 w-4 text-green-600" /> : <XCircle className="h-4 w-4 text-red-500" />}</div>}
+                {!isTransferEmpty && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {isTransferValid ?
+                      <BadgeCheck className="h-4 w-4 text-green-600" />
+                    : <XCircle className="h-4 w-4 text-red-500" />}
+                  </div>
+                )}
               </div>
 
               {isTransferEmpty && grandTotal > 0 && <p className="text-xs text-muted-foreground">Masukkan jumlah yang ditransfer untuk melanjutkan</p>}
@@ -802,7 +899,11 @@ function PaymentFormDialog({
                 Batal
               </Button>
               <Button type="submit" disabled={!isSubmitDisabled} title={selectedItemsCount === 0 ? "Pilih minimal 1 item" : undefined}>
-                {isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+                {isPending ?
+                  "Menyimpan..."
+                : editData ?
+                  "Perbarui"
+                : "Simpan"}
               </Button>
             </div>
           </div>
@@ -931,7 +1032,9 @@ function PaymentDataTable({
           <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs px-2" onClick={() => toggleExpand(p.id)}>
             <Package className="h-3.5 w-3.5" />
             {itemCount}
-            {isExpanded ? <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" /> : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
+            {isExpanded ?
+              <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" />
+            : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
           </Button>
         );
       },
@@ -1265,7 +1368,7 @@ function PaymentDataTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
                   <TableRow data-state={row.getIsSelected() && "selected"}>
@@ -1283,8 +1386,7 @@ function PaymentDataTable({
                   )}
                 </React.Fragment>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1306,7 +1408,7 @@ function PaymentDataTable({
                   </div>
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>
