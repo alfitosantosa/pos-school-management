@@ -11,13 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
 
 // Import hooks
@@ -115,7 +113,11 @@ function AcademicYearFormDialog({ open, onOpenChange, editData, onSuccess }: { o
               Batal
             </Button>
             <Button type="submit" disabled={createAcademicYear.isPending || updateAcademicYear.isPending}>
-              {createAcademicYear.isPending || updateAcademicYear.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createAcademicYear.isPending || updateAcademicYear.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -368,19 +370,19 @@ function AcademicYearDataTable() {
                     .map((column) => {
                       return (
                         <DropdownMenuCheckboxItem key={column.id} className="capitalize" checked={column.getIsVisible()} onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                          {column.id === "year"
-                            ? "Tahun Ajaran"
-                            : column.id === "startDate"
-                              ? "Tanggal Mulai"
-                              : column.id === "endDate"
-                                ? "Tanggal Selesai"
-                                : column.id === "isActive"
-                                  ? "Status"
-                                  : column.id === "classes"
-                                    ? "Jumlah Kelas"
-                                    : column.id === "students"
-                                      ? "Jumlah Siswa"
-                                      : column.id}
+                          {column.id === "year" ?
+                            "Tahun Ajaran"
+                          : column.id === "startDate" ?
+                            "Tanggal Mulai"
+                          : column.id === "endDate" ?
+                            "Tanggal Selesai"
+                          : column.id === "isActive" ?
+                            "Status"
+                          : column.id === "classes" ?
+                            "Jumlah Kelas"
+                          : column.id === "students" ?
+                            "Jumlah Siswa"
+                          : column.id}
                         </DropdownMenuCheckboxItem>
                       );
                     })}
@@ -406,7 +408,7 @@ function AcademicYearDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length ?
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -414,13 +416,12 @@ function AcademicYearDataTable() {
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
+                : <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data tahun ajaran.
                     </TableCell>
                   </TableRow>
-                )}
+                }
               </TableBody>
             </Table>
           </div>

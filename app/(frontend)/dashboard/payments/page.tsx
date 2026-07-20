@@ -119,7 +119,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
 
     // ── 1. Siapkan data ───────────────────────────────────────────────────
     const exportData = data.map((item) => ({
-      "Branch": item.major?.name ?? "-",
+      Branch: item.major?.name ?? "-",
       "Nama Siswa": item.student?.name ?? "-",
       "No. HP Orang Tua": item.student?.parentPhone ?? "-",
       "No. Kwitansi": item.receiptNumber,
@@ -306,7 +306,7 @@ function ExpandedItemsRow({ items }: { items: PaymentItemData[] }) {
             <tr key={item.id ?? i} className="border-b last:border-0">
               <td className="py-2 font-medium">{item.name ?? "-"}</td>
               <td className="py-2 text-center">
-                {item.month} {item.year}
+                {item.month} / {item.year}
               </td>
               <td className="py-2 text-right">{formatRupiah(item.amount)}</td>
               <td className="py-2 text-center">{item.quantity}</td>
@@ -318,7 +318,6 @@ function ExpandedItemsRow({ items }: { items: PaymentItemData[] }) {
     </div>
   );
 }
-
 // ─── Form Dialog ──────────────────────────────────────────────────────────────
 // ─── Di dalam PaymentFormDialog ──────────────────────────────────────────────
 function PaymentFormDialog({

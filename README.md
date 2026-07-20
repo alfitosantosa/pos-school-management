@@ -749,7 +749,7 @@ This project is proprietary software developed for SMK Fajar Sentosa.
 
 ### Support
 Untuk pertanyaan teknis atau support, silakan hubungi tim development:
-- Email: support@smkfajarsentosa.sch.id
+- Email: support@rahmaniyah.sch.id
 - GitHub Issues: [Report a bug](https://github.com/yourusername/pos-rahmany-new-2/issues)
 
 ---

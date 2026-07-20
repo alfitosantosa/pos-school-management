@@ -17,7 +17,7 @@ export async function GET() {
           description: 'Dokumentasi lengkap untuk API backend sistem Point of Sale SMK Fajar Sentosa',
           contact: {
             name: 'Tim Pengembang',
-            email: 'dev@smkfajarsentosa.id'
+            email: 'dev@rahmaniyah.id'
           },
           license: {
             name: 'MIT',
@@ -30,7 +30,7 @@ export async function GET() {
             description: 'Server development lokal'
           },
           {
-            url: 'https://api.smkfajarsentosa.id/api',
+            url: 'https://api.rahmaniyah.id/api',
             description: 'Server produksi'
           }
         ],
