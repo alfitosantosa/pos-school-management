@@ -12,6 +12,7 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap", // Prevent FOIT (Flash of Invisible Text)
   variable: "--font-inter",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -32,8 +33,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={inter.variable}>
-      <body className={`${inter.className} antialiased`}>
+    <html lang="id" className={inter.variable} suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
         <Toaster />
         <ReactQueryProvider>
           <Navbar />

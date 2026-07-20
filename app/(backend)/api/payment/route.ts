@@ -72,7 +72,11 @@ export async function GET() {
             paymentTypeId: true,
             amount: true,
             quantity: true,
+            subtotal: true,
+            month: true,
+            year: true,
             skuType: true,
+            name: true,
             PaymentType: {
               select: {
                 id: true,

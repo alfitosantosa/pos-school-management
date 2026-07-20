@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    // Check database connectivity
-    await prisma.$queryRaw`SELECT 1`;
+    // Check database connectivity with timeout
+    const dbCheck = await Promise.race([prisma.$queryRaw`SELECT 1`, new Promise((_, reject) => setTimeout(() => reject(new Error("Database timeout")), 5000))]);
 
     return NextResponse.json(
       {
@@ -12,6 +12,7 @@ export async function GET() {
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         environment: process.env.NODE_ENV,
+        database: "connected",
       },
       { status: 200 },
     );

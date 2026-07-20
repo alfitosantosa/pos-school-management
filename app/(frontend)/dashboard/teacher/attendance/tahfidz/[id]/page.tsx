@@ -142,7 +142,7 @@ Anda tidak perlu membalas pesan ini.
 
 Terima kasih atas perhatiannya.
 
-~IT Fajarsentosa
+~IT Rahmaniyah Al-Islamy
 _Pesan ini dikirim otomatis oleh sistem._`,
 
       // Template 2: Formal & Concise
@@ -164,7 +164,7 @@ Kami menginformasikan kehadiran putra/putri Anda pada:
 Anda tidak perlu membalas pesan ini.
 
 Hormat kami,
-Tim IT Fajarsentosa
+Tim IT Rahmaniyah Al-Islamy
 _(Pesan Otomatis)_`,
 
       // Template 3: Friendly & Polite
@@ -187,7 +187,7 @@ Anda tidak perlu membalas pesan ini.
 Terima kasih atas kerja samanya dalam memantau pendidikan ananda. 🙏
 
 Salam,
-IT Fajarsentosa`,
+IT Rahmaniyah Al-Islamy`,
 
       // Template 4: Bullet Points Focus
       `🔔 *INFO SEKOLAH*
@@ -208,7 +208,7 @@ Anda tidak perlu membalas pesan ini.
 
 Mohon dapat diterima dengan baik. Terima kasih.
 
-~ Admin IT Fajarsentosa ~`,
+~ Admin IT Rahmaniyah Al-Islamy ~`,
 
       // Template 5: Direct & Clear
       `📢 *STATUS KEHADIRAN*
@@ -227,7 +227,7 @@ Anda tidak perlu membalas pesan ini.
 Guru Pengampu: ${schedule.teacher?.name || "Guru"}
 
 Terima kasih.
-*IT Fajarsentosa*`,
+*IT Rahmaniyah Al-Islamy*`,
     ];
 
     // Send individual messages with personalized status
