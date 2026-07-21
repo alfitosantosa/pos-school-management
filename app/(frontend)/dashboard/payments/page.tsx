@@ -208,7 +208,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
     // ── 6. Lebar kolom ────────────────────────────────────────────────────
     ws2["!cols"] = [
       { wch: 22 }, // Branch / Jurusan
-      { wch: 36 }, // Nama Siswa
+      { wch: 35 }, // Nama Siswa
       { wch: 18 }, // No. HP Orang Tua
       { wch: 18 }, // No. Kwitansi
       { wch: 14 }, // Bulan
