@@ -33,6 +33,7 @@ import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersById
 import { v4 as uuidv4 } from "uuid";
 import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoice";
 import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -127,7 +128,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
       Tahun: new Date(item.createdAt).getFullYear(),
       "Jumlah (Rp)": Number(item.amount),
       Status: statusConfig[item.status]?.label ?? item.status,
-      "Tanggal Bayar": item.paymentDate ? new Date(item.paymentDate).toLocaleDateString("id-ID") : "-",
+      "Tanggal Bayar": item.createdAt ? new Date(item.createdAt).toLocaleDateString("id-ID") : "-",
       "Jatuh Tempo": item.dueDate ? new Date(item.dueDate).toLocaleDateString("id-ID") : "-",
       Bank: item.accountBank?.accountBank ?? "-",
       "Nama Rekening": item.accountBank?.accountName ?? "-",
@@ -207,7 +208,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
     // ── 6. Lebar kolom ────────────────────────────────────────────────────
     ws2["!cols"] = [
       { wch: 22 }, // Branch / Jurusan
-      { wch: 28 }, // Nama Siswa
+      { wch: 36 }, // Nama Siswa
       { wch: 18 }, // No. HP Orang Tua
       { wch: 18 }, // No. Kwitansi
       { wch: 14 }, // Bulan
@@ -994,6 +995,7 @@ function PaymentDataTable({
   const { data: payments = [], isLoading, refetch } = useGetPayments();
   const { data: allStudents = [] } = useGetStudents();
   const { data: allAccountBanks = [] } = useGetAccountBank();
+  const { data: allBranchs = [] } = useGetMajors();
 
   const handleSuccess = () => refetch();
 
@@ -1125,7 +1127,7 @@ function PaymentDataTable({
       },
     },
     {
-      accessorKey: "paymentDate",
+      accessorKey: "createdAt",
       header: ({ column }) => (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           <CalendarDays className="mr-2 h-4 w-4" />
@@ -1134,7 +1136,7 @@ function PaymentDataTable({
         </Button>
       ),
       cell: ({ row }) => {
-        const d = row.getValue("paymentDate") as string;
+        const d = row.getValue("createdAt") as string;
         if (!d) return <span className="text-muted-foreground">-</span>;
         return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
       },
@@ -1251,6 +1253,21 @@ function PaymentDataTable({
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Cari siswa, kwitansi, bulan..." value={globalFilter ?? ""} onChange={(e) => setGlobalFilter(e.target.value)} className="max-w-sm pl-8" />
           </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Filter Branch" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem key="all" value="all">
+                Semua Branch
+              </SelectItem>
+              {allBranchs.map((b: any) => (
+                <SelectItem key={b.id} value={b.id}>
+                  {b.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-36">
               <SelectValue placeholder="Filter Status" />
