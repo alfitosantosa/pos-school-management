@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const isProduction = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    authInterrupts: true,
+  },
   // ============================================================================
   // CORE
   // ============================================================================
@@ -58,6 +61,7 @@ const nextConfig: NextConfig = {
 
     experimental: {
       optimizePackageImports: ["lucide-react", "date-fns", "recharts", "@tanstack/react-query", "@tanstack/react-table"],
+      authInterrupts: true,
 
       serverActions: {
         bodySizeLimit: "2mb",
