@@ -90,9 +90,9 @@ export type PaymentData = {
     id: string;
     name: string;
     parentPhone: string;
-    class: {
+    class?: {
       name: string;
-    };
+    } | null;
   };
   major?: { id: string; name: string };
   accountBank?: { id: string; accountName: string; accountBank?: string; accountNumber: string };
@@ -124,7 +124,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
     // ── 1. Siapkan data ───────────────────────────────────────────────────
     const exportData = data.map((item) => ({
       Branch: item.major?.name ?? "-",
-      Kelas: item.student?.class.name ?? "-",
+      Kelas: item.student?.class?.name ?? "-",
       "Nama Siswa": item.student?.name ?? "-",
       "No. HP Orang Tua": item.student?.parentPhone ?? "-",
       "No. Kwitansi": item.receiptNumber,
@@ -141,7 +141,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
       Keterangan: item.notes ?? "-",
     }));
 
-    const totalCols = 15;
+    const totalCols = 16;
     const now = new Date();
     const exportDateStr = now.toLocaleDateString("id-ID", {
       day: "2-digit",
@@ -195,14 +195,14 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
       const excelRowIdx = rowIdx + 3; // baris data mulai di index 3 (baris Excel ke-4)
 
       // Jumlah (Rp) — kolom index 6
-      const jumlahCell = XLSX.utils.encode_cell({ r: excelRowIdx, c: 6 });
+      const jumlahCell = XLSX.utils.encode_cell({ r: excelRowIdx, c: 7 });
       if (ws2[jumlahCell]) {
         ws2[jumlahCell].t = "n";
         ws2[jumlahCell].z = "#,##0";
       }
 
       // Tahun — kolom index 5
-      const tahunCell = XLSX.utils.encode_cell({ r: excelRowIdx, c: 5 });
+      const tahunCell = XLSX.utils.encode_cell({ r: excelRowIdx, c: 6 });
       if (ws2[tahunCell]) {
         ws2[tahunCell].t = "n";
         ws2[tahunCell].z = "0";
