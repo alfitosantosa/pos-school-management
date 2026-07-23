@@ -27,7 +27,6 @@ export type KwitansiPDFData = {
   month: string;
   bankRef?: string;
   notes?: string | null;
-
   student?: {
     name: string;
     nisn?: string;
@@ -37,7 +36,6 @@ export type KwitansiPDFData = {
     classId?: string;
     class: { name: string };
   };
-
   major?: {
     name: string;
     code?: string;
@@ -46,13 +44,11 @@ export type KwitansiPDFData = {
     unitName?: string;
     fax?: string;
   };
-
   accountBank?: {
     accountName: string;
     accountBank: string;
     accountNumber: string;
   };
-
   createdBy?: { name: string };
   paymentItems?: PaymentItem[];
 };
@@ -92,30 +88,52 @@ const terbilang = (n: number): string => {
   return terbilang(Math.floor(n / 1_000_000_000)) + " miliar" + (n % 1_000_000_000 ? " " + terbilang(n % 1_000_000_000) : "");
 };
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+const toTerbilang = (v: number) => {
+  if (!v || v === 0) return "Nol Rupiah";
+  const str = terbilang(Math.floor(v));
+  return str.charAt(0).toUpperCase() + str.slice(1) + " Rupiah";
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DESIGN TOKENS
 // ─────────────────────────────────────────────────────────────────────────────
 
-// A5 portrait — cukup luas untuk tabel panjang, tetap ringkas untuk kwitansi
-// react-pdf otomatis membuat halaman baru ketika konten melebihi tinggi page
-const PAGE_W = 420; // ~A5 width in pt (148mm)
-const PAGE_H = 595; // ~A5 height in pt (210mm)
-
-const PAD_H = 18;
+// A5 portrait
+const PW = 420;
+const PH = 595;
+const PH_MARGIN = 20; // horizontal page margin
+const PV_BODY = 10; // vertical body padding top
 
 const C = {
+  // Navy palette — formal
+  navy: "#0F2D4A",
+  navyMid: "#1A4570",
+  navyLt: "#2260A0",
+  navyFade: "#EBF2FA",
+
+  // Text
   ink: "#111827",
   sub: "#374151",
   muted: "#6B7280",
-  hairline: "#D1D5DB",
-  stripe: "#F9FAFB",
-  accent: "#1E3A5F",
-  accentLt: "#2D5288",
+  faint: "#9CA3AF",
+
+  // Surface
   white: "#FFFFFF",
-  paid: "#065F46",
-  pending: "#92400E",
+  offWhite: "#F8FAFC",
+  stripe: "#F1F5F9",
+  border: "#CBD5E1",
+  borderLt: "#E2E8F0",
+
+  // Status
+  green: "#065F46",
+  greenBg: "#ECFDF5",
+  amber: "#92400E",
+  amberBg: "#FFFBEB",
+  red: "#991B1B",
+  redBg: "#FEF2F2",
+
+  // Gold accent line
+  gold: "#2260A0",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -123,7 +141,6 @@ const C = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const S = StyleSheet.create({
-  // ── Page ──────────────────────────────────────────────────────────────────
   page: {
     fontFamily: "Helvetica",
     fontSize: 7,
@@ -131,361 +148,457 @@ const S = StyleSheet.create({
     backgroundColor: C.white,
   },
 
-  // ── HEADER (repeats on every page via `fixed`) ───────────────────────────
+  // ── HEADER ─────────────────────────────────────────────────────────────────
+
+  // Gold rule at very top
+  goldRule: {
+    height: 3,
+    backgroundColor: C.gold,
+  },
+
   header: {
-    backgroundColor: C.accent,
-    paddingHorizontal: PAD_H,
+    backgroundColor: C.navy,
+    paddingHorizontal: PH_MARGIN,
     paddingTop: 10,
+    paddingBottom: 0,
   },
-  headerTop: {
+  headerInner: {
     flexDirection: "row",
-    alignItems: "flex-start",
     justifyContent: "space-between",
-    paddingBottom: 8,
+    alignItems: "flex-start",
+    paddingBottom: 10,
   },
-  headerLeft: { flex: 1 },
-  headerInstitution: {
+
+  // Left: institution
+  instBlock: { flex: 1, paddingRight: 16 },
+  instName: {
     color: C.white,
-    fontSize: 10,
+    fontSize: 9.5,
     fontFamily: "Helvetica-Bold",
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
+    marginBottom: 2,
   },
-  headerUnit: {
+  instUnit: {
     color: "#93C5FD",
-    fontSize: 7,
-    marginTop: 2,
+    fontSize: 6.5,
+    marginBottom: 3,
     letterSpacing: 0.2,
   },
-  headerAddress: {
-    color: "#CBD5E1",
-    fontSize: 6,
-    marginTop: 3,
-    lineHeight: 1.5,
+  instDivider: {
+    height: 0.5,
+    backgroundColor: "#2D6EA8",
+    marginBottom: 4,
+    width: 60,
   },
-  headerRight: {
-    alignItems: "flex-end",
-    minWidth: 120,
+  instAddr: {
+    color: "#94A3B8",
+    fontSize: 5.5,
+    lineHeight: 1.7,
   },
-  headerDocLabel: {
+
+  // Right: document identity
+  docBlock: { alignItems: "flex-end", minWidth: 130 },
+  docType: {
     color: "#93C5FD",
-    fontSize: 6,
-    letterSpacing: 1.5,
+    fontSize: 5.5,
+    letterSpacing: 2,
     textTransform: "uppercase",
+    marginBottom: 2,
+  },
+  docTitle: {
+    color: C.white,
+    fontSize: 16,
+    fontFamily: "Helvetica-Bold",
+    letterSpacing: 1,
     marginBottom: 3,
   },
-  headerDocTitle: {
-    color: C.white,
-    fontSize: 13,
+  docNoLabel: { color: "#94A3B8", fontSize: 5.5, marginBottom: 1 },
+  docNo: {
+    color: "#BFDBFE",
+    fontSize: 7,
     fontFamily: "Helvetica-Bold",
     letterSpacing: 0.5,
   },
-  headerDocNo: {
-    color: "#BFDBFE",
-    fontSize: 6.5,
-    marginTop: 3,
-  },
 
-  headerMeta: {
-    backgroundColor: C.accentLt,
+  // Meta strip below header
+  metaStrip: {
+    backgroundColor: C.navyMid,
+    paddingHorizontal: PH_MARGIN,
+    paddingVertical: 5,
     flexDirection: "row",
-    paddingHorizontal: PAD_H,
-    paddingVertical: 6,
     justifyContent: "space-between",
-  },
-  headerMetaCol: {
-    flexDirection: "row",
     alignItems: "center",
-    gap: 4,
   },
-  headerMetaLabel: { color: "#93C5FD", fontSize: 6.5 },
-  headerMetaValue: { color: C.white, fontSize: 6.5, fontFamily: "Helvetica-Bold" },
+  metaItem: { flexDirection: "row", alignItems: "center", gap: 3 },
+  metaLabel: { color: "#93C5FD", fontSize: 6 },
+  metaValue: { color: C.white, fontSize: 6, fontFamily: "Helvetica-Bold" },
 
-  badge: {
-    borderRadius: 2,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-  },
-  badgePaid: { backgroundColor: C.paid },
-  badgePending: { backgroundColor: C.pending },
-  badgeText: { fontSize: 6, fontFamily: "Helvetica-Bold", color: C.white },
+  // Status badge
+  badge: { borderRadius: 2, paddingHorizontal: 5, paddingVertical: 2 },
+  badgePaid: { backgroundColor: C.green },
+  badgePending: { backgroundColor: C.amber },
+  badgeOverdue: { backgroundColor: C.red },
+  badgeText: { color: C.white, fontSize: 5.5, fontFamily: "Helvetica-Bold", letterSpacing: 0.3 },
 
-  // small continuation banner shown on page 2+
-  continuationBar: {
-    backgroundColor: C.stripe,
-    paddingHorizontal: PAD_H,
-    paddingVertical: 4,
-    borderBottomWidth: 0.5,
-    borderBottomColor: C.hairline,
-  },
-  continuationText: {
-    fontSize: 6,
-    color: C.muted,
-    fontFamily: "Helvetica-Oblique",
-  },
+  // ── STUDENT INFO BAR ───────────────────────────────────────────────────────
 
-  // ── BODY ──────────────────────────────────────────────────────────────────
-  body: {
-    paddingHorizontal: PAD_H,
-    paddingTop: 8,
-  },
-
-  infoRow: {
-    flexDirection: "row",
-    borderWidth: 0.5,
-    borderColor: C.hairline,
-    borderRadius: 2,
-    marginBottom: 8,
+  studentBar: {
+    marginHorizontal: PH_MARGIN,
+    marginTop: 9,
+    marginBottom: 9,
+    borderWidth: 0.75,
+    borderColor: C.border,
+    borderRadius: 3,
     overflow: "hidden",
   },
-  infoCell: {
-    flex: 1,
-    paddingHorizontal: 7,
-    paddingVertical: 5,
-    borderRightWidth: 0.5,
-    borderRightColor: C.hairline,
+  studentBarHeader: {
+    backgroundColor: C.navyFade,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderBottomWidth: 0.75,
+    borderBottomColor: C.border,
   },
-  infoCellLast: {
+  studentBarHeaderText: {
+    fontSize: 5.5,
+    color: C.navyLt,
+    fontFamily: "Helvetica-Bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  studentBarBody: {
+    flexDirection: "row",
+    backgroundColor: C.white,
+  },
+  studentCell: {
     flex: 1,
-    paddingHorizontal: 7,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRightWidth: 0.75,
+    borderRightColor: C.borderLt,
+  },
+  studentCellLast: {
+    flex: 1,
+    paddingHorizontal: 8,
     paddingVertical: 5,
   },
-  infoLabel: { fontSize: 5.5, color: C.muted, marginBottom: 2, textTransform: "uppercase", letterSpacing: 0.5 },
-  infoValue: { fontSize: 7, fontFamily: "Helvetica-Bold", color: C.ink },
+  cellLabel: {
+    fontSize: 5,
+    color: C.faint,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  cellValue: {
+    fontSize: 6.5,
+    color: C.ink,
+    fontFamily: "Helvetica-Bold",
+  },
 
-  // Table
+  // ── TABLE ──────────────────────────────────────────────────────────────────
+
+  tableWrap: {
+    marginHorizontal: PH_MARGIN,
+  },
   tableHead: {
     flexDirection: "row",
-    backgroundColor: C.ink,
+    backgroundColor: C.navy,
     paddingVertical: 5,
     paddingHorizontal: 6,
   },
   th: {
     color: C.white,
-    fontSize: 6,
+    fontSize: 5.5,
     fontFamily: "Helvetica-Bold",
-    letterSpacing: 0.3,
+    letterSpacing: 0.4,
     textTransform: "uppercase",
   },
-  tableRow: {
+  tableRowEven: {
     flexDirection: "row",
-    borderBottomWidth: 0.5,
-    borderBottomColor: C.hairline,
-    paddingVertical: 4.5,
-    paddingHorizontal: 6,
     backgroundColor: C.white,
-  },
-  tableRowAlt: {
-    flexDirection: "row",
-    borderBottomWidth: 0.5,
-    borderBottomColor: C.hairline,
-    paddingVertical: 4.5,
+    paddingVertical: 5,
     paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: C.borderLt,
+  },
+  tableRowOdd: {
+    flexDirection: "row",
     backgroundColor: C.stripe,
+    paddingVertical: 5,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: C.borderLt,
   },
   td: { fontSize: 6.5, color: C.sub },
   tdBold: { fontSize: 6.5, color: C.ink, fontFamily: "Helvetica-Bold" },
+  tdMono: { fontSize: 6.5, color: C.navyLt, fontFamily: "Helvetica-Bold" },
 
-  cNo: { width: "6%" },
-  cName: { width: "37%" },
-  cPeriod: { width: "18%", textAlign: "center" },
-  cType: { width: "16%", textAlign: "center" },
-  cQty: { width: "8%", textAlign: "center" },
-  cAmt: { width: "15%", textAlign: "right" },
+  // Column widths
+  colNo: { width: "5%" },
+  colName: { width: "36%" },
+  colPeriod: { width: "17%", textAlign: "center" as const },
+  colType: { width: "15%", textAlign: "center" as const },
+  colQty: { width: "8%", textAlign: "center" as const },
+  colAmt: { width: "19%", textAlign: "right" as const },
 
-  // running subtotal shown at the bottom of every page when content continues
-  pageSubtotalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#EEF2F7",
-    paddingVertical: 4,
-    paddingHorizontal: 6,
-    marginTop: 4,
-    borderRadius: 2,
+  // Gold rule below table body
+  tableBottomRule: {
+    marginHorizontal: PH_MARGIN,
+    height: 1.5,
+    backgroundColor: C.gold,
   },
-  pageSubtotalLabel: { fontSize: 6, color: C.muted, fontFamily: "Helvetica-Oblique" },
-  pageSubtotalValue: { fontSize: 6, color: C.sub, fontFamily: "Helvetica-Bold" },
 
-  // Totals block (only on last page)
-  totalWrap: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  // ── TOTALS SECTION ─────────────────────────────────────────────────────────
+
+  totalsWrap: {
+    marginHorizontal: PH_MARGIN,
     marginTop: 8,
-    alignItems: "flex-end",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
   },
+
+  // Terbilang box
   terbilangBox: {
     flex: 1,
-    borderWidth: 0.5,
-    borderColor: C.hairline,
-    borderRadius: 2,
-    padding: 6,
-    marginRight: 10,
+    borderWidth: 0.75,
+    borderColor: C.border,
+    borderRadius: 3,
+    overflow: "hidden",
   },
-  terbilangLabel: { fontSize: 5.5, color: C.muted, marginBottom: 3, textTransform: "uppercase", letterSpacing: 0.5 },
-  terbilangText: { fontSize: 6.5, color: C.ink, fontFamily: "Helvetica-Oblique", lineHeight: 1.5 },
-
-  totalBox: { width: 165 },
-  totalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  terbilangHeader: {
+    backgroundColor: C.navyFade,
+    paddingHorizontal: 7,
     paddingVertical: 3,
-    borderBottomWidth: 0.5,
-    borderBottomColor: C.hairline,
+    borderBottomWidth: 0.75,
+    borderBottomColor: C.border,
   },
-  totalLabel: { fontSize: 6.5, color: C.muted },
-  totalValue: { fontSize: 6.5, color: C.sub },
-  grandRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: C.accent,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderRadius: 2,
-    marginTop: 4,
-  },
-  grandLabel: { fontSize: 8, fontFamily: "Helvetica-Bold", color: C.white },
-  grandValue: { fontSize: 8, fontFamily: "Helvetica-Bold", color: C.white },
-
-  // ── FOOTER (only rendered after the table is fully done, i.e. last page) ──
-  footerSpacer: { marginTop: 10 },
-  footer: {
-    borderTopWidth: 0.5,
-    borderTopColor: C.hairline,
-    paddingHorizontal: PAD_H,
-    paddingTop: 8,
-    paddingBottom: 8,
-  },
-  footerInner: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  footerSection: { flex: 1, marginRight: 10 },
-  footerSectionMid: { alignItems: "center", width: 90, marginRight: 10 },
-  footerSectionLast: { alignItems: "center", width: 90 },
-  footerSectionLabel: {
+  terbilangHeaderText: {
     fontSize: 5.5,
-    color: C.muted,
+    color: C.navyLt,
     fontFamily: "Helvetica-Bold",
     textTransform: "uppercase",
     letterSpacing: 0.5,
-    marginBottom: 3,
-    borderBottomWidth: 0.5,
-    borderBottomColor: C.hairline,
-    paddingBottom: 2,
   },
-  footerText: { fontSize: 6.5, color: C.sub, lineHeight: 1.7 },
-  sigSpace: { height: 24 },
-  sigLine: { borderBottomWidth: 0.5, borderBottomColor: C.ink, marginBottom: 3, width: "100%" },
-  sigName: { fontSize: 6.5, fontFamily: "Helvetica-Bold", color: C.ink, textAlign: "center" },
-  sigRole: { fontSize: 6, color: C.muted, textAlign: "center" },
+  terbilangBody: {
+    paddingHorizontal: 7,
+    paddingVertical: 5,
+  },
+  terbilangText: {
+    fontSize: 6.5,
+    color: C.ink,
+    fontFamily: "Helvetica-Oblique",
+    lineHeight: 1.6,
+  },
+  notesLabel: {
+    fontSize: 5,
+    color: C.faint,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginTop: 5,
+    marginBottom: 1,
+  },
+  notesText: {
+    fontSize: 6.5,
+    color: C.sub,
+    lineHeight: 1.5,
+  },
 
-  // page footer note (every page)
-  pageFooterNote: {
-    paddingHorizontal: PAD_H,
-    paddingTop: 6,
-    paddingBottom: 10,
+  // Total box
+  totalBox: {
+    width: 155,
+  },
+  totalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: C.borderLt,
   },
-  pageFooterText: { fontSize: 5.5, color: C.muted },
-  pageNumber: { fontSize: 5.5, color: C.muted, fontFamily: "Helvetica-Bold" },
+  totalRowAlt: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: C.borderLt,
+    backgroundColor: C.stripe,
+  },
+  totalLabel: { fontSize: 6, color: C.muted },
+  totalValue: { fontSize: 6, color: C.sub },
+  grandRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: C.navy,
+    paddingVertical: 7,
+    paddingHorizontal: 8,
+    marginTop: 3,
+    borderRadius: 2,
+  },
+  grandLabel: { fontSize: 8, fontFamily: "Helvetica-Bold", color: C.white, letterSpacing: 0.3 },
+  grandValue: { fontSize: 8, fontFamily: "Helvetica-Bold", color: C.white },
+
+  // ── FOOTER ─────────────────────────────────────────────────────────────────
+
+  footerWrap: {
+    marginTop: 10,
+    marginHorizontal: PH_MARGIN,
+    borderWidth: 0.75,
+    borderColor: C.border,
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  footerHeader: {
+    backgroundColor: C.navyFade,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderBottomWidth: 0.75,
+    borderBottomColor: C.border,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  footerHeaderText: {
+    fontSize: 5.5,
+    color: C.navyLt,
+    fontFamily: "Helvetica-Bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  footerHeaderValid: {
+    fontSize: 5.5,
+    color: C.green,
+    fontFamily: "Helvetica-Oblique",
+  },
+  footerBody: {
+    flexDirection: "row",
+    backgroundColor: C.white,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    gap: 0,
+  },
+
+  footerCol: {
+    flex: 1,
+    paddingRight: 10,
+    borderRightWidth: 0.5,
+    borderRightColor: C.borderLt,
+    marginRight: 10,
+  },
+  footerColLast: {
+    alignItems: "center" as const,
+    width: 80,
+  },
+  footerColMid: {
+    alignItems: "center" as const,
+    width: 80,
+    paddingRight: 10,
+    borderRightWidth: 0.5,
+    borderRightColor: C.borderLt,
+    marginRight: 10,
+  },
+  footerColLabel: {
+    fontSize: 5.5,
+    color: C.navyLt,
+    fontFamily: "Helvetica-Bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 4,
+    paddingBottom: 2,
+    borderBottomWidth: 0.5,
+    borderBottomColor: C.borderLt,
+  },
+  footerText: { fontSize: 6, color: C.sub, lineHeight: 1.8 },
+  footerTextBold: { fontSize: 6, color: C.ink, fontFamily: "Helvetica-Bold" },
+
+  sigSpace: { height: 44 },
+  sigLine: {
+    borderBottomWidth: 0.75,
+    borderBottomColor: C.ink,
+    marginBottom: 3,
+    width: "100%",
+  },
+  sigName: {
+    fontSize: 6.5,
+    fontFamily: "Helvetica-Bold",
+    color: C.ink,
+    textAlign: "center" as const,
+  },
+  sigRole: {
+    fontSize: 5.5,
+    color: C.muted,
+    textAlign: "center" as const,
+    marginTop: 1,
+  },
+
+  // ── OPERATOR STRIP ─────────────────────────────────────────────────────────
+  operatorStrip: {
+    marginTop: 0,
+    backgroundColor: C.navy,
+    paddingHorizontal: PH_MARGIN,
+    paddingVertical: 4,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  operatorText: { fontSize: 5, color: "#94A3B8" },
+
+  // ── PAGE FOOTER (fixed, every page) ───────────────────────────────────────
+  pageFooter: {
+    paddingHorizontal: PH_MARGIN,
+    paddingTop: 5,
+    paddingBottom: 6,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderTopWidth: 0.5,
+    borderTopColor: C.borderLt,
+  },
+  pageFooterText: { fontSize: 5, color: C.faint },
+
+  // ── CONTINUATION BANNER (page 2+) ─────────────────────────────────────────
+  continuationBar: {
+    backgroundColor: C.navyFade,
+    paddingHorizontal: PH_MARGIN,
+    paddingVertical: 4,
+    borderBottomWidth: 0.75,
+    borderBottomColor: C.border,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  continuationText: { fontSize: 5.5, color: C.navyLt, fontFamily: "Helvetica-Oblique" },
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SUB-COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
-function MetaField({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={S.headerMetaCol}>
-      <Text style={S.headerMetaLabel}>{label}:</Text>
-      <Text style={S.headerMetaValue}>{value}</Text>
-    </View>
-  );
-}
-
-function InfoCell({ label, value, last }: { label: string; value: string; last?: boolean }) {
-  return (
-    <View style={last ? S.infoCellLast : S.infoCell}>
-      <Text style={S.infoLabel}>{label}</Text>
-      <Text style={S.infoValue}>{value}</Text>
-    </View>
-  );
-}
+const INSTITUTION = {
+  name: "YAYASAN PENDIDIKAN RAHMANY",
+  address: "Jl. Lapangan Member, Blok C No. 11, Sukmajaya, Depok 16412",
+  phone: "(021) 77833598",
+  fax: "(021) 77835420",
+};
 
 function StatusBadge({ status }: { status: string }) {
-  const isPaid = status.toLowerCase() === "paid" || status.toLowerCase() === "lunas";
+  const s = status.toLowerCase();
+  const isPaid = s === "paid" || s === "lunas";
+  const isOverdue = s === "overdue" || s === "terlambat";
+  const badgeStyle =
+    isPaid ? S.badgePaid
+    : isOverdue ? S.badgeOverdue
+    : S.badgePending;
+  const label =
+    isPaid ? "LUNAS"
+    : isOverdue ? "TERLAMBAT"
+    : "MENUNGGU";
   return (
-    <View style={[S.badge, isPaid ? S.badgePaid : S.badgePending]}>
-      <Text style={S.badgeText}>{isPaid ? "LUNAS" : status.toUpperCase()}</Text>
-    </View>
-  );
-}
-
-// Header yang berulang di setiap halaman (pakai `fixed` agar react-pdf
-// otomatis menempatkannya di setiap page baru ketika konten overflow)
-function RepeatingHeader({ data, isFirstPage }: { data: KwitansiPDFData; isFirstPage: boolean }) {
-  const institution = {
-    name: "YAYASAN PENDIDIKAN RAHMANY",
-    address: "Jl. Lapangan Member, Blok C No.11 Sukmajaya - Depok 16412",
-    phone: "(021) 77833598",
-    fax: "(021) 77835420",
-  };
-
-  const unitName = data.major?.unitName ?? data.major?.name ?? "";
-  const unitPhone = data.major?.phone ?? institution.phone;
-  const unitFax = data.major?.fax ?? institution.fax;
-
-  return (
-    <>
-      <View style={S.header} fixed>
-        <View style={S.headerTop}>
-          <View style={S.headerLeft}>
-            <Text style={S.headerInstitution}>{unitName || institution.name}</Text>
-            {unitName ? <Text style={S.headerUnit}>{institution.name}</Text> : null}
-            <Text style={S.headerAddress}>
-              {data.major?.address ?? institution.address}
-              {"\n"}
-              Telp. {unitPhone}
-              {unitFax ? `  |  Fax. ${unitFax}` : ""}
-            </Text>
-          </View>
-
-          <View style={S.headerRight}>
-            <Text style={S.headerDocLabel}>Bukti Transaksi</Text>
-            <Text style={S.headerDocTitle}>KWITANSI</Text>
-            <Text style={S.headerDocNo}>No. {data.receiptNumber}</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={S.headerMeta} fixed>
-        <MetaField label="Tanggal" value={fmtDate(data.paymentDate)} />
-        <MetaField label="Bulan Bayar" value={data.month} />
-        <MetaField label="Cara Bayar" value={data.bankRef ?? "-"} />
-        <View style={S.headerMetaCol}>
-          <Text style={S.headerMetaLabel}>Status:</Text>
-          <StatusBadge status={data.status} />
-        </View>
-      </View>
-
-      {/* Banner "lanjutan" hanya tampil estetis di halaman 2+ — karena react-pdf
-          tidak punya conditional-by-page-number native, kita pakai render prop
-          `render` pada Text dengan pageNumber dari context */}
-      {!isFirstPage && (
-        <View style={S.continuationBar}>
-          <Text style={S.continuationText}>Lanjutan rincian transaksi — Kwitansi No. {data.receiptNumber}</Text>
-        </View>
-      )}
-    </>
-  );
-}
-
-// Page footer note — nomor halaman, muncul di setiap page (fixed)
-function PageFooterNote({ data }: { data: KwitansiPDFData }) {
-  return (
-    <View style={S.pageFooterNote} fixed>
-      <Text style={S.pageFooterText} render={({ pageNumber, totalPages }) => (totalPages > 1 ? `Halaman ${pageNumber} dari ${totalPages}` : "")} />
-      <Text style={S.pageNumber} render={({ pageNumber, totalPages }) => `${data.receiptNumber}`} />
+    <View style={[S.badge, badgeStyle]}>
+      <Text style={S.badgeText}>{label}</Text>
     </View>
   );
 }
@@ -497,187 +610,255 @@ function PageFooterNote({ data }: { data: KwitansiPDFData }) {
 function KwitansiDocument({ data }: { data: KwitansiPDFData }) {
   const items = data.paymentItems ?? [];
   const total = Number(data.amount);
-  const subTotal = items.reduce((s, i) => s + i.subtotal, 0);
-  const isDiff = subTotal !== total;
-
-  const institution = {
-    name: "YAYASAN PENDIDIKAN RAHMANY",
-    address: "Jl. Lapangan Member, Blok C No.11 Sukmajaya - Depok 16412",
-    phone: "(021) 77833598",
-    fax: "(021) 77835420",
-  };
+  const unitName = data.major?.unitName ?? data.major?.name ?? "";
+  const phone = data.major?.phone ?? INSTITUTION.phone;
+  const fax = data.major?.fax ?? INSTITUTION.fax;
+  const address = data.major?.address ?? INSTITUTION.address;
 
   return (
     <Document>
-      {/*
-        ✅ KUNCI MULTI-PAGE: hanya SATU <Page> dengan `wrap` (default true).
-        react-pdf akan otomatis memecah konten ke halaman baru ketika
-        body melebihi tinggi page. Header/footer dengan `fixed` akan
-        otomatis berulang di setiap halaman yang dihasilkan.
-      */}
-      <Page size={[PAGE_W, PAGE_H]} style={S.page} wrap>
-        {/* ═══ HEADER — berulang otomatis di setiap halaman ═══ */}
-        <RepeatingHeader data={data} isFirstPage={true} />
+      <Page size={[PW, PH]} style={S.page} wrap>
+        {/* ══════════════════════════════════════════
+            GOLD TOP RULE — fixed, every page
+        ══════════════════════════════════════════ */}
+        <View style={S.goldRule} fixed />
 
-        {/* ═══ BODY ═══ */}
-        <View style={S.body}>
-          {/* Student info bar — hanya tampil natural di halaman pertama
-              karena diletakkan sebelum tabel; saat tabel overflow ke
-              halaman 2, info bar ini tidak diulang (sesuai praktik kwitansi) */}
-          <View style={S.infoRow}>
-            <InfoCell label="NIS / NISN" value={data.student?.nisn ?? "-"} />
-            <InfoCell label="Nama Siswa" value={data.student?.name ?? "-"} />
-            <InfoCell label="Kelas" value={data.student?.class?.name ?? "-"} />
-            <InfoCell label="No. HP Wali" value={data.student?.parentPhone ?? "-"} last />
-          </View>
-
-          {/* ── Payment Items Table — header tabel ikut berulang ── */}
-          <View style={S.tableHead} fixed>
-            <Text style={[S.th, S.cNo]}>#</Text>
-            <Text style={[S.th, S.cName]}>Keterangan Transaksi</Text>
-            <Text style={[S.th, S.cPeriod]}>Periode</Text>
-            <Text style={[S.th, S.cType]}>Jenis</Text>
-            <Text style={[S.th, S.cQty]}>Qty</Text>
-            <Text style={[S.th, S.cAmt]}>Jumlah (Rp)</Text>
-          </View>
-
-          {/*
-            ✅ Setiap baris dibungkus `wrap={false}` agar satu baris item
-            TIDAK terpotong di antara dua halaman — react-pdf akan
-            memindahkan baris yang tidak cukup muat ke halaman berikutnya
-            secara utuh, bukan terpotong di tengah.
-          */}
-          {items.map((item, i) => (
-            <View key={item.id} style={i % 2 === 0 ? S.tableRow : S.tableRowAlt} wrap={false}>
-              <Text style={[S.td, S.cNo]}>{i + 1}</Text>
-              <Text style={[S.tdBold, S.cName]}>{item.name}</Text>
-              <Text style={[S.td, S.cPeriod]}>
-                {item.month} / {item.year}
+        {/* ══════════════════════════════════════════
+            HEADER — fixed, every page
+        ══════════════════════════════════════════ */}
+        <View style={S.header} fixed>
+          <View style={S.headerInner}>
+            {/* Left: institution identity */}
+            <View style={S.instBlock}>
+              <Text style={S.instName}>{unitName || INSTITUTION.name}</Text>
+              {unitName ?
+                <Text style={S.instUnit}>{INSTITUTION.name}</Text>
+              : null}
+              <View style={S.instDivider} />
+              <Text style={S.instAddr}>
+                {address}
+                {"\n"}
+                Telp. {phone}
+                {fax ? `  ·  Fax. ${fax}` : ""}
               </Text>
-              <Text style={[S.td, S.cType]}>{item.skuType}</Text>
-              <Text style={[S.td, S.cQty]}>{item.quantity}</Text>
-              <Text style={[S.td, S.cAmt]}>{fmt(item.subtotal)}</Text>
-            </View>
-          ))}
-
-          {/*
-            ✅ Totals & Terbilang dibungkus `wrap={false}` agar blok ini
-            tidak terpotong di antara dua halaman — kalau tidak cukup
-            muat di sisa halaman saat ini, otomatis pindah ke halaman
-            berikutnya secara keseluruhan.
-          */}
-          <View style={S.totalWrap} wrap={false}>
-            <View style={S.terbilangBox}>
-              <Text style={S.terbilangLabel}>Terbilang</Text>
-              <Text style={S.terbilangText}>{capitalize(terbilang(total))} rupiah</Text>
-              {data.notes ? (
-                <>
-                  <Text style={[S.terbilangLabel, { marginTop: 5 }]}>Catatan</Text>
-                  <Text style={S.terbilangText}>{data.notes}</Text>
-                </>
-              ) : null}
             </View>
 
-            <View style={S.totalBox}>
-              <View style={S.totalRow}>
-                <Text style={S.totalLabel}>Jumlah Item</Text>
-                <Text style={S.totalValue}>{items.length} item</Text>
-              </View>
-              {/* {isDiff && (
-                <View style={S.totalRow}>
-                  <Text style={S.totalLabel}>Subtotal</Text>
-                  <Text style={S.totalValue}>Rp {fmt(subTotal)}</Text>
-                </View>
-              )} */}
-              {data.bankRef && (
-                <View style={S.totalRow}>
-                  <Text style={S.totalLabel}>Metode</Text>
-                  <Text style={S.totalValue}>{data.bankRef}</Text>
-                </View>
-              )}
-              <View style={S.grandRow}>
-                <Text style={S.grandLabel}>TOTAL</Text>
-                <Text style={S.grandValue}>Rp {fmt(total)}</Text>
-              </View>
-            </View>
-          </View>
-
-          {/*
-            ✅ Footer tanda tangan & info bank dibungkus `wrap={false}`
-            sehingga selalu utuh — kalau ruang tidak cukup di halaman
-            saat ini, react-pdf otomatis memindahkannya ke page baru.
-          */}
-          <View style={S.footerSpacer} wrap={false}>
-            <View style={S.footer}>
-              <View style={S.footerInner}>
-                <View style={S.footerSection}>
-                  <Text style={S.footerSectionLabel}>Informasi Rekening</Text>
-                  <Text style={S.footerText}>
-                    Bank : {data.accountBank?.accountBank ?? "-"}
-                    {"\n"}
-                    No. Rekening : {data.accountBank?.accountNumber ?? "-"}
-                    {"\n"}
-                    Atas Nama : {data.accountBank?.accountName ?? "-"}
-                  </Text>
-                </View>
-
-                <View style={[S.footerSection, { flex: 2 }]}>
-                  <Text style={S.footerSectionLabel}>Keterangan</Text>
-                  <Text style={S.footerText}>
-                    Bukti Transaksi ini sah tanpa tanda tangan dan stempel basah apabila{"\n"}
-                    tercatat dalam sistem informasi keuangan sekolah.
-                  </Text>
-                </View>
-
-                <View style={S.footerSectionMid}>
-                  <Text style={S.footerSectionLabel}>Pemberi</Text>
-                  <View style={S.sigSpace} />
-                  <View style={S.sigLine} />
-                  <Text style={S.sigName}>{data.student?.name?.split(" ").slice(0, 2).join(" ") ?? ""}</Text>
-                  <Text style={S.sigRole}>Siswa / Wali</Text>
-                </View>
-
-                <View style={S.footerSectionLast}>
-                  <Text style={S.footerSectionLabel}>Penerima</Text>
-                  <View style={S.sigSpace} />
-                  <View style={S.sigLine} />
-                  <Text style={S.sigName}>{data.createdBy?.name ?? ""}</Text>
-                  <Text style={S.sigRole}>Bendahara</Text>
-                </View>
-              </View>
-            </View>
-
-            <View
-              style={{
-                backgroundColor: C.stripe,
-                borderTopWidth: 0.5,
-                borderTopColor: C.hairline,
-                paddingHorizontal: PAD_H,
-                paddingVertical: 4,
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={{ fontSize: 5.5, color: C.muted }}>
-                Dicetak oleh: {data.createdBy?.name ?? "-"} · {fmtDateTime(data.paymentDate)}
-              </Text>
-              <Text style={{ fontSize: 5.5, color: C.muted }}>
-                {institution.phone}
-                {institution.fax ? `  |  Fax. ${institution.fax}` : ""}
-              </Text>
+            {/* Right: document identity */}
+            <View style={S.docBlock}>
+              <Text style={S.docType}>Bukti Transaksi</Text>
+              <Text style={S.docTitle}>KWITANSI</Text>
+              <Text style={S.docNoLabel}>Nomor Dokumen</Text>
+              <Text style={S.docNo}>{data.receiptNumber}</Text>
             </View>
           </View>
         </View>
 
-        {/* ═══ Nomor halaman — muncul di setiap halaman, di posisi bawah ═══ */}
-        <PageFooterNote data={data} />
+        {/* Meta strip — fixed, every page */}
+        <View style={S.metaStrip} fixed>
+          <View style={S.metaItem}>
+            <Text style={S.metaLabel}>Tanggal Bayar :</Text>
+            <Text style={S.metaValue}>{fmtDate(data.paymentDate)}</Text>
+          </View>
+          <View style={S.metaItem}>
+            <Text style={S.metaLabel}>Bulan Tagihan :</Text>
+            <Text style={S.metaValue}>{data.month}</Text>
+          </View>
+          <View style={S.metaItem}>
+            <Text style={S.metaLabel}>Metode / Ref :</Text>
+            <Text style={S.metaValue}>{data.bankRef ?? "-"}</Text>
+          </View>
+          <View style={S.metaItem}>
+            <Text style={S.metaLabel}>Status :</Text>
+            <StatusBadge status={data.status} />
+          </View>
+        </View>
+
+        {/* ══════════════════════════════════════════
+            BODY
+        ══════════════════════════════════════════ */}
+
+        {/* Student info bar */}
+        <View style={S.studentBar}>
+          <View style={S.studentBarHeader}>
+            <Text style={S.studentBarHeaderText}>Data Siswa</Text>
+          </View>
+          <View style={S.studentBarBody}>
+            <View style={S.studentCell}>
+              <Text style={S.cellLabel}>NIS / NISN</Text>
+              <Text style={S.cellValue}>{data.student?.nisn ?? "-"}</Text>
+            </View>
+            <View style={S.studentCell}>
+              <Text style={S.cellLabel}>Nama Lengkap</Text>
+              <Text style={S.cellValue}>{data.student?.name ?? "-"}</Text>
+            </View>
+            <View style={S.studentCell}>
+              <Text style={S.cellLabel}>Kelas</Text>
+              <Text style={S.cellValue}>{data.student?.class?.name ?? "-"}</Text>
+            </View>
+            <View style={S.studentCell}>
+              <Text style={S.cellLabel}>No. HP Orang Tua / Wali</Text>
+              <Text style={S.cellValue}>{data.student?.parentPhone ?? "-"}</Text>
+            </View>
+            <View style={S.studentCellLast}>
+              <Text style={S.cellLabel}>Email</Text>
+              <Text style={S.cellValue}>{data.student?.email ?? "-"}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Payment Items Table ── */}
+        <View style={S.tableWrap}>
+          {/* Table header — fixed so it repeats on every page */}
+          <View style={S.tableHead} fixed>
+            <Text style={[S.th, S.colNo]}>#</Text>
+            <Text style={[S.th, S.colName]}>Keterangan / Nama Tagihan</Text>
+            <Text style={[S.th, S.colPeriod]}>Periode</Text>
+            <Text style={[S.th, S.colType]}>Jenis</Text>
+            <Text style={[S.th, S.colQty]}>Qty</Text>
+            <Text style={[S.th, S.colAmt]}>Jumlah (Rp)</Text>
+          </View>
+
+          {/* Rows — wrap={false} prevents a row from splitting across pages */}
+          {items.map((item, i) => (
+            <View key={item.id} style={i % 2 === 0 ? S.tableRowEven : S.tableRowOdd} wrap={false}>
+              <Text style={[S.td, S.colNo]}>{i + 1}</Text>
+              <Text style={[S.tdBold, S.colName]}>{item.name}</Text>
+              <Text style={[S.td, S.colPeriod]}>
+                {item.month} / {item.year}
+              </Text>
+              <Text style={[S.td, S.colType]}>{item.skuType}</Text>
+              <Text style={[S.td, S.colQty]}>{item.quantity}</Text>
+              <Text style={[S.tdMono, S.colAmt]}>{fmt(item.subtotal)}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Gold rule after table */}
+        <View style={S.tableBottomRule} />
+
+        {/* ── Totals & Terbilang — wrap={false}: moves as a unit to next page ── */}
+        <View style={S.totalsWrap} wrap={false}>
+          {/* Terbilang box */}
+          <View style={S.terbilangBox}>
+            <View style={S.terbilangHeader}>
+              <Text style={S.terbilangHeaderText}>Terbilang</Text>
+            </View>
+            <View style={S.terbilangBody}>
+              <Text style={S.terbilangText}>{toTerbilang(total)}</Text>
+              {data.notes ?
+                <>
+                  <Text style={S.notesLabel}>Catatan</Text>
+                  <Text style={S.notesText}>{data.notes}</Text>
+                </>
+              : null}
+            </View>
+          </View>
+
+          {/* Breakdown + Grand Total */}
+          <View style={S.totalBox}>
+            <View style={S.totalRow}>
+              <Text style={S.totalLabel}>Jumlah Item</Text>
+              <Text style={S.totalValue}>{items.length} tagihan</Text>
+            </View>
+            <View style={S.totalRowAlt}>
+              <Text style={S.totalLabel}>Bank / Rekening</Text>
+              <Text style={S.totalValue}>{data.accountBank?.accountBank ?? "-"}</Text>
+            </View>
+            {data.bankRef ?
+              <View style={S.totalRow}>
+                <Text style={S.totalLabel}>Referensi Bank</Text>
+                <Text style={S.totalValue}>{data.bankRef}</Text>
+              </View>
+            : null}
+            <View style={S.grandRow}>
+              <Text style={S.grandLabel}>TOTAL BAYAR</Text>
+              <Text style={S.grandValue}>Rp {fmt(total)}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Footer: rekening + tanda tangan — wrap={false} ── */}
+        <View style={S.footerWrap} wrap={false}>
+          <View style={S.footerHeader}>
+            <Text style={S.footerHeaderText}>Tanda Tangan &amp; Informasi</Text>
+            <Text style={S.footerHeaderValid}>Dokumen ini sah apabila tercatat dalam sistem keuangan sekolah.</Text>
+          </View>
+
+          <View style={S.footerBody}>
+            {/* Rekening */}
+            <View style={S.footerCol}>
+              <Text style={S.footerColLabel}>Informasi Rekening</Text>
+              <Text style={S.footerText}>
+                <Text>Bank</Text>
+                {"\n"}
+                <Text style={S.footerTextBold}>{data.accountBank?.accountBank ?? "-"}</Text>
+                {"\n"}
+                <Text>No. Rekening</Text>
+                {"\n"}
+                <Text style={S.footerTextBold}>{data.accountBank?.accountNumber ?? "-"}</Text>
+                {"\n"}
+                <Text> Atas Nama</Text>
+                {"\n"}
+                <Text style={S.footerTextBold}>{data.accountBank?.accountName ?? "-"}</Text>
+              </Text>
+            </View>
+
+            {/* Keterangan */}
+            <View style={S.footerCol}>
+              <Text style={S.footerColLabel}>Validitas</Text>
+              <Text style={S.footerText}>Kwitansi ini merupakan bukti pembayaran resmi yang diterbitkan oleh bagian keuangan. Harap disimpan sebagai arsip pribadi.</Text>
+            </View>
+
+            {/* Sig: pemberi */}
+            <View style={S.footerColMid}>
+              <Text style={S.footerColLabel}>Pemberi</Text>
+              <View style={S.sigSpace} />
+              <View style={S.sigLine} />
+              <Text style={S.sigName}>{data.student?.name?.split(" ").slice(0, 2).join(" ") ?? ""}</Text>
+              <Text style={S.sigRole}>Siswa / Wali Murid</Text>
+            </View>
+
+            {/* Sig: penerima */}
+            <View style={S.footerColLast}>
+              <Text style={S.footerColLabel}>Penerima</Text>
+              <View style={S.sigSpace} />
+              <View style={S.sigLine} />
+              <Text style={S.sigName}>{data.createdBy?.name ?? ""}</Text>
+              <Text style={S.sigRole}>Bendahara</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Operator strip ── */}
+        <View style={S.operatorStrip} wrap={false}>
+          <Text style={S.operatorText}>
+            Dicetak oleh: {data.createdBy?.name ?? "-"}
+            {"  ·  "}
+            {fmtDateTime(data.paymentDate)}
+            {"  ·  "}
+            {unitName || INSTITUTION.name}
+          </Text>
+          <Text style={S.operatorText}>
+            Telp. {phone}
+            {fax ? `  ·  Fax. ${fax}` : ""}
+          </Text>
+        </View>
+
+        {/* ══════════════════════════════════════════
+            PAGE FOOTER — fixed, every page
+        ══════════════════════════════════════════ */}
+        <View style={S.pageFooter} fixed>
+          <Text style={S.pageFooterText} render={({ pageNumber, totalPages }) => (totalPages > 1 ? `Halaman ${pageNumber} dari ${totalPages}` : " ")} />
+          <Text style={S.pageFooterText}>{data.receiptNumber}</Text>
+          <Text style={S.pageFooterText}>{INSTITUTION.name}</Text>
+        </View>
       </Page>
     </Document>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// EXPORT FUNCTION
+// EXPORT
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function createPDFKwitansi(data: KwitansiPDFData) {
