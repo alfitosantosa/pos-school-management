@@ -90,6 +90,9 @@ export type PaymentData = {
     id: string;
     name: string;
     parentPhone: string;
+    class: {
+      name: string;
+    };
   };
   major?: { id: string; name: string };
   accountBank?: { id: string; accountName: string; accountBank?: string; accountNumber: string };
@@ -121,6 +124,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
     // ── 1. Siapkan data ───────────────────────────────────────────────────
     const exportData = data.map((item) => ({
       Branch: item.major?.name ?? "-",
+      Kelas: item.student?.class.name ?? "-",
       "Nama Siswa": item.student?.name ?? "-",
       "No. HP Orang Tua": item.student?.parentPhone ?? "-",
       "No. Kwitansi": item.receiptNumber,
@@ -207,7 +211,8 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
 
     // ── 6. Lebar kolom ────────────────────────────────────────────────────
     ws2["!cols"] = [
-      { wch: 22 }, // Branch / Jurusan
+      { wch: 22 }, // Branch
+      { wch: 22 }, // Kelas
       { wch: 35 }, // Nama Siswa
       { wch: 18 }, // No. HP Orang Tua
       { wch: 18 }, // No. Kwitansi

@@ -48,6 +48,11 @@ export async function GET() {
             name: true,
             email: true,
             parentPhone: true,
+            class: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
         major: {
