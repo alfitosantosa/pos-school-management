@@ -42,6 +42,7 @@ export async function GET() {
         month: true,
         bankRef: true,
         notes: true,
+        paymentDate: true,
         student: {
           select: {
             id: true,
