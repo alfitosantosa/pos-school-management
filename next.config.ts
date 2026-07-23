@@ -5,6 +5,7 @@ const isProduction = process.env.NODE_ENV === "production";
 const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
+    globalNotFound: true,
   },
   // ============================================================================
   // CORE
@@ -62,6 +63,7 @@ const nextConfig: NextConfig = {
     experimental: {
       optimizePackageImports: ["lucide-react", "date-fns", "recharts", "@tanstack/react-query", "@tanstack/react-table"],
       authInterrupts: true,
+      globalNotFound: true,
 
       serverActions: {
         bodySizeLimit: "2mb",
