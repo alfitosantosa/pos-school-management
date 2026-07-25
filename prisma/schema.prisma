@@ -172,19 +172,21 @@ model AcademicYear {
 }
 
 model Major {
-  id          String        @id @default(cuid())
-  code        String        @unique
-  name        String
-  description String?
-  isActive    Boolean       @default(true)
-  address     String?
-  phone       String?
-  accountBank AccountBank[]
-  classes     Class[]
-  paymenttype PaymentType[]
-  payments    Payment[]
-  subjects    Subject[]
-  students    UserData[]    @relation("UserMajor")
+  id           String        @id @default(cuid())
+  code         String        @unique
+  name         String
+  description  String?
+  isActive     Boolean       @default(true)
+  address      String?
+  phone        String?
+  adminName    String?
+  signatureUrl String?
+  accountBank  AccountBank[]
+  classes      Class[]
+  paymenttype  PaymentType[]
+  payments     Payment[]
+  subjects     Subject[]
+  students     UserData[]    @relation("UserMajor")
 
   @@map("majors")
 }

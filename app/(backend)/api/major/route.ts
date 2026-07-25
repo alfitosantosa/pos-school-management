@@ -4,6 +4,8 @@
 //   name        String
 //   description String?
 //   isActive    Boolean   @default(true)
+//   adminName   String?
+//   signatureUrl String?
 //   classes     Class[]
 //   students    Student[]
 //   subjects    Subject[]
@@ -44,7 +46,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { code, name, description, isActive, phone, address } = await request.json();
+    const { code, name, description, isActive, phone, address, adminName, signatureUrl } = await request.json();
     if (!code || !name) {
       return NextResponse.json({ error: "Code and name are required" }, { status: 400 });
     }
@@ -56,6 +58,8 @@ export async function POST(request: NextRequest) {
         description,
         phone,
         address,
+        adminName,
+        signatureUrl,
         isActive: isActive !== undefined ? isActive : true,
         // Default to true if not provided
       },
@@ -70,7 +74,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, code, name, description, isActive, phone, address } = await request.json();
+    const { id, code, name, description, isActive, phone, address, adminName, signatureUrl } = await request.json();
     if (!id || !code || !name) {
       return NextResponse.json({ error: "ID, code, and name are required" }, { status: 400 });
     }
@@ -83,7 +87,10 @@ export async function PUT(request: NextRequest) {
         description,
         phone,
         address,
-        isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
+        adminName,
+        signatureUrl,
+        isActive: isActive !== undefined ? isActive : true, 
+        // Default to true if not provided
       },
     });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, pdf, Image } from "@react-pdf/renderer";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -43,6 +43,8 @@ export type KwitansiPDFData = {
     address?: string;
     unitName?: string;
     fax?: string;
+    adminName: string;
+    signatureUrl: string;
   };
   accountBank?: {
     accountName: string;
@@ -521,6 +523,12 @@ const S = StyleSheet.create({
     marginBottom: 3,
     width: "100%",
   },
+  sigImage: {
+    width: "100%",
+    height: 44,
+    objectFit: "contain" as const,
+    marginBottom: 3,
+  },
   sigName: {
     fontSize: 6.5,
     fontFamily: "Helvetica-Bold",
@@ -821,9 +829,14 @@ function KwitansiDocument({ data }: { data: KwitansiPDFData }) {
             {/* Sig: penerima */}
             <View style={S.footerColLast}>
               <Text style={S.footerColLabel}>Penerima</Text>
-              <View style={S.sigSpace} />
-              <View style={S.sigLine} />
-              <Text style={S.sigName}>{data.createdBy?.name ?? ""}</Text>
+              {data.major?.signatureUrl ?
+                <Image src={data.major?.signatureUrl} style={S.sigImage} />
+              : <>
+                  <View style={S.sigSpace} />
+                  <View style={S.sigLine} />
+                </>
+              }
+              <Text style={S.sigName}>{data.major?.adminName ?? ""}</Text>
               <Text style={S.sigRole}>Bendahara</Text>
             </View>
           </View>
