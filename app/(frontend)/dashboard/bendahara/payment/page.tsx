@@ -93,7 +93,7 @@ export type PaymentData = {
       name: string;
     };
   };
-  major?: { id: string; name: string };
+  major?: { id: string; name: string; adminName: string; signatureUrl: string };
   accountBank?: { id: string; accountName: string; accountBank?: string; accountNumber: string };
   paymentItems?: PaymentItemData[];
 };

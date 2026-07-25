@@ -3121,7 +3121,9 @@ export const MajorScalarFieldEnum = {
   description: 'description',
   isActive: 'isActive',
   address: 'address',
-  phone: 'phone'
+  phone: 'phone',
+  adminName: 'adminName',
+  signatureUrl: 'signatureUrl'
 } as const
 
 export type MajorScalarFieldEnum = (typeof MajorScalarFieldEnum)[keyof typeof MajorScalarFieldEnum]

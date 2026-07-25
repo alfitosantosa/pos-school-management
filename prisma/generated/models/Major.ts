@@ -32,6 +32,8 @@ export type MajorMinAggregateOutputType = {
   isActive: boolean | null
   address: string | null
   phone: string | null
+  adminName: string | null
+  signatureUrl: string | null
 }
 
 export type MajorMaxAggregateOutputType = {
@@ -42,6 +44,8 @@ export type MajorMaxAggregateOutputType = {
   isActive: boolean | null
   address: string | null
   phone: string | null
+  adminName: string | null
+  signatureUrl: string | null
 }
 
 export type MajorCountAggregateOutputType = {
@@ -52,6 +56,8 @@ export type MajorCountAggregateOutputType = {
   isActive: number
   address: number
   phone: number
+  adminName: number
+  signatureUrl: number
   _all: number
 }
 
@@ -64,6 +70,8 @@ export type MajorMinAggregateInputType = {
   isActive?: true
   address?: true
   phone?: true
+  adminName?: true
+  signatureUrl?: true
 }
 
 export type MajorMaxAggregateInputType = {
@@ -74,6 +82,8 @@ export type MajorMaxAggregateInputType = {
   isActive?: true
   address?: true
   phone?: true
+  adminName?: true
+  signatureUrl?: true
 }
 
 export type MajorCountAggregateInputType = {
@@ -84,6 +94,8 @@ export type MajorCountAggregateInputType = {
   isActive?: true
   address?: true
   phone?: true
+  adminName?: true
+  signatureUrl?: true
   _all?: true
 }
 
@@ -167,6 +179,8 @@ export type MajorGroupByOutputType = {
   isActive: boolean
   address: string | null
   phone: string | null
+  adminName: string | null
+  signatureUrl: string | null
   _count: MajorCountAggregateOutputType | null
   _min: MajorMinAggregateOutputType | null
   _max: MajorMaxAggregateOutputType | null
@@ -198,6 +212,8 @@ export type MajorWhereInput = {
   isActive?: Prisma.BoolFilter<"Major"> | boolean
   address?: Prisma.StringNullableFilter<"Major"> | string | null
   phone?: Prisma.StringNullableFilter<"Major"> | string | null
+  adminName?: Prisma.StringNullableFilter<"Major"> | string | null
+  signatureUrl?: Prisma.StringNullableFilter<"Major"> | string | null
   accountBank?: Prisma.AccountBankListRelationFilter
   classes?: Prisma.ClassListRelationFilter
   paymenttype?: Prisma.PaymentTypeListRelationFilter
@@ -214,6 +230,8 @@ export type MajorOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  adminName?: Prisma.SortOrderInput | Prisma.SortOrder
+  signatureUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   accountBank?: Prisma.AccountBankOrderByRelationAggregateInput
   classes?: Prisma.ClassOrderByRelationAggregateInput
   paymenttype?: Prisma.PaymentTypeOrderByRelationAggregateInput
@@ -233,6 +251,8 @@ export type MajorWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"Major"> | boolean
   address?: Prisma.StringNullableFilter<"Major"> | string | null
   phone?: Prisma.StringNullableFilter<"Major"> | string | null
+  adminName?: Prisma.StringNullableFilter<"Major"> | string | null
+  signatureUrl?: Prisma.StringNullableFilter<"Major"> | string | null
   accountBank?: Prisma.AccountBankListRelationFilter
   classes?: Prisma.ClassListRelationFilter
   paymenttype?: Prisma.PaymentTypeListRelationFilter
@@ -249,6 +269,8 @@ export type MajorOrderByWithAggregationInput = {
   isActive?: Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  adminName?: Prisma.SortOrderInput | Prisma.SortOrder
+  signatureUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.MajorCountOrderByAggregateInput
   _max?: Prisma.MajorMaxOrderByAggregateInput
   _min?: Prisma.MajorMinOrderByAggregateInput
@@ -265,6 +287,8 @@ export type MajorScalarWhereWithAggregatesInput = {
   isActive?: Prisma.BoolWithAggregatesFilter<"Major"> | boolean
   address?: Prisma.StringNullableWithAggregatesFilter<"Major"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Major"> | string | null
+  adminName?: Prisma.StringNullableWithAggregatesFilter<"Major"> | string | null
+  signatureUrl?: Prisma.StringNullableWithAggregatesFilter<"Major"> | string | null
 }
 
 export type MajorCreateInput = {
@@ -275,6 +299,8 @@ export type MajorCreateInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeCreateNestedManyWithoutMajorInput
@@ -291,6 +317,8 @@ export type MajorUncheckedCreateInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeUncheckedCreateNestedManyWithoutMajorInput
@@ -307,6 +335,8 @@ export type MajorUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUpdateManyWithoutMajorNestedInput
@@ -323,6 +353,8 @@ export type MajorUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUncheckedUpdateManyWithoutMajorNestedInput
@@ -339,6 +371,8 @@ export type MajorCreateManyInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
 }
 
 export type MajorUpdateManyMutationInput = {
@@ -349,6 +383,8 @@ export type MajorUpdateManyMutationInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MajorUncheckedUpdateManyInput = {
@@ -359,6 +395,8 @@ export type MajorUncheckedUpdateManyInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MajorNullableScalarRelationFilter = {
@@ -374,6 +412,8 @@ export type MajorCountOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   address?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  adminName?: Prisma.SortOrder
+  signatureUrl?: Prisma.SortOrder
 }
 
 export type MajorMaxOrderByAggregateInput = {
@@ -384,6 +424,8 @@ export type MajorMaxOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   address?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  adminName?: Prisma.SortOrder
+  signatureUrl?: Prisma.SortOrder
 }
 
 export type MajorMinOrderByAggregateInput = {
@@ -394,6 +436,8 @@ export type MajorMinOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   address?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  adminName?: Prisma.SortOrder
+  signatureUrl?: Prisma.SortOrder
 }
 
 export type MajorScalarRelationFilter = {
@@ -497,6 +541,8 @@ export type MajorCreateWithoutStudentsInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeCreateNestedManyWithoutMajorInput
@@ -512,6 +558,8 @@ export type MajorUncheckedCreateWithoutStudentsInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeUncheckedCreateNestedManyWithoutMajorInput
@@ -543,6 +591,8 @@ export type MajorUpdateWithoutStudentsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUpdateManyWithoutMajorNestedInput
@@ -558,6 +608,8 @@ export type MajorUncheckedUpdateWithoutStudentsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUncheckedUpdateManyWithoutMajorNestedInput
@@ -573,6 +625,8 @@ export type MajorCreateWithoutClassesInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   paymenttype?: Prisma.PaymentTypeCreateNestedManyWithoutMajorInput
   payments?: Prisma.PaymentCreateNestedManyWithoutMajorInput
@@ -588,6 +642,8 @@ export type MajorUncheckedCreateWithoutClassesInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   paymenttype?: Prisma.PaymentTypeUncheckedCreateNestedManyWithoutMajorInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutMajorInput
@@ -619,6 +675,8 @@ export type MajorUpdateWithoutClassesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   paymenttype?: Prisma.PaymentTypeUpdateManyWithoutMajorNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutMajorNestedInput
@@ -634,6 +692,8 @@ export type MajorUncheckedUpdateWithoutClassesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   paymenttype?: Prisma.PaymentTypeUncheckedUpdateManyWithoutMajorNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutMajorNestedInput
@@ -649,6 +709,8 @@ export type MajorCreateWithoutSubjectsInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeCreateNestedManyWithoutMajorInput
@@ -664,6 +726,8 @@ export type MajorUncheckedCreateWithoutSubjectsInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeUncheckedCreateNestedManyWithoutMajorInput
@@ -695,6 +759,8 @@ export type MajorUpdateWithoutSubjectsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUpdateManyWithoutMajorNestedInput
@@ -710,6 +776,8 @@ export type MajorUncheckedUpdateWithoutSubjectsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUncheckedUpdateManyWithoutMajorNestedInput
@@ -725,6 +793,8 @@ export type MajorCreateWithoutPaymenttypeInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
   payments?: Prisma.PaymentCreateNestedManyWithoutMajorInput
@@ -740,6 +810,8 @@ export type MajorUncheckedCreateWithoutPaymenttypeInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutMajorInput
@@ -771,6 +843,8 @@ export type MajorUpdateWithoutPaymenttypeInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutMajorNestedInput
@@ -786,6 +860,8 @@ export type MajorUncheckedUpdateWithoutPaymenttypeInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutMajorNestedInput
@@ -801,6 +877,8 @@ export type MajorCreateWithoutPaymentsInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeCreateNestedManyWithoutMajorInput
@@ -816,6 +894,8 @@ export type MajorUncheckedCreateWithoutPaymentsInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   accountBank?: Prisma.AccountBankUncheckedCreateNestedManyWithoutMajorsInput
   classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeUncheckedCreateNestedManyWithoutMajorInput
@@ -847,6 +927,8 @@ export type MajorUpdateWithoutPaymentsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUpdateManyWithoutMajorNestedInput
@@ -862,6 +944,8 @@ export type MajorUncheckedUpdateWithoutPaymentsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountBank?: Prisma.AccountBankUncheckedUpdateManyWithoutMajorsNestedInput
   classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUncheckedUpdateManyWithoutMajorNestedInput
@@ -877,6 +961,8 @@ export type MajorCreateWithoutAccountBankInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   classes?: Prisma.ClassCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeCreateNestedManyWithoutMajorInput
   payments?: Prisma.PaymentCreateNestedManyWithoutMajorInput
@@ -892,6 +978,8 @@ export type MajorUncheckedCreateWithoutAccountBankInput = {
   isActive?: boolean
   address?: string | null
   phone?: string | null
+  adminName?: string | null
+  signatureUrl?: string | null
   classes?: Prisma.ClassUncheckedCreateNestedManyWithoutMajorInput
   paymenttype?: Prisma.PaymentTypeUncheckedCreateNestedManyWithoutMajorInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutMajorInput
@@ -923,6 +1011,8 @@ export type MajorUpdateWithoutAccountBankInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classes?: Prisma.ClassUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUpdateManyWithoutMajorNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutMajorNestedInput
@@ -938,6 +1028,8 @@ export type MajorUncheckedUpdateWithoutAccountBankInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  signatureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classes?: Prisma.ClassUncheckedUpdateManyWithoutMajorNestedInput
   paymenttype?: Prisma.PaymentTypeUncheckedUpdateManyWithoutMajorNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutMajorNestedInput
@@ -1029,6 +1121,8 @@ export type MajorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   isActive?: boolean
   address?: boolean
   phone?: boolean
+  adminName?: boolean
+  signatureUrl?: boolean
   accountBank?: boolean | Prisma.Major$accountBankArgs<ExtArgs>
   classes?: boolean | Prisma.Major$classesArgs<ExtArgs>
   paymenttype?: boolean | Prisma.Major$paymenttypeArgs<ExtArgs>
@@ -1046,6 +1140,8 @@ export type MajorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isActive?: boolean
   address?: boolean
   phone?: boolean
+  adminName?: boolean
+  signatureUrl?: boolean
 }, ExtArgs["result"]["major"]>
 
 export type MajorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1056,6 +1152,8 @@ export type MajorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isActive?: boolean
   address?: boolean
   phone?: boolean
+  adminName?: boolean
+  signatureUrl?: boolean
 }, ExtArgs["result"]["major"]>
 
 export type MajorSelectScalar = {
@@ -1066,9 +1164,11 @@ export type MajorSelectScalar = {
   isActive?: boolean
   address?: boolean
   phone?: boolean
+  adminName?: boolean
+  signatureUrl?: boolean
 }
 
-export type MajorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "description" | "isActive" | "address" | "phone", ExtArgs["result"]["major"]>
+export type MajorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "description" | "isActive" | "address" | "phone" | "adminName" | "signatureUrl", ExtArgs["result"]["major"]>
 export type MajorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accountBank?: boolean | Prisma.Major$accountBankArgs<ExtArgs>
   classes?: boolean | Prisma.Major$classesArgs<ExtArgs>
@@ -1099,6 +1199,8 @@ export type $MajorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     isActive: boolean
     address: string | null
     phone: string | null
+    adminName: string | null
+    signatureUrl: string | null
   }, ExtArgs["result"]["major"]>
   composites: {}
 }
@@ -1535,6 +1637,8 @@ export interface MajorFieldRefs {
   readonly isActive: Prisma.FieldRef<"Major", 'Boolean'>
   readonly address: Prisma.FieldRef<"Major", 'String'>
   readonly phone: Prisma.FieldRef<"Major", 'String'>
+  readonly adminName: Prisma.FieldRef<"Major", 'String'>
+  readonly signatureUrl: Prisma.FieldRef<"Major", 'String'>
 }
     
 
