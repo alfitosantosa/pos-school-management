@@ -13,8 +13,8 @@ RUN apk add --no-cache curl \
 # Copy package files
 COPY package.json package-lock.json* yarn.lock* bun.lock* ./
 
-# Install dependencies dan cleanup dalam satu layer
-RUN npm install  \
+# Install dependencies dengan legacy peer deps untuk mengatasi konflik valibot
+RUN npm install --legacy-peer-deps \
     && rm -rf /tmp/*
 
 # ==========================================
