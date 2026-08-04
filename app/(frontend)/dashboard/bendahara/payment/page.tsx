@@ -33,6 +33,9 @@ import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersById
 import { v4 as uuidv4 } from "uuid";
 import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoice";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import { DateRange } from "react-day-picker";
+import { usePaymentsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -958,6 +961,7 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
           {/* <AlertDialogAction onClick={handleDelete} disabled={deletePayment.isPending} className="bg-red-600 hover:bg-red-700">
             {deletePayment.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction> */}
+          fdsar ';g fd
           <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
             {deletePayment.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
@@ -978,6 +982,7 @@ function PaymentDataTable({
     name?: string;
   };
 }) {
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -992,24 +997,24 @@ function PaymentDataTable({
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedPayment, setSelectedPayment] = React.useState<PaymentData | null>(null);
-  const [totalTransfer, setTotalTransfer] = React.useState(0);
+  // const [totalTransfer, setTotalTransfer] = React.useState(0);
 
   const majorId = userDataMajor.id;
 
-  const { data: payments = [], isLoading, refetch } = useGetPaymentByIdMajor(majorId as string);
+  // Query hooks
+  const {
+    data: payments = [],
+    isLoading,
+    refetch,
+  } = usePaymentsByDate({
+    fromdate: dateRange?.from,
+    todate: dateRange?.to,
+    majorId: majorId ?? "",
+  });
   const { data: allStudents = [] } = useGetStudentByIdMajor(majorId as string);
   const { data: allAccountBanks = [] } = useGetAccountBankByIdMajor(majorId as string);
 
-  const handleSuccess = () => refetch();
-
-  const toggleExpand = (id: string) => {
-    setExpandedRows((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
-
+  // Callback hooks
   const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
     if (!filterValue) return true;
     const p = row.original as PaymentData;
@@ -1017,189 +1022,205 @@ function PaymentDataTable({
     return text.includes(filterValue.toLowerCase());
   }, []);
 
-  const columns: ColumnDef<PaymentData>[] = [
-    {
-      id: "select",
-      header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)} aria-label="Select all" />,
-      cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(v) => row.toggleSelected(!!v)} aria-label="Select row" />,
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      id: "expand",
-      header: () => <span className="text-xs text-muted-foreground">Item</span>,
-      cell: ({ row }) => {
-        const p = row.original;
-        const isExpanded = expandedRows.has(p.id);
-        const itemCount = p.paymentItems?.length ?? 0;
-        return (
-          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs px-2" onClick={() => toggleExpand(p.id)}>
-            <Package className="h-3.5 w-3.5" />
-            {itemCount}
-            {isExpanded ?
-              <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" />
-            : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
+  const toggleExpand = React.useCallback((id: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }, []);
+
+  const handleSuccess = React.useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  // Memoize columns definition
+  const columns: ColumnDef<PaymentData>[] = React.useMemo(
+    () => [
+      {
+        id: "select",
+        header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)} aria-label="Select all" />,
+        cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(v) => row.toggleSelected(!!v)} aria-label="Select row" />,
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        id: "expand",
+        header: () => <span className="text-xs text-muted-foreground">Item</span>,
+        cell: ({ row }) => {
+          const p = row.original;
+          const isExpanded = expandedRows.has(p.id);
+          const itemCount = p.paymentItems?.length ?? 0;
+          return (
+            <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs px-2" onClick={() => toggleExpand(p.id)}>
+              <Package className="h-3.5 w-3.5" />
+              {itemCount}
+              {isExpanded ?
+                <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" />
+              : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
+            </Button>
+          );
+        },
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        id: "student",
+        accessorFn: (row) => row.student?.name ?? "-",
+        header: ({ column }) => (
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            <User className="mr-2 h-4 w-4" />
+            Siswa
+            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        );
+        ),
+        cell: ({ row }) => <div className="font-medium">{row.original.student?.name ?? "-"}</div>,
       },
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      id: "student",
-      accessorFn: (row) => row.student?.name ?? "-",
-      header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          <User className="mr-2 h-4 w-4" />
-          Siswa
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => <div className="font-medium">{row.original.student?.name ?? "-"}</div>,
-    },
-    {
-      accessorKey: "receiptNumber",
-      header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          <Receipt className="mr-2 h-4 w-4" />
-          No. Kwitansi
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => <div className="font-mono text-sm font-medium">{row.getValue("receiptNumber")}</div>,
-    },
-    {
-      accessorKey: "month",
-      header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          <CalendarDays className="mr-2 h-4 w-4" />
-          Bulan
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => <Badge variant="outline">{row.getValue("month")}</Badge>,
-      filterFn: (row, _id, value) => {
-        if (value === "all") return true;
-        return row.original.month === value;
+      {
+        accessorKey: "receiptNumber",
+        header: ({ column }) => (
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            <Receipt className="mr-2 h-4 w-4" />
+            No. Kwitansi
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => <div className="font-mono text-sm font-medium">{row.getValue("receiptNumber")}</div>,
       },
-    },
-    {
-      accessorKey: "amount",
-      header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          <CreditCard className="mr-2 h-4 w-4" />
-          Jumlah
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => <div className="font-semibold tabular-nums">{formatRupiah(row.getValue("amount"))}</div>,
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
-      filterFn: (row, _id, value) => {
-        if (value === "all") return true;
-        return row.original.status === value;
+      {
+        accessorKey: "month",
+        header: ({ column }) => (
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            <CalendarDays className="mr-2 h-4 w-4" />
+            Bulan
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => <Badge variant="outline">{row.getValue("month")}</Badge>,
+        filterFn: (row, _id, value) => {
+          if (value === "all") return true;
+          return row.original.month === value;
+        },
       },
-    },
-    {
-      id: "major",
-      accessorFn: (row) => row.major?.name ?? "-",
-      header: "Branch",
-      cell: ({ row }) => <Badge variant="secondary">{row.original.major?.name ?? "-"}</Badge>,
-    },
-    {
-      id: "accountBank",
-      accessorFn: (row) => row.accountBank?.accountName ?? "-",
-      header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          <Building2 className="mr-2 h-4 w-4" />
-          Bank
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => {
-        const bank = row.original.accountBank;
-        return (
-          <div>
-            <div className="text-sm font-medium">{bank?.accountBank ?? "-"}</div>
-            {bank?.accountName && <div className="text-xs text-muted-foreground">{bank.accountName}</div>}
-          </div>
-        );
+      {
+        accessorKey: "amount",
+        header: ({ column }) => (
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            <CreditCard className="mr-2 h-4 w-4" />
+            Jumlah
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => <div className="font-semibold tabular-nums">{formatRupiah(row.getValue("amount"))}</div>,
       },
-    },
-    {
-      accessorKey: "paymentDate",
-      header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          <CalendarDays className="mr-2 h-4 w-4" />
-          Tgl Bayar
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => {
-        const d = row.getValue("paymentDate") as string;
-        if (!d) return <span className="text-muted-foreground">-</span>;
-        return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
+        filterFn: (row, _id, value) => {
+          if (value === "all") return true;
+          return row.original.status === value;
+        },
       },
-    },
-    {
-      accessorKey: "dueDate",
-      header: "Jatuh Tempo",
-      cell: ({ row }) => {
-        const d = row.getValue("dueDate") as string;
-        if (!d) return <span className="text-muted-foreground">-</span>;
-        return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
+      {
+        id: "major",
+        accessorFn: (row) => row.major?.name ?? "-",
+        header: "Branch",
+        cell: ({ row }) => <Badge variant="secondary">{row.original.major?.name ?? "-"}</Badge>,
       },
-    },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => {
-        const p = row.original;
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.id)}>Copy ID Pembayaran</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.receiptNumber)}>Copy No. Kwitansi</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => createPDFKwitansi(p as any)}>
-                <FileDown className="mr-2 h-4 w-4" />
-                Invoice PDF
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  setSelectedPayment(p);
-                  setEditDialogOpen(true);
-                }}
-              >
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setSelectedPayment(p);
-                  setDeleteDialogOpen(true);
-                }}
-                className="text-red-600"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Hapus
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
+      {
+        id: "accountBank",
+        accessorFn: (row) => row.accountBank?.accountName ?? "-",
+        header: ({ column }) => (
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            <Building2 className="mr-2 h-4 w-4" />
+            Bank
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const bank = row.original.accountBank;
+          return (
+            <div>
+              <div className="text-sm font-medium">{bank?.accountBank ?? "-"}</div>
+              {bank?.accountName && <div className="text-xs text-muted-foreground">{bank.accountName}</div>}
+            </div>
+          );
+        },
       },
-    },
-  ];
+      {
+        accessorKey: "paymentDate",
+        header: ({ column }) => (
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            <CalendarDays className="mr-2 h-4 w-4" />
+            Tgl Bayar
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const d = row.getValue("paymentDate") as string;
+          if (!d) return <span className="text-muted-foreground">-</span>;
+          return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
+        },
+      },
+      {
+        accessorKey: "dueDate",
+        header: "Jatuh Tempo",
+        cell: ({ row }) => {
+          const d = row.getValue("dueDate") as string;
+          if (!d) return <span className="text-muted-foreground">-</span>;
+          return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
+        },
+      },
+      {
+        id: "actions",
+        enableHiding: false,
+        cell: ({ row }) => {
+          const p = row.original;
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.id)}>Copy ID Pembayaran</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.receiptNumber)}>Copy No. Kwitansi</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => createPDFKwitansi(p as any)}>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Invoice PDF
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedPayment(p);
+                    setEditDialogOpen(true);
+                  }}
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedPayment(p);
+                    setDeleteDialogOpen(true);
+                  }}
+                  className="text-red-600"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Hapus
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      },
+    ],
+    [expandedRows, toggleExpand],
+  );
 
   const table = useReactTable({
     data: payments as PaymentData[],
@@ -1267,6 +1288,9 @@ function PaymentDataTable({
               <SelectItem value="overdue">Terlambat</SelectItem>
             </SelectContent>
           </Select>
+          <div>
+            <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+          </div>
           <Select value={monthFilter} onValueChange={setMonthFilter}>
             <SelectTrigger className="w-36">
               <SelectValue placeholder="Filter Bulan" />

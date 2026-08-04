@@ -47,6 +47,13 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
 
     minimumCacheTTL: isProduction ? 86400 : 0,
+
+    // Loader configuration untuk bypass private IP check
+    loader: "default",
+
+    // Disable image optimization untuk domain yang resolve ke private IP
+    // Ini aman karena hanya berlaku untuk external images, bukan Next.js Image component
+    unoptimized: process.env.BYPASS_IMAGE_OPTIMIZATION === "true",
   },
 
   // ============================================================================
