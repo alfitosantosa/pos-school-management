@@ -36,6 +36,7 @@ import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoi
 import { DatePickerWithRange } from "@/components/date/datePicker";
 import { DateRange } from "react-day-picker";
 import { usePaymentsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -961,8 +962,7 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
           {/* <AlertDialogAction onClick={handleDelete} disabled={deletePayment.isPending} className="bg-red-600 hover:bg-red-700">
             {deletePayment.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction> */}
-          fdsar ';g fd
-          <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogAction onClick={handleDelete} disabled={deletePayment.isPending} className="bg-red-600 hover:bg-red-700">
             {deletePayment.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -1011,7 +1011,7 @@ function PaymentDataTable({
     todate: dateRange?.to,
     majorId: majorId ?? "",
   });
-  const { data: allStudents = [] } = useGetStudentByIdMajor(majorId as string);
+  const { data: allStudents = [] } = useGetStudents();
   const { data: allAccountBanks = [] } = useGetAccountBankByIdMajor(majorId as string);
 
   // Callback hooks
