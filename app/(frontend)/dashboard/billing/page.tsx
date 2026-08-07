@@ -109,29 +109,25 @@ const YEARS = Array.from({ length: 5 }, (_, i) => String(currentYear - 2 + i));
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function PaidBadge({ isPaid }: { isPaid: boolean }) {
-  return isPaid ? (
-    <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
-      <BadgeCheck className="h-3 w-3" />
-      Lunas
-    </Badge>
-  ) : (
-    <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
-      <Clock className="h-3 w-3" />
-      Belum Lunas
-    </Badge>
-  );
+  return isPaid ?
+      <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
+        <BadgeCheck className="h-3 w-3" />
+        Lunas
+      </Badge>
+    : <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
+        <Clock className="h-3 w-3" />
+        Belum Lunas
+      </Badge>;
 }
 
 function ActiveBadge({ isActive }: { isActive: boolean }) {
-  return isActive ? (
-    <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
-      Aktif
-    </Badge>
-  ) : (
-    <Badge variant="outline" className="text-gray-400 text-xs">
-      Nonaktif
-    </Badge>
-  );
+  return isActive ?
+      <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+        Aktif
+      </Badge>
+    : <Badge variant="outline" className="text-gray-400 text-xs">
+        Nonaktif
+      </Badge>;
 }
 
 // ─── Single Item Form Schema ──────────────────────────────────────────────────
@@ -503,7 +499,13 @@ function SingleItemDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Batal
             </Button>
-            <Button type="submit">{isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}</Button>
+            <Button type="submit">
+              {isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
+            </Button>
           </div>
 
           {/* Debug: Show current form values */}
@@ -1081,7 +1083,7 @@ function BillingDataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -1089,8 +1091,7 @@ function BillingDataTable() {
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1103,7 +1104,7 @@ function BillingDataTable() {
                   </div>
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>

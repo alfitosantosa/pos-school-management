@@ -204,3 +204,19 @@ export const usePaymentItemsByStudentId = (id: string) => {
     enabled: !!id, // Prevent request when id is empty
   });
 };
+
+
+export const usePaymentItemsByFilterDate 
+ = (startDate: string, endDate: string) => {
+  return useQuery({
+    queryKey: ["payment-items-filter-date", startDate, endDate],
+    queryFn: async () => {
+      try {
+        const res = await apiGet(`/api/payment/items/filter/date?start_date=${startDate}&end_date=${endDate}`);
+        return res.data;
+      } catch (error: any) {
+        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
+      }
+    },
+  });
+};

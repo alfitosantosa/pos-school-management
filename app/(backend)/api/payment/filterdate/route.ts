@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     startDate.setHours(0, 0, 0, 0);
     endDate.setHours(23, 59, 59, 999);
 
-    const attendances = await prisma.payment.findMany({
+    const payments = await prisma.payment.findMany({
       where: {
         createdAt: {
           gte: startDate,
@@ -44,9 +44,9 @@ export async function GET(request: NextRequest) {
         createdAt: "desc",
       },
     });
-    return NextResponse.json(attendances);
+    return NextResponse.json(payments);
   } catch (error) {
-    console.error("Error fetching attendances:", error);
-    return NextResponse.json({ error: "Failed to fetch attendances" }, { status: 500 });
+    console.error("Error fetching payments:", error);
+    return NextResponse.json({ error: "Failed to fetch payments" }, { status: 500 });
   }
 }

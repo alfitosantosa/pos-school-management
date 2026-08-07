@@ -466,7 +466,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                   <strong>Subtotal</strong> — boleh dikosongkan, otomatis = Qty × Amount
                 </li>
                 <li>
-                  <strong>Month</strong> — format 2 digit: 01 s/d 12
+                  <strong>Month</strong> — format sesuai digit: 1 s/d 12
                 </li>
                 <li>
                   <strong>Year</strong> — format 4 digit: mis. {currentYear}

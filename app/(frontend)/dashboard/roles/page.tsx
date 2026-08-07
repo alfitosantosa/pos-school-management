@@ -131,7 +131,7 @@ const availablePermissions = [
   },
   {
     id: "/dashboard/bendahara/paymenttype",
-    label: "Katalog (Bendahara)",
+    label: "Jenis Tagihan (Bendahara)",
   },
   {
     id: "/dashboard/bendahara/payment",
