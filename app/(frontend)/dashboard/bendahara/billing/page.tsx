@@ -28,6 +28,9 @@ import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import { DateRange } from "react-day-picker";
+import { usePaymentsItemsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentItemsByDate";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -107,29 +110,25 @@ const YEARS = Array.from({ length: 5 }, (_, i) => String(currentYear - 2 + i));
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function PaidBadge({ isPaid }: { isPaid: boolean }) {
-  return isPaid ? (
-    <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
-      <BadgeCheck className="h-3 w-3" />
-      Lunas
-    </Badge>
-  ) : (
-    <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
-      <Clock className="h-3 w-3" />
-      Belum Lunas
-    </Badge>
-  );
+  return isPaid ?
+      <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
+        <BadgeCheck className="h-3 w-3" />
+        Lunas
+      </Badge>
+    : <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
+        <Clock className="h-3 w-3" />
+        Belum Lunas
+      </Badge>;
 }
 
 function ActiveBadge({ isActive }: { isActive: boolean }) {
-  return isActive ? (
-    <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
-      Aktif
-    </Badge>
-  ) : (
-    <Badge variant="outline" className="text-gray-400 text-xs">
-      Nonaktif
-    </Badge>
-  );
+  return isActive ?
+      <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+        Aktif
+      </Badge>
+    : <Badge variant="outline" className="text-gray-400 text-xs">
+        Nonaktif
+      </Badge>;
 }
 
 // ─── Single Item Form Schema ──────────────────────────────────────────────────
@@ -501,7 +500,13 @@ function SingleItemDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Batal
             </Button>
-            <Button type="submit">{isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}</Button>
+            <Button type="submit">
+              {isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
+            </Button>
           </div>
 
           {/* Debug: Show current form values */}
@@ -627,7 +632,15 @@ async function exportToExcel(data: PaymentItemData[], filename: string = "Data_T
 }
 
 // ─── Main DataTable ───────────────────────────────────────────────────────────
-function BillingDataTable({ majorId }: { majorId: string }) {
+function BillingDataTable({
+  majorData,
+}: {
+  majorData: {
+    id: string;
+    name: string;
+  };
+}) {
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -644,10 +657,33 @@ function BillingDataTable({ majorId }: { majorId: string }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<PaymentItemData | null>(null);
 
-  const { data: paymentItems = [], isLoading, refetch } = usePaymentItemsByMajorId(majorId);
-  const { data: allStudents = [] } = useGetStudentByIdMajor(majorId);
-  const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorId);
-  const { data: allClassById = [] } = useGetClassByIdMajor(majorId);
+  // ✅ Smart handlers untuk date range
+  const handleResetDateRange = React.useCallback(() => {
+    setDateRange(undefined);
+  }, []);
+
+  const handleDateRangeChange = React.useCallback((newDateRange: DateRange | undefined) => {
+    setDateRange(newDateRange);
+  }, []);
+
+  // ✅ Integrasikan hook dengan filter tanggal, major, status, dan isPaid
+  const {
+    data: paymentItems = [],
+    isLoading,
+    refetch,
+  } = usePaymentsItemsByDate({
+    fromdate: dateRange?.from,
+    todate: dateRange?.to,
+    majorId: majorData.id,
+    isPaid:
+      paidFilter === "all" ? undefined
+      : paidFilter === "paid" ? true
+      : false,
+  });
+
+  const { data: allStudents = [] } = useGetStudentByIdMajor(majorData?.id);
+  const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorData?.id);
+  const { data: allClassById = [] } = useGetClassByIdMajor(majorData?.id);
   const handleSuccess = () => refetch();
 
   const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
@@ -803,11 +839,19 @@ function BillingDataTable({ majorId }: { majorId: string }) {
         return true;
       },
     },
+
     {
       id: "receipt",
       accessorFn: (row) => row.payment?.receiptNumber ?? "-",
       header: "Kwitansi",
       cell: ({ row }) => <div className="font-mono text-xs text-muted-foreground">{row.original.payment?.receiptNumber ?? "-"}</div>,
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Tanggal Pembuatan",
+      cell: ({ row }) => {
+        return <div className="text-xs">{new Date(row.getValue("createdAt")).toLocaleDateString("id-ID")}</div>;
+      },
     },
     {
       id: "actions",
@@ -907,7 +951,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
     receipt: "Kwitansi",
   };
 
-  const hasActiveFilter = globalFilter || paidFilter !== "all" || classFilter !== "all" || monthFilter !== "all" || yearFilter !== "all";
+  const hasActiveFilter = globalFilter || paidFilter !== "all" || classFilter !== "all" || monthFilter !== "all" || yearFilter !== "all" || dateRange;
 
   const resetFilters = () => {
     setGlobalFilter("");
@@ -915,19 +959,23 @@ function BillingDataTable({ majorId }: { majorId: string }) {
     setClassFilter("all");
     setMonthFilter("all");
     setYearFilter("all");
+    handleResetDateRange();
     table.resetColumnFilters();
   };
 
   return (
     <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
-      <div className="font-bold text-3xl mb-6">Data Tagihan (Billing)</div>
-
+      <div className="font-bold text-3xl mb-3">Data Tagihan (Billing)</div>
+      <Badge>{majorData.name}</Badge>
       {/* Toolbar */}
       <div className="flex items-center justify-between py-4 flex-wrap gap-y-3">
         <div className="flex items-center space-x-2 flex-wrap gap-y-2">
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Cari siswa, item, kwitansi..." value={globalFilter ?? ""} onChange={(e) => setGlobalFilter(e.target.value)} className="max-w-xs pl-8" />
+          </div>
+          <div>
+            <DatePickerWithRange date={dateRange} setDate={handleDateRangeChange} />
           </div>
 
           <Select value={classFilter} onValueChange={setClassFilter}>
@@ -957,7 +1005,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
 
           <Select value={monthFilter} onValueChange={setMonthFilter}>
             <SelectTrigger className="w-36">
-              <SelectValue placeholder="Filter B/ulan" />
+              <SelectValue placeholder="Filter Bulan" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Bulan</SelectItem>
@@ -987,7 +1035,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
           {hasActiveFilter && (
             <Button variant="outline" size="sm" onClick={resetFilters}>
               <X className="mr-2 h-4 w-4" />
-              Reset
+              Reset Filter
             </Button>
           )}
         </div>
@@ -1039,6 +1087,12 @@ function BillingDataTable({ majorId }: { majorId: string }) {
               <X className="h-3 w-3 cursor-pointer" onClick={() => setGlobalFilter("")} />
             </Badge>
           )}
+          {dateRange && (
+            <Badge variant="secondary" className="gap-1">
+              Tanggal: {dateRange.from?.toLocaleDateString("id-ID")} - {dateRange.to?.toLocaleDateString("id-ID")}
+              <X className="h-3 w-3 cursor-pointer" onClick={handleResetDateRange} />
+            </Badge>
+          )}
           {paidFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
               {paidFilter === "paid" ? "Lunas" : "Belum Lunas"}
@@ -1079,7 +1133,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -1087,8 +1141,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1101,7 +1154,7 @@ function BillingDataTable({ majorId }: { majorId: string }) {
                   </div>
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>
@@ -1179,7 +1232,8 @@ export default function BillingPage() {
   const userId = session?.user?.id;
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
-  const majorId = userData?.major?.id;
+  const majorData = userData?.major;
+  // const majorId = userData?.major?.id;
 
   if (isPending || isLoadingUserData) return <Loading />;
   // Check if user is Admin
@@ -1189,5 +1243,5 @@ export default function BillingPage() {
       return null;
     }
   }
-  return <BillingDataTable majorId={majorId} />;
+  return <BillingDataTable majorData={majorData} />;
 }
