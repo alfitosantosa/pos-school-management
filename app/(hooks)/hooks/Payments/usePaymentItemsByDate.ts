@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api-client";
 
-export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPaid }: { fromdate?: Date; todate?: Date; majorId?: string; status?: string; isPaid?: boolean }) => {
+export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPaid, skuType }: { fromdate?: Date; todate?: Date; majorId?: string; status?: string; isPaid?: boolean; skuType?: string }) => {
   // Format tanggal ke YYYY-MM-DD menggunakan timezone lokal
   const formatLocalDate = (date: Date) => {
     const year = date.getFullYear();
@@ -14,7 +14,7 @@ export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPa
   const todateStr = todate ? formatLocalDate(todate) : undefined;
 
   return useQuery({
-    queryKey: ["payments-items-by-date", fromdateStr, todateStr, majorId, status, isPaid],
+    queryKey: ["payments-items-by-date", fromdateStr, todateStr, majorId, status, isPaid, skuType],
     queryFn: async () => {
       // Jika tidak ada date range, return empty array
       if (!fromdate || !todate || !fromdateStr || !todateStr) {
@@ -32,6 +32,9 @@ export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPa
       }
       if (status) {
         params.status = status;
+      }
+      if (skuType) {
+        params.skuType = skuType;
       }
       if (isPaid !== undefined) {
         params.isPaid = String(isPaid);

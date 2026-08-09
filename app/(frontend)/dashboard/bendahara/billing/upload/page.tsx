@@ -28,6 +28,7 @@ export type typeData = {
 };
 
 export type PaymentTypeData = {
+  skuType: any;
   id: string;
   name: string;
   amount: string;
@@ -113,7 +114,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
   const skuTypes = useMemo(() => {
     const set = new Set<string>();
     (paymentTypes as PaymentTypeData[]).forEach((pt) => {
-      if (pt.owner) set.add(pt.owner);
+      if (pt.skuType) set.add(pt.skuType);
     });
     return Array.from(set);
   }, [paymentTypes]);
@@ -327,7 +328,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
           currentMonth,
           String(currentYear),
           firstPT?.name ?? "SPP Bulanan",
-          firstPT?.owner ?? "spp",
+          firstPT?.skuType ?? "SPP",
           "false",
         ],
       ];
@@ -369,8 +370,8 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
       const XLSX = await import("xlsx");
 
       const wsData = [
-        ["ID (gunakan di kolom Payment Type ID)", "Nama", "Nominal", "SKU Type (owner)", "Bulanan?", "Nominal Tetap?", "Qty Tetap?"],
-        ...(paymentTypes as PaymentTypeData[]).map((pt) => [pt.id, pt.name, parseFloat(pt.amount), pt.owner, pt.isMonthly ? "Ya" : "Tidak", pt.isFixedAmount ? "Ya" : "Tidak", pt.isFixedQuantity ? "Ya" : "Tidak"]),
+        ["ID (gunakan di kolom Payment Type ID)", "Nama", "Nominal", "Owner", "Tipe SKU", "Bulanan?", "Nominal Tetap?", "Qty Tetap?"],
+        ...(paymentTypes as PaymentTypeData[]).map((pt) => [pt.id, pt.name, parseFloat(pt.amount), pt.owner, pt.skuType, pt.isMonthly ? "Ya" : "Tidak", pt.isFixedAmount ? "Ya" : "Tidak", pt.isFixedQuantity ? "Ya" : "Tidak"]),
       ];
 
       const wb = XLSX.utils.book_new();
@@ -391,7 +392,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
     <div className="min-h-screen w-full max-w-7xl mx-auto my-8 p-6 space-y-6">
       {/* ── Page Header ── */}
       <div>
-        <div className="font-bold text-3xl mb-1">Upload Tagihan (Billing)</div>
+        <div className="font-bold text-3xl mb-1">Upload Tagihan</div>
         {majorName && (
           <Badge variant="secondary" className="text-sm">
             Branch: {majorName}
@@ -688,7 +689,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                     <TableCell className="tabular-nums">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(parseFloat(pt.amount))}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className="text-xs">
-                        {pt.owner}
+                        {pt.skuType}
                       </Badge>
                     </TableCell>
                     <TableCell>
