@@ -590,7 +590,7 @@ async function exportToExcel(data: PaymentItemData[], filename: string = "Data_T
       Kelas: item.student?.class?.name ?? "-",
       Siswa: item.student?.name ?? "-",
       "Nama Item": item.name,
-      "Tipe SKU": item.skuType || "default",
+      "Tipe SKU": item.PaymentType?.skuType || "default",
       Owner: item.PaymentType?.owner || "-",
       Nominal: item.amount,
       Qty: item.quantity,
