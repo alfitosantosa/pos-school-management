@@ -378,7 +378,8 @@ export const PaymentScalarFieldEnum = {
   majorId: 'majorId',
   month: 'month',
   bendaharaId: 'bendaharaId',
-  bankRef: 'bankRef'
+  bankRef: 'bankRef',
+  transferDate: 'transferDate'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]

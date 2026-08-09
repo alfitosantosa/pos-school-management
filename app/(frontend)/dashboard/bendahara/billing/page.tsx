@@ -640,7 +640,14 @@ function BillingDataTable({
     name: string;
   };
 }) {
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined);
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(() => {
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    return {
+      from: firstDayOfMonth,
+      to: today,
+    };
+  });
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -659,13 +666,13 @@ function BillingDataTable({
   const [selectedItem, setSelectedItem] = React.useState<PaymentItemData | null>(null);
 
   // ✅ Smart handlers untuk date range
-  const handleResetDateRange = React.useCallback(() => {
-    setDateRange(undefined);
-  }, []);
+  // const handleResetDateRange = React.useCallback(() => {
+  //   setDateRange(undefined);
+  // }, []);
 
-  const handleDateRangeChange = React.useCallback((newDateRange: DateRange | undefined) => {
-    setDateRange(newDateRange);
-  }, []);
+  // const handleDateRangeChange = React.useCallback((newDateRange: DateRange | undefined) => {
+  //   setDateRange(newDateRange);
+  // }, []);
 
   // ✅ Integrasikan hook dengan filter tanggal, major, skuType, dan isPaid
   const {
@@ -930,9 +937,9 @@ function BillingDataTable({
     table.getColumn("year")?.setFilterValue(yearFilter !== "all" ? yearFilter : undefined);
   }, [yearFilter, table]);
 
-  React.useEffect(() => {
-    table.getColumn("year")?.setFilterValue(skuFilter !== "all" ? skuFilter : undefined);
-  }, [skuFilter, table]);
+  // React.useEffect(() => {
+  //   table.getColumn("skuType")?.setFilterValue(skuFilter !== "all" ? skuFilter : undefined);
+  // }, [skuFilter, table]);
 
   if (isLoading) return <Loading />;
 
@@ -966,7 +973,6 @@ function BillingDataTable({
     setMonthFilter("all");
     setYearFilter("all");
     setSkuFilter("all");
-    handleResetDateRange();
     table.resetColumnFilters();
   };
 
@@ -982,7 +988,7 @@ function BillingDataTable({
             <Input placeholder="Cari siswa, item, kwitansi..." value={globalFilter ?? ""} onChange={(e) => setGlobalFilter(e.target.value)} className="max-w-xs pl-8" />
           </div>
           <div>
-            <DatePickerWithRange date={dateRange} setDate={handleDateRangeChange} />
+            <DatePickerWithRange date={dateRange} setDate={setDateRange} />
           </div>
 
           <Select value={classFilter} onValueChange={setClassFilter}>
@@ -1108,12 +1114,12 @@ function BillingDataTable({
               <X className="h-3 w-3 cursor-pointer" onClick={() => setGlobalFilter("")} />
             </Badge>
           )}
-          {dateRange && (
+          {/* {dateRange && (
             <Badge variant="secondary" className="gap-1">
               Tanggal: {dateRange.from?.toLocaleDateString("id-ID")} - {dateRange.to?.toLocaleDateString("id-ID")}
               <X className="h-3 w-3 cursor-pointer" onClick={handleResetDateRange} />
             </Badge>
-          )}
+          )} */}
           {paidFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
               {paidFilter === "paid" ? "Lunas" : "Belum Lunas"}

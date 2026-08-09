@@ -10,14 +10,25 @@ export const usePaymentsByDate = ({ fromdate, todate, majorId }: { fromdate?: Da
     return `${year}-${month}-${day}`;
   };
 
-  const fromdateStr = fromdate ? formatLocalDate(fromdate) : undefined;
-  const todateStr = todate ? formatLocalDate(todate) : undefined;
+  // Normalisasi waktu: set fromdate ke awal hari (00:00:00.000) dan todate ke akhir hari (23:59:59.999)
+  const normalizedFromDate = fromdate ? new Date(fromdate) : undefined;
+  const normalizedToDate = todate ? new Date(todate) : undefined;
+
+  if (normalizedFromDate) {
+    normalizedFromDate.setHours(0, 0, 0, 0);
+  }
+  if (normalizedToDate) {
+    normalizedToDate.setHours(23, 59, 59, 999);
+  }
+
+  const fromdateStr = normalizedFromDate ? formatLocalDate(normalizedFromDate) : undefined;
+  const todateStr = normalizedToDate ? formatLocalDate(normalizedToDate) : undefined;
 
   return useQuery({
     queryKey: ["payments-by-date", fromdateStr, todateStr, majorId],
     queryFn: async () => {
       // Jika tidak ada date range, return empty array
-      if (!fromdate || !todate || !fromdateStr || !todateStr) {
+      if (!normalizedFromDate || !normalizedToDate || !fromdateStr || !todateStr) {
         return [];
       }
 

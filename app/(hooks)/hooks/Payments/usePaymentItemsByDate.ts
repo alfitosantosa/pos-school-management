@@ -10,22 +10,31 @@ export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPa
     return `${year}-${month}-${day}`;
   };
 
-  const fromdateStr = fromdate ? formatLocalDate(fromdate) : undefined;
-  const todateStr = todate ? formatLocalDate(todate) : undefined;
+  // Normalisasi waktu: set fromdate ke awal hari (00:00:00.000) dan todate ke akhir hari (23:59:59.999)
+  const normalizedFromDate = fromdate ? new Date(fromdate) : undefined;
+  const normalizedToDate = todate ? new Date(todate) : undefined;
+
+  if (normalizedFromDate) {
+    normalizedFromDate.setHours(0, 0, 0, 0);
+  }
+  if (normalizedToDate) {
+    normalizedToDate.setHours(23, 59, 59, 999);
+  }
+
+  const fromdateStr = normalizedFromDate ? formatLocalDate(normalizedFromDate) : undefined;
+  const todateStr = normalizedToDate ? formatLocalDate(normalizedToDate) : undefined;
 
   return useQuery({
     queryKey: ["payments-items-by-date", fromdateStr, todateStr, majorId, status, isPaid, skuType],
     queryFn: async () => {
-      // Jika tidak ada date range, return empty array
-      if (!fromdate || !todate || !fromdateStr || !todateStr) {
-        return [];
-      }
-
       // Build params object, only include if exists
-      const params: Record<string, string> = {
-        fromdate: fromdateStr,
-        todate: todateStr,
-      };
+      const params: Record<string, string> = {};
+
+      // Jika ada date range, tambahkan ke params
+      if (normalizedFromDate && normalizedToDate && fromdateStr && todateStr) {
+        params.fromdate = fromdateStr;
+        params.todate = todateStr;
+      }
 
       if (majorId) {
         params.majorId = majorId;
@@ -43,7 +52,7 @@ export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPa
       const response = await apiGet("/api/payment/items/filterdate", { params });
       return response.data;
     },
-    // Selalu enabled, tapi return empty array jika tidak ada date
+    // Selalu enabled
     enabled: true,
   });
 };

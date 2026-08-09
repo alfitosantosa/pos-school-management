@@ -380,6 +380,7 @@ model Payment {
   month              String
   bendaharaId        String
   bankRef            String?
+  transferDate       DateTime?
   paymentItems       PaymentItems[]
   paymentTransaction PaymentTransaction?
   accountBank        AccountBank         @relation(fields: [accountBankId], references: [id])
