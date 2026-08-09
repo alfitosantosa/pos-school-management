@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const majorId = request.nextUrl.searchParams.get("majorId");
   const status = request.nextUrl.searchParams.get("status");
   const isPaidParam = request.nextUrl.searchParams.get("isPaid");
+  const skuType = request.nextUrl.searchParams.get("skuType");
 
   if (!fromdate || !todate) {
     return NextResponse.json({ error: "Missing fromdate or todate query parameters" }, { status: 400 });
@@ -42,6 +43,11 @@ export async function GET(request: NextRequest) {
       whereClause.student = {
         majorId: majorId,
       };
+    }
+
+    // Filter by skuType if provided (skuType is a field in PaymentItems)
+    if (skuType) {
+      whereClause.skuType = skuType;
     }
 
     // Filter by isPaid if provided (true = Lunas, false = Belum Lunas)

@@ -924,7 +924,7 @@ function BillingDataTable() {
 
   return (
     <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
-      <div className="font-bold text-3xl mb-6">Data Tagihan (Billing)</div>
+      <div className="font-bold text-3xl mb-6">Data Tagihan</div>
 
       {/* Toolbar */}
       <div className="flex items-center justify-between py-4 flex-wrap gap-y-3">

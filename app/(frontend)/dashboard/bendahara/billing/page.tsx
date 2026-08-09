@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 
-import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, usePaymentItemsUnpaidStudent, usePaymentItemsByMajorId } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
 
 import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
@@ -650,6 +650,7 @@ function BillingDataTable({
   const [classFilter, setClassFilter] = React.useState<string>("all");
   const [monthFilter, setMonthFilter] = React.useState<string>("all");
   const [yearFilter, setYearFilter] = React.useState<string>("all");
+  const [skuFilter, setSkuFilter] = React.useState<string>("all");
   const [isExporting, setIsExporting] = React.useState(false);
 
   const [singleDialogOpen, setSingleDialogOpen] = React.useState(false);
@@ -666,7 +667,7 @@ function BillingDataTable({
     setDateRange(newDateRange);
   }, []);
 
-  // ✅ Integrasikan hook dengan filter tanggal, major, status, dan isPaid
+  // ✅ Integrasikan hook dengan filter tanggal, major, skuType, dan isPaid
   const {
     data: paymentItems = [],
     isLoading,
@@ -675,6 +676,7 @@ function BillingDataTable({
     fromdate: dateRange?.from,
     todate: dateRange?.to,
     majorId: majorData.id,
+    skuType: skuFilter !== "all" ? skuFilter : undefined,
     isPaid:
       paidFilter === "all" ? undefined
       : paidFilter === "paid" ? true
@@ -928,6 +930,10 @@ function BillingDataTable({
     table.getColumn("year")?.setFilterValue(yearFilter !== "all" ? yearFilter : undefined);
   }, [yearFilter, table]);
 
+  React.useEffect(() => {
+    table.getColumn("year")?.setFilterValue(skuFilter !== "all" ? skuFilter : undefined);
+  }, [skuFilter, table]);
+
   if (isLoading) return <Loading />;
 
   const filteredRows = table.getFilteredRowModel().rows;
@@ -951,7 +957,7 @@ function BillingDataTable({
     receipt: "Kwitansi",
   };
 
-  const hasActiveFilter = globalFilter || paidFilter !== "all" || classFilter !== "all" || monthFilter !== "all" || yearFilter !== "all" || dateRange;
+  const hasActiveFilter = globalFilter || paidFilter !== "all" || classFilter !== "all" || monthFilter !== "all" || yearFilter !== "all" || skuFilter !== "all" || dateRange;
 
   const resetFilters = () => {
     setGlobalFilter("");
@@ -959,13 +965,14 @@ function BillingDataTable({
     setClassFilter("all");
     setMonthFilter("all");
     setYearFilter("all");
+    setSkuFilter("all");
     handleResetDateRange();
     table.resetColumnFilters();
   };
 
   return (
     <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
-      <div className="font-bold text-3xl mb-3">Data Tagihan (Billing)</div>
+      <div className="font-bold text-3xl mb-3">Data Tagihan</div>
       <Badge>{majorData.name}</Badge>
       {/* Toolbar */}
       <div className="flex items-center justify-between py-4 flex-wrap gap-y-3">
@@ -1029,6 +1036,20 @@ function BillingDataTable({
                   {y}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+          {/* filter SKU */}
+          <Select value={skuFilter} onValueChange={setSkuFilter}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Filter SKU" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua SKU</SelectItem>
+              <SelectItem value="SPP">SPP</SelectItem>
+              <SelectItem value="Seragam">Seragam</SelectItem>
+              <SelectItem value="Kegiatan">Kegiatan</SelectItem>
+              <SelectItem value="Catering">Catering</SelectItem>
+              <SelectItem value="Lainnya">Lainnya</SelectItem>
             </SelectContent>
           </Select>
 
