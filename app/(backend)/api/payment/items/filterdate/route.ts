@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const endDate = new Date(todate);
 
     // Set time boundaries
-    startDate.setHours(0, 0, 0, 0);
+    startDate.setHours(0, 0, 0, 1);
     endDate.setHours(23, 59, 59, 999);
 
     // Build where clause dynamically
@@ -45,9 +45,11 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // Filter by skuType if provided (skuType is a field in PaymentItems)
+    // Filter by skuType if provided (skuType is a field in paymentType and take skuType)
     if (skuType) {
-      whereClause.skuType = skuType;
+      whereClause.PaymentType = {
+        skuType: skuType,
+      };
     }
 
     // Filter by isPaid if provided (true = Lunas, false = Belum Lunas)

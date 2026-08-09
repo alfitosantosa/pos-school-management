@@ -9,10 +9,11 @@
 //   paymentDate        DateTime
 //   receiptNumber      String              @unique
 //   accountBankId      String
-//   bankRef            String?
+//   transferDate       DateTime?
 //   majorId            String
 //   month              String
 //   bendaharaId        String
+//   bankRef            String?
 //   paymentItems       PaymentItems[]
 //   paymentTransaction PaymentTransaction?
 //   accountBank        AccountBank         @relation(fields: [accountBankId], references: [id])
@@ -20,6 +21,13 @@
 //   major              Major               @relation(fields: [majorId], references: [id])
 //   student            UserData            @relation("StudentPayment", fields: [studentId], references: [id], onDelete: Cascade)
 
+//   @@index([studentId])
+//   @@index([majorId])
+//   @@index([accountBankId])
+//   @@index([bendaharaId])
+//   @@index([status])
+//   @@index([createdAt])
+//   @@index([month])
 //   @@map("payments")
 // }
 
@@ -105,7 +113,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { studentId, amount, dueDate, status, notes, paymentDate, receiptNumber, accountBankId, majorId, month, bendaharaId, bankRef } = await request.json();
+    const { studentId, amount, dueDate, status, notes, paymentDate, receiptNumber, accountBankId, majorId, month, bendaharaId, bankRef, transferDate } = await request.json();
 
     const newPayment = await prisma.payment.create({
       data: {
@@ -120,6 +128,7 @@ export async function POST(request: NextRequest) {
         status,
         notes,
         paymentDate: new Date(paymentDate),
+        transferDate: transferDate ? new Date(transferDate) : undefined,
         receiptNumber,
       },
       include: {
@@ -139,7 +148,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, studentId, amount, dueDate, status, notes, paymentDate, receiptNumber, accountBankId, majorId, month, bankRef } = await request.json();
+    const { id, studentId, amount, dueDate, status, notes, paymentDate, receiptNumber, accountBankId, majorId, month, bankRef, transferDate } = await request.json();
 
     const updatedPayment = await prisma.payment.update({
       where: { id },
@@ -153,6 +162,7 @@ export async function PUT(request: NextRequest) {
         status,
         notes,
         paymentDate: new Date(paymentDate),
+        transferDate: transferDate ? new Date(transferDate) : undefined,
         receiptNumber,
         bankRef,
       },
