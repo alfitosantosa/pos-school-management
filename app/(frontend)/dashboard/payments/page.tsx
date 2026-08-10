@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
-import { useCreatePayment, useUpdatePayment, useDeletePayment, useGetPaymentByIdMajor } from "@/app/(hooks)/hooks/Payments/usePayment";
+import { useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
 import { usePaymentItemsUnpaidStudent, userPaymentItemsSetPaid } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
 import { useGetAccountBankByIdMajor } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
 import Loading from "@/components/loading";
@@ -36,7 +36,7 @@ import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoi
 import { DatePickerWithRange } from "@/components/date/datePicker";
 import { DateRange } from "react-day-picker";
 import { usePaymentsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
-import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
+import { DatePickerTime } from "@/components/date/datePickerTime";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -84,6 +84,7 @@ export type PaymentData = {
   notes?: string;
   createdAt: string;
   paymentDate: string;
+  transferDate: string;
   receiptNumber: string;
   bankRef: string;
   accountBankId: string;
@@ -135,6 +136,13 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
       Tahun: new Date(item.createdAt).getFullYear(),
       "Jumlah (Rp)": Number(item.amount),
       Status: statusConfig[item.status]?.label ?? item.status,
+      "Tanggal Transfer":
+        item.transferDate ?
+          new Date(item.transferDate).toLocaleString("id-ID", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })
+        : "-",
       "Tanggal Bayar": item.createdAt ? new Date(item.createdAt).toLocaleDateString("id-ID") : "-",
       "Jatuh Tempo": item.dueDate ? new Date(item.dueDate).toLocaleDateString("id-ID") : "-",
       Bank: item.accountBank?.accountBank ?? "-",
@@ -144,7 +152,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
       Keterangan: item.notes ?? "-",
     }));
 
-    const totalCols = 16;
+    const totalCols = 17;
     const now = new Date();
     const exportDateStr = now.toLocaleDateString("id-ID", {
       day: "2-digit",
@@ -223,6 +231,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
       { wch: 8 }, // Tahun
       { wch: 18 }, // Jumlah (Rp)
       { wch: 14 }, // Status
+      { wch: 14 }, // Tanggal Transfer
       { wch: 14 }, // Tanggal Bayar
       { wch: 14 }, // Jatuh Tempo
       { wch: 16 }, // Bank
@@ -284,6 +293,7 @@ const paymentSchema = z.object({
   month: z.string().min(1, "Bulan wajib dipilih"),
   status: z.string().min(1, "Status wajib dipilih"),
   paymentDate: z.string().min(1, "Tanggal bayar wajib diisi"),
+  transferDate: z.string().optional(),
   dueDate: z.string().optional(),
   receiptNumber: z.string().min(1, "Nomor kwitansi wajib diisi"),
   bankRef: z.string().min(1, "Masukan Ref Bank"),
@@ -388,6 +398,7 @@ function PaymentFormDialog({
     defaultValues: {
       status: "pending",
       paymentDate: new Date().toISOString().split("T")[0],
+      transferDate: new Date().toISOString(),
       month: MONTHS[new Date().getMonth()],
       bendaharaId: userDataId || "",
       majorId: userDataMajorId || "",
@@ -486,6 +497,7 @@ function PaymentFormDialog({
         month: editData.month || "",
         status: editData.status || "pending",
         paymentDate: editData.paymentDate ? new Date(editData.paymentDate).toISOString().split("T")[0] : "",
+        transferDate: editData.transferDate ? new Date(editData.transferDate).toISOString() : "",
         dueDate: editData.dueDate ? new Date(editData.dueDate).toISOString().split("T")[0] : "",
         receiptNumber: editData.receiptNumber || "",
         bankRef: editData.bankRef || "",
@@ -517,6 +529,7 @@ function PaymentFormDialog({
         month: MONTHS[new Date().getMonth()],
         status: "paid",
         paymentDate: new Date().toISOString().split("T")[0],
+        transferDate: new Date().toISOString(),
         dueDate: "",
         receiptNumber: newReceiptNumber,
         bankRef: "",
@@ -556,11 +569,14 @@ function PaymentFormDialog({
         amount: grandTotal,
         status: data.status,
         paymentDate: new Date(data.paymentDate).toISOString(),
+        transferDate: data.transferDate ? new Date(data.transferDate).toISOString() : undefined,
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
         receiptNumber: data.receiptNumber,
         bankRef: data.bankRef,
         notes: data.notes || null,
       };
+
+      console.log(paymentPayload);
 
       if (editData) {
         await updatePayment.mutateAsync({ id: editData.id, ...paymentPayload });
@@ -733,6 +749,29 @@ function PaymentFormDialog({
               <Input id="bankRef" placeholder="Contoh: 122237678764" {...register("bankRef")} />
               {errors.bankRef && <p className="text-sm text-red-500">{errors.bankRef.message}</p>}
             </div>
+          </div>
+
+          {/* Transfer Date with Time Picker */}
+          <div className="space-y-2">
+            <Label>
+              Tanggal & Waktu Transfer <span className="text-xs text-muted-foreground">(opsional)</span>
+            </Label>
+            <Controller
+              name="transferDate"
+              control={control}
+              render={({ field }) => (
+                <DatePickerTime
+                  value={field.value ? new Date(field.value) : undefined}
+                  onChange={(date) => {
+                    field.onChange(date ? date.toISOString() : "");
+                  }}
+                  dateLabel="Tanggal"
+                  timeLabel="Waktu"
+                  placeholder="Pilih tanggal"
+                />
+              )}
+            />
+            {errors.transferDate && <p className="text-sm text-red-500">{errors.transferDate.message}</p>}
           </div>
 
           <Separator />
@@ -959,12 +998,12 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          {/* <AlertDialogAction onClick={handleDelete} disabled={deletePayment.isPending} className="bg-red-600 hover:bg-red-700">
-            {deletePayment.isPending ? "Menghapus..." : "Hapus"}
-          </AlertDialogAction> */}
           <AlertDialogAction onClick={handleDelete} disabled={deletePayment.isPending} className="bg-red-600 hover:bg-red-700">
             {deletePayment.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
+          {/* <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
+            {deletePayment.isPending ? "Menghapus..." : "Hapus"}
+          </AlertDialogAction> */}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -982,7 +1021,13 @@ function PaymentDataTable({
     name?: string;
   };
 }) {
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined);
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(() => {
+    const today = new Date();
+    return {
+      from: today,
+      to: today,
+    };
+  });
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -1011,7 +1056,7 @@ function PaymentDataTable({
     todate: dateRange?.to,
     majorId: majorId ?? "",
   });
-  const { data: allStudents = [] } = useGetStudents();
+  const { data: allStudents = [] } = useGetStudentByIdMajor(majorId as string);
   const { data: allAccountBanks = [] } = useGetAccountBankByIdMajor(majorId as string);
 
   // Callback hooks
@@ -1149,16 +1194,31 @@ function PaymentDataTable({
         },
       },
       {
-        accessorKey: "paymentDate",
+        accessorKey: "transferDate",
         header: ({ column }) => (
           <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
             <CalendarDays className="mr-2 h-4 w-4" />
-            Tgl Bayar
+            Tgl Transfer
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
         cell: ({ row }) => {
-          const d = row.getValue("paymentDate") as string;
+          const d = row.getValue("transferDate") as string;
+          if (!d) return <span className="text-muted-foreground">-</span>;
+          return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
+        },
+      },
+      {
+        accessorKey: "createdAt",
+        header: ({ column }) => (
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            <CalendarDays className="mr-2 h-4 w-4" />
+            Tgl Input
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const d = row.getValue("createdAt") as string;
           if (!d) return <span className="text-muted-foreground">-</span>;
           return <span>{format(new Date(d), "dd MMM yyyy", { locale: localeId })}</span>;
         },
@@ -1261,6 +1321,7 @@ function PaymentDataTable({
     major: "Branch",
     accountBank: "Bank",
     paymentDate: "Tgl Bayar",
+    transferDate: "Tgl Transfer",
     dueDate: "Jatuh Tempo",
   };
 

@@ -24,9 +24,11 @@ export const useCreatePayment = () => {
       return res.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payment-by-id-major"] });
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["unpaid-students"] });
-      queryClient.invalidateQueries({ queryKey: ["payment-by-id-major"] });
+      queryClient.invalidateQueries({ queryKey: ["      payment-items-filter-date"] });
+      queryClient.invalidateQueries({ queryKey: ["       payments-by-date"] });
     },
   });
 };

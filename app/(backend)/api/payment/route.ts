@@ -188,13 +188,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     // First, delete payment transaction if exists
-    await prisma.paymentTransaction.deleteMany({
-      where: { paymentId: id },
-    });
+    // await prisma.paymentTransaction.deleteMany({
+    //   where: { paymentId: id },
+    // });
 
-    // Then, delete all payment items associated with this payment
-    await prisma.paymentItems.deleteMany({
+    // Then, payment items edit  associated with this payment
+    await prisma.paymentItems.updateMany({
       where: { paymentId: id },
+      data: { paymentId: null, isPaid: false },
     });
 
     // Finally, delete the payment
