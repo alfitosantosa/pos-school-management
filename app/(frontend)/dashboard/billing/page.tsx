@@ -18,9 +18,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 
-import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, usePaymentItemsUnpaidStudent, usePaymentItemsByMajorId, useGetPaymentsItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
 
-import { useGetPaymentTypeByIdMajor, useGetPaymentTypes } from "@/app/(hooks)/hooks/Payments/usePaymentType";
+import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
 import Loading from "@/components/loading";
 import { StudentCombobox } from "@/components/ui/student-combobox";
 import { useSession } from "@/lib/auth-client";
@@ -28,8 +28,9 @@ import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
-import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
-import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import { DateRange } from "react-day-picker";
+import { usePaymentsItemsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentItemsByDate";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -567,12 +568,12 @@ function DeleteItemDialog({ open, onOpenChange, itemData, onSuccess }: { open: b
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deleteItem.isPending} className="bg-red-600 hover:bg-red-700">
-            {deleteItem.isPending ? "Menghapus..." : "Hapus"}
-          </AlertDialogAction>
-          {/* <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
+          {/* <AlertDialogAction onClick={handleDelete} disabled={deleteItem.isPending} className="bg-red-600 hover:bg-red-700">
             {deleteItem.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction> */}
+          <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
+            {deleteItem.isPending ? "Menghapus..." : "Hapus"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -589,7 +590,7 @@ async function exportToExcel(data: PaymentItemData[], filename: string = "Data_T
       Kelas: item.student?.class?.name ?? "-",
       Siswa: item.student?.name ?? "-",
       "Nama Item": item.name,
-      "Tipe SKU": item.skuType || "default",
+      "Tipe SKU": item.PaymentType?.skuType || "default",
       Owner: item.PaymentType?.owner || "-",
       Nominal: item.amount,
       Qty: item.quantity,
@@ -631,7 +632,21 @@ async function exportToExcel(data: PaymentItemData[], filename: string = "Data_T
 }
 
 // ─── Main DataTable ───────────────────────────────────────────────────────────
-function BillingDataTable() {
+function BillingDataTable({
+  majorData,
+}: {
+  majorData: {
+    id: string;
+    name: string;
+  };
+}) {
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(() => {
+    const today = new Date();
+    return {
+      from: today,
+      to: today,
+    };
+  });
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -641,6 +656,7 @@ function BillingDataTable() {
   const [classFilter, setClassFilter] = React.useState<string>("all");
   const [monthFilter, setMonthFilter] = React.useState<string>("all");
   const [yearFilter, setYearFilter] = React.useState<string>("all");
+  const [skuFilter, setSkuFilter] = React.useState<string>("all");
   const [isExporting, setIsExporting] = React.useState(false);
 
   const [singleDialogOpen, setSingleDialogOpen] = React.useState(false);
@@ -648,10 +664,25 @@ function BillingDataTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<PaymentItemData | null>(null);
 
-  const { data: paymentItems = [], isLoading, refetch } = useGetPaymentsItems();
-  const { data: allStudents = [] } = useGetStudents();
-  const { data: allPaymentTypes = [] } = useGetPaymentTypes();
-  const { data: allClassById = [] } = useGetClasses();
+  // ✅ Integrasikan hook dengan filter tanggal, major, skuType, dan isPaid
+  const {
+    data: paymentItems = [],
+    isLoading,
+    refetch,
+  } = usePaymentsItemsByDate({
+    fromdate: dateRange?.from,
+    todate: dateRange?.to,
+    majorId: undefined,
+    skuType: skuFilter !== "all" ? skuFilter : undefined,
+    isPaid:
+      paidFilter === "all" ? undefined
+      : paidFilter === "paid" ? true
+      : false,
+  });
+
+  const { data: allStudents = [] } = useGetStudentByIdMajor(majorData?.id);
+  const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorData?.id);
+  const { data: allClassById = [] } = useGetClassByIdMajor(majorData?.id);
   const handleSuccess = () => refetch();
 
   const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
@@ -807,11 +838,19 @@ function BillingDataTable() {
         return true;
       },
     },
+
     {
       id: "receipt",
       accessorFn: (row) => row.payment?.receiptNumber ?? "-",
       header: "Kwitansi",
       cell: ({ row }) => <div className="font-mono text-xs text-muted-foreground">{row.original.payment?.receiptNumber ?? "-"}</div>,
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Tanggal Pembuatan",
+      cell: ({ row }) => {
+        return <div className="text-xs">{new Date(row.getValue("createdAt")).toLocaleDateString("id-ID")}</div>;
+      },
     },
     {
       id: "actions",
@@ -888,6 +927,10 @@ function BillingDataTable() {
     table.getColumn("year")?.setFilterValue(yearFilter !== "all" ? yearFilter : undefined);
   }, [yearFilter, table]);
 
+  // React.useEffect(() => {
+  //   table.getColumn("skuType")?.setFilterValue(skuFilter !== "all" ? skuFilter : undefined);
+  // }, [skuFilter, table]);
+
   if (isLoading) return <Loading />;
 
   const filteredRows = table.getFilteredRowModel().rows;
@@ -911,7 +954,7 @@ function BillingDataTable() {
     receipt: "Kwitansi",
   };
 
-  const hasActiveFilter = globalFilter || paidFilter !== "all" || classFilter !== "all" || monthFilter !== "all" || yearFilter !== "all";
+  const hasActiveFilter = globalFilter || paidFilter !== "all" || classFilter !== "all" || monthFilter !== "all" || yearFilter !== "all" || skuFilter !== "all" || dateRange;
 
   const resetFilters = () => {
     setGlobalFilter("");
@@ -919,19 +962,23 @@ function BillingDataTable() {
     setClassFilter("all");
     setMonthFilter("all");
     setYearFilter("all");
+    setSkuFilter("all");
     table.resetColumnFilters();
   };
 
   return (
     <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
-      <div className="font-bold text-3xl mb-6">Data Tagihan</div>
-
+      <div className="font-bold text-3xl mb-3">Data Tagihan</div>
+      <Badge>Seluruh Branch</Badge>
       {/* Toolbar */}
       <div className="flex items-center justify-between py-4 flex-wrap gap-y-3">
         <div className="flex items-center space-x-2 flex-wrap gap-y-2">
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Cari siswa, item, kwitansi..." value={globalFilter ?? ""} onChange={(e) => setGlobalFilter(e.target.value)} className="max-w-xs pl-8" />
+          </div>
+          <div>
+            <DatePickerWithRange date={dateRange} setDate={setDateRange} />
           </div>
 
           <Select value={classFilter} onValueChange={setClassFilter}>
@@ -961,7 +1008,7 @@ function BillingDataTable() {
 
           <Select value={monthFilter} onValueChange={setMonthFilter}>
             <SelectTrigger className="w-36">
-              <SelectValue placeholder="Filter B/ulan" />
+              <SelectValue placeholder="Filter Bulan" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Bulan</SelectItem>
@@ -987,11 +1034,25 @@ function BillingDataTable() {
               ))}
             </SelectContent>
           </Select>
+          {/* filter SKU */}
+          <Select value={skuFilter} onValueChange={setSkuFilter}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Filter SKU" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua SKU</SelectItem>
+              <SelectItem value="SPP">SPP</SelectItem>
+              <SelectItem value="Seragam">Seragam</SelectItem>
+              <SelectItem value="Kegiatan">Kegiatan</SelectItem>
+              <SelectItem value="Catering">Catering</SelectItem>
+              <SelectItem value="Lainnya">Lainnya</SelectItem>
+            </SelectContent>
+          </Select>
 
           {hasActiveFilter && (
             <Button variant="outline" size="sm" onClick={resetFilters}>
               <X className="mr-2 h-4 w-4" />
-              Reset
+              Reset Filter
             </Button>
           )}
         </div>
@@ -1026,7 +1087,7 @@ function BillingDataTable() {
             <FileText className="mr-2 h-4 w-4" />
             {isExporting ? "Mengexport..." : "Export Excel"}
           </Button>
-          <Button onClick={() => setSingleDialogOpen(true)}>
+          <Button disabled={true} onClick={() => setSingleDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Item
           </Button>
@@ -1043,6 +1104,12 @@ function BillingDataTable() {
               <X className="h-3 w-3 cursor-pointer" onClick={() => setGlobalFilter("")} />
             </Badge>
           )}
+          {/* {dateRange && (
+            <Badge variant="secondary" className="gap-1">
+              Tanggal: {dateRange.from?.toLocaleDateString("id-ID")} - {dateRange.to?.toLocaleDateString("id-ID")}
+              <X className="h-3 w-3 cursor-pointer" onClick={handleResetDateRange} />
+            </Badge>
+          )} */}
           {paidFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
               {paidFilter === "paid" ? "Lunas" : "Belum Lunas"}
@@ -1182,7 +1249,8 @@ export default function BillingPage() {
   const userId = session?.user?.id;
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
-  const majorId = userData?.major?.id;
+  const majorData = userData?.major;
+  // const majorId = userData?.major?.id;
 
   if (isPending || isLoadingUserData) return <Loading />;
   // Check if user is Admin
@@ -1192,5 +1260,5 @@ export default function BillingPage() {
       return null;
     }
   }
-  return <BillingDataTable />;
+  return <BillingDataTable majorData={majorData} />;
 }
