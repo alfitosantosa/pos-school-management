@@ -1054,7 +1054,7 @@ function PaymentDataTable({
   } = usePaymentsByDate({
     fromdate: dateRange?.from,
     todate: dateRange?.to,
-    majorId: majorId ?? "",
+    majorId: undefined,
   });
   const { data: allStudents = [] } = useGetStudentByIdMajor(majorId as string);
   const { data: allAccountBanks = [] } = useGetAccountBankByIdMajor(majorId as string);
