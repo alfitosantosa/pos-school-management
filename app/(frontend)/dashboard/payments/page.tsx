@@ -1412,7 +1412,7 @@ function PaymentDataTable({
             <FileText className="mr-2 h-4 w-4" />
             {isExporting ? "Mengexport..." : "Export Excel"}
           </Button>
-          <Button onClick={() => setCreateDialogOpen(true)}>
+          <Button disabled={true} onClick={() => setCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Pembayaran
           </Button>
