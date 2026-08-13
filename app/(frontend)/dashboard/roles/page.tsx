@@ -157,6 +157,10 @@ const availablePermissions = [
     id: "/dashboard/bendahara/studentinformation",
     label: "Student Information (Bendahara)",
   },
+  {
+    id: "/dashboard/payments/chart",
+    label: "Dashboard Transaksi",
+  },
 ];
 
 // Create/Edit Dialog Component
