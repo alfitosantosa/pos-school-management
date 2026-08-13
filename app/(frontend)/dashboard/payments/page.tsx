@@ -24,19 +24,19 @@ import { id as localeId } from "date-fns/locale";
 
 import { useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
 import { usePaymentItemsUnpaidStudent, userPaymentItemsSetPaid } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
-import { useGetAccountBankByIdMajor } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
+import { useGetAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
 import Loading from "@/components/loading";
 import { StudentCombobox } from "@/components/ui/student-combobox";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { v4 as uuidv4 } from "uuid";
-import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoice";
 import { DatePickerWithRange } from "@/components/date/datePicker";
 import { DateRange } from "react-day-picker";
 import { usePaymentsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
 import { DatePickerTime } from "@/components/date/datePickerTime";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -1056,8 +1056,8 @@ function PaymentDataTable({
     todate: dateRange?.to,
     majorId: undefined,
   });
-  const { data: allStudents = [] } = useGetStudentByIdMajor(majorId as string);
-  const { data: allAccountBanks = [] } = useGetAccountBankByIdMajor(majorId as string);
+  const { data: allStudents = [] } = useGetStudents();
+  const { data: allAccountBanks = [] } = useGetAccountBank();
 
   // Callback hooks
   const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
