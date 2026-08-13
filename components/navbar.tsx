@@ -65,6 +65,8 @@ const permissionLabels: Record<string, string> = {
   "/dashboard/bendahara/billing/upload": "Upload Tagihan",
   "/dashboard/bendahara/users/upload": "Upload Data Siswa",
   "/dashboard/bendahara/studentinformation": "Informasi Siswa",
+  "/dashboard/payments/chart": "Dashboard Transaksi",
+  "/dashboard/billing/chart": "Dashboard Tagihan",
 };
 
 export default function Navbar() {
