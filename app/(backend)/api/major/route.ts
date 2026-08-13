@@ -36,6 +36,7 @@ export async function GET() {
           },
         },
       },
+      orderBy: { name: "asc" },
     });
     return NextResponse.json(majors);
   } catch (error) {
@@ -89,7 +90,7 @@ export async function PUT(request: NextRequest) {
         address,
         adminName,
         signatureUrl,
-        isActive: isActive !== undefined ? isActive : true, 
+        isActive: isActive !== undefined ? isActive : true,
         // Default to true if not provided
       },
     });

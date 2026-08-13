@@ -165,6 +165,10 @@ const availablePermissions = [
     id: "/dashboard/billing/chart",
     label: "Dashboard Tagihan",
   },
+  {
+    id: "/dashboard/accountbank/chart",
+    label: "Dashboard Saldo",
+  },
 ];
 
 // Create/Edit Dialog Component
