@@ -195,14 +195,25 @@ function AccountBankBalanceDashboard({
   };
   isAdmin: boolean;
 }) {
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
-    from: subMonths(new Date(), 3),
-    to: new Date(),
-  });
+  // ✅ Memoize initial date to prevent re-creation
+  const initialDateRange = React.useMemo(
+    () => ({
+      from: subMonths(new Date(), 3),
+      to: new Date(),
+    }),
+    [],
+  );
+
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(initialDateRange);
 
   // ✅ Fix: Provide fallback value untuk undefined dan set based on isAdmin
   const [selectedMajorId, setSelectedMajorId] = React.useState<string>(isAdmin ? "all" : (userDataMajor?.id ?? ""));
   const [activeTab, setActiveTab] = React.useState("overview");
+
+  // ✅ Memoize setDateRange handler to prevent recreating on every render
+  const handleDateRangeChange = React.useCallback((newDateRange: DateRange | undefined) => {
+    setDateRange(newDateRange);
+  }, []);
 
   const { data: majors = [] } = useGetMajors();
 
@@ -292,7 +303,7 @@ function AccountBankBalanceDashboard({
               <span className="text-sm font-medium text-muted-foreground">Periode:</span>
             </div>
 
-            <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+            <DatePickerWithRange date={dateRange} setDate={handleDateRangeChange} />
 
             {isAdmin && (
               <>

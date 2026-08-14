@@ -9,20 +9,20 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { type DateRange } from "react-day-picker";
 
-export function DatePickerWithRange({ date: controlledDate, setDate: setControlledDate }: { date?: DateRange; setDate?: (date: DateRange | undefined) => void }) {
-  const [internalDate, setInternalDate] = React.useState<DateRange | undefined>({
-    from: new Date(),
-    to: new Date(),
-  });
-
-  const date = controlledDate !== undefined ? controlledDate : internalDate;
-  const setDate = setControlledDate || setInternalDate;
+export function DatePickerWithRange({ date, setDate }: { date?: DateRange; setDate?: (date: DateRange | undefined) => void }) {
+  // ✅ Use controlled date only, no internal state
+  const handleSelect = React.useCallback(
+    (newDate: DateRange | undefined) => {
+      setDate?.(newDate);
+    },
+    [setDate],
+  );
 
   return (
     <div className="grid gap-2">
       <Popover>
         <PopoverTrigger asChild>
-          <Button id="date" variant={"outline"} className={cn("w-75 justify-start text-left font-normal", !date && "text-muted-foreground")}>
+          <Button id="date" variant="outline" className={cn("w-75 justify-start text-left font-normal", !date && "text-muted-foreground")}>
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ?
               date.to ?
@@ -34,7 +34,7 @@ export function DatePickerWithRange({ date: controlledDate, setDate: setControll
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar mode="range" defaultMonth={date?.from} selected={date} onSelect={setDate} numberOfMonths={2} />
+          <Calendar mode="range" defaultMonth={date?.from} selected={date} onSelect={handleSelect} numberOfMonths={2} />
         </PopoverContent>
       </Popover>
     </div>

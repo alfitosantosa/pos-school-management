@@ -1021,14 +1021,23 @@ function PaymentDataTable({
     name?: string;
   };
 }) {
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(() => {
+  // ✅ Memoize initial date range to prevent re-creation
+  const initialDateRange = React.useMemo(() => {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     return {
       from: firstDayOfMonth,
       to: today,
     };
-  });
+  }, []);
+
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(initialDateRange);
+
+  // ✅ Memoize date change handler
+  const handleDateRangeChange = React.useCallback((newDateRange: DateRange | undefined) => {
+    setDateRange(newDateRange);
+  }, []);
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -1055,7 +1064,7 @@ function PaymentDataTable({
   } = usePaymentsByDate({
     fromdate: dateRange?.from,
     todate: dateRange?.to,
-    majorId: majorId ?? "",
+    majorId: majorId, // ✅ FIX: Pass majorId directly (undefined is OK)
   });
   const { data: allStudents = [] } = useGetStudentByIdMajor(majorId as string);
   const { data: allAccountBanks = [] } = useGetAccountBankByIdMajor(majorId as string);
@@ -1079,6 +1088,11 @@ function PaymentDataTable({
   const handleSuccess = React.useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // ✅ Memoize reset handler - MUST BE BEFORE OTHER LOGIC
+  const handleResetDateRange = React.useCallback(() => {
+    setDateRange(initialDateRange);
+  }, [initialDateRange]);
 
   // Memoize columns definition
   const columns: ColumnDef<PaymentData>[] = React.useMemo(
@@ -1326,7 +1340,8 @@ function PaymentDataTable({
     dueDate: "Jatuh Tempo",
   };
 
-  const hasActiveFilter = globalFilter || statusFilter !== "all" || monthFilter !== "all";
+  // ✅ Include dateRange in active filter detection
+  const hasActiveFilter = globalFilter || statusFilter !== "all" || monthFilter !== "all" || dateRange;
 
   return (
     <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
@@ -1351,7 +1366,7 @@ function PaymentDataTable({
             </SelectContent>
           </Select>
           <div>
-            <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+            <DatePickerWithRange date={dateRange} setDate={handleDateRangeChange} />
           </div>
           <Select value={monthFilter} onValueChange={setMonthFilter}>
             <SelectTrigger className="w-36">
@@ -1374,6 +1389,7 @@ function PaymentDataTable({
                 setGlobalFilter("");
                 setStatusFilter("all");
                 setMonthFilter("all");
+                handleResetDateRange();
                 table.resetColumnFilters();
               }}
             >
@@ -1489,6 +1505,7 @@ function PaymentDataTable({
                           setGlobalFilter("");
                           setStatusFilter("all");
                           setMonthFilter("all");
+                          handleResetDateRange();
                           table.resetColumnFilters();
                         }}
                       >
