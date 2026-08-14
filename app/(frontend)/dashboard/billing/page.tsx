@@ -568,10 +568,7 @@ function DeleteItemDialog({ open, onOpenChange, itemData, onSuccess }: { open: b
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          {/* <AlertDialogAction onClick={handleDelete} disabled={deleteItem.isPending} className="bg-red-600 hover:bg-red-700">
-            {deleteItem.isPending ? "Menghapus..." : "Hapus"}
-          </AlertDialogAction> */}
-          <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
             {deleteItem.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
         </AlertDialogFooter>
