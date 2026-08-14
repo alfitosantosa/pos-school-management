@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api-client";
 
-export const usePaymentsByDate = ({ fromdate, todate, majorId, enabled = false }: { fromdate?: Date; todate?: Date; majorId?: string; enabled?: boolean }) => {
+export const usePaymentsByDate = ({ fromdate, todate, majorId }: { fromdate?: Date; todate?: Date; majorId?: string }) => {
   // Format tanggal ke YYYY-MM-DD menggunakan timezone lokal
   const formatLocalDate = (date: Date) => {
     const year = date.getFullYear();
@@ -45,9 +45,10 @@ export const usePaymentsByDate = ({ fromdate, todate, majorId, enabled = false }
       const response = await apiGet("/api/payment/filterdate", { params });
       return response.data;
     },
-    // Selalu enabled, tapi return empty array jika tidak ada date
-    // enabled: true,
-    enabled: enabled && !!normalizedFromDate && !!normalizedToDate,
+    // ✅ FIX: Enable query when dates are available
+    enabled: !!fromdateStr && !!todateStr,
+    staleTime: 60_000, // 1 minute
+    gcTime: 300_000, // 5 minutes
   });
 };
 

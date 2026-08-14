@@ -24,13 +24,14 @@ import { id as localeId } from "date-fns/locale";
 
 import { useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
 import { usePaymentItemsUnpaidStudent, userPaymentItemsSetPaid } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
-import { useGetAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
+import { useGetAccountBank, useGetAccountBankByIdMajor } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
 import Loading from "@/components/loading";
 import { StudentCombobox } from "@/components/ui/student-combobox";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { v4 as uuidv4 } from "uuid";
+import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoice";
 import { DatePickerWithRange } from "@/components/date/datePicker";
 import { DateRange } from "react-day-picker";
@@ -998,12 +999,12 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deletePayment.isPending} className="bg-red-600 hover:bg-red-700">
-            {deletePayment.isPending ? "Menghapus..." : "Hapus"}
-          </AlertDialogAction>
-          {/* <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
+          {/* <AlertDialogAction onClick={handleDelete} disabled={deletePayment.isPending} className="bg-red-600 hover:bg-red-700">
             {deletePayment.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction> */}
+          <AlertDialogAction onClick={handleDelete} disabled={true} className="bg-red-600 hover:bg-red-700">
+            {deletePayment.isPending ? "Menghapus..." : "Hapus"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -1021,13 +1022,23 @@ function PaymentDataTable({
     name?: string;
   };
 }) {
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(() => {
+  // ✅ Memoize initial date range to prevent re-creation
+  const initialDateRange = React.useMemo(() => {
     const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     return {
-      from: today,
+      from: firstDayOfMonth,
       to: today,
     };
-  });
+  }, []);
+
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(initialDateRange);
+
+  // ✅ Memoize date change handler
+  const handleDateRangeChange = React.useCallback((newDateRange: DateRange | undefined) => {
+    setDateRange(newDateRange);
+  }, []);
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -1054,10 +1065,10 @@ function PaymentDataTable({
   } = usePaymentsByDate({
     fromdate: dateRange?.from,
     todate: dateRange?.to,
-    majorId: undefined,
+    majorId: undefined, // ✅ FIX: Pass majorId directly (undefined is OK)
   });
-  const { data: allStudents = [] } = useGetStudents();
-  const { data: allAccountBanks = [] } = useGetAccountBank();
+  // const { data: allStudents = [] } = useGetStudents();
+  // const { data: allAccountBanks = [] } = useGetAccountBank();
 
   // Callback hooks
   const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
@@ -1078,6 +1089,11 @@ function PaymentDataTable({
   const handleSuccess = React.useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // ✅ Memoize reset handler - MUST BE BEFORE OTHER LOGIC
+  const handleResetDateRange = React.useCallback(() => {
+    setDateRange(initialDateRange);
+  }, [initialDateRange]);
 
   // Memoize columns definition
   const columns: ColumnDef<PaymentData>[] = React.useMemo(
@@ -1325,7 +1341,8 @@ function PaymentDataTable({
     dueDate: "Jatuh Tempo",
   };
 
-  const hasActiveFilter = globalFilter || statusFilter !== "all" || monthFilter !== "all";
+  // ✅ Include dateRange in active filter detection
+  const hasActiveFilter = globalFilter || statusFilter !== "all" || monthFilter !== "all" || dateRange;
 
   return (
     <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
@@ -1350,7 +1367,7 @@ function PaymentDataTable({
             </SelectContent>
           </Select>
           <div>
-            <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+            <DatePickerWithRange date={dateRange} setDate={handleDateRangeChange} />
           </div>
           <Select value={monthFilter} onValueChange={setMonthFilter}>
             <SelectTrigger className="w-36">
@@ -1373,6 +1390,7 @@ function PaymentDataTable({
                 setGlobalFilter("");
                 setStatusFilter("all");
                 setMonthFilter("all");
+                handleResetDateRange();
                 table.resetColumnFilters();
               }}
             >
@@ -1412,6 +1430,10 @@ function PaymentDataTable({
             <FileText className="mr-2 h-4 w-4" />
             {isExporting ? "Mengexport..." : "Export Excel"}
           </Button>
+          {/* <Button onClick={() => setCreateDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah Pembayaran
+          </Button> */}
           <Button disabled={true} onClick={() => setCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Pembayaran
@@ -1488,6 +1510,7 @@ function PaymentDataTable({
                           setGlobalFilter("");
                           setStatusFilter("all");
                           setMonthFilter("all");
+                          handleResetDateRange();
                           table.resetColumnFilters();
                         }}
                       >
@@ -1558,7 +1581,7 @@ function PaymentDataTable({
       </div>
 
       {/* Dialogs */}
-      <PaymentFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allAccountBanks={allAccountBanks} userDataId={userDataId} userDataMajorId={majorId} />
+      {/* <PaymentFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allAccountBanks={allAccountBanks} userDataId={userDataId} userDataMajorId={majorId} />
       <PaymentFormDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
@@ -1568,7 +1591,7 @@ function PaymentDataTable({
         allAccountBanks={allAccountBanks}
         userDataId={userDataId}
         userDataMajorId={majorId}
-      />
+      /> */}
       <DeletePaymentDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} paymentData={selectedPayment} onSuccess={handleSuccess} />
     </div>
   );
