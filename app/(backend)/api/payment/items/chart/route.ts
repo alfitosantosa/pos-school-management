@@ -322,7 +322,7 @@ export async function GET(request: NextRequest) {
         };
       })
       .sort((a, b) => b.totalUnpaidAmount - a.totalUnpaidAmount)
-      .slice(0, 20); // top 20 siswa tunggakan terbesar
+      .slice(0, 50); // top 20 siswa tunggakan terbesar
 
     // ── 8. Compose & return ─────────────────────────────────────────────
     const result: DashboardResult = {

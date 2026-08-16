@@ -599,7 +599,7 @@ function UnpaidPaymentDashboard({ userMajorId, isAdmin }: { userMajorId?: string
                 <div>
                   <CardTitle className="text-base flex items-center gap-2">
                     <ListChecks className="h-4 w-4 text-red-600" />
-                    Top 20 Siswa dengan Tunggakan Terbesar
+                    Top 50 Siswa dengan Tunggakan Terbesar
                   </CardTitle>
                   <CardDescription className="text-xs mt-1">Diurutkan berdasarkan total nominal belum bayar</CardDescription>
                 </div>
