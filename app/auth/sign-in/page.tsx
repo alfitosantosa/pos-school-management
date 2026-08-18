@@ -23,7 +23,7 @@ export default function SignIn() {
       <div className="w-full max-w-md">
         {/* Logo and Brand */}
         <div className="flex flex-col items-center mb-8">
-          <Image src={Logo} alt="Logo Rahmaniyah" className="h-10 w-10 mb-5" priority />
+          <Image src={Logo} alt="Logo Rahmaniyah" className="h-10 w-10 mb-5" loading="eager" />
           <h1 className="text-2xl font-bold text-gray-900">Rahmaniyah Al-Islamy</h1>
           <p className="text-sm text-gray-600 mt-1">Sistem Informasi Sekolah</p>
         </div>
