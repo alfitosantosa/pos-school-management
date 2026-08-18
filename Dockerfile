@@ -1,29 +1,33 @@
 # ==========================================
-# PRODUCTION-READY DOCKERFILE - OPTIMIZED FOR SIZE
+# PRODUCTION-READY DOCKERFILE
+# NEXT.JS + BUN + PRISMA
 # ==========================================
 
-# Stage 1: Dependencies (Minimal cache)
-FROM node:24-alpine AS deps
+# ==========================================
+# Stage 1: Dependencies
+# ==========================================
+FROM oven/bun:latest-alpine AS deps
+
 WORKDIR /app
 
-# Install dependencies in single layer dengan cleanup
-RUN apk add --no-cache curl \
-    && rm -rf /var/cache/apk/* /tmp/*
+# Copy dependency files
+COPY package.json bun.lock* ./
 
-# Copy package files
-COPY package.json package-lock.json* yarn.lock* bun.lock* ./
+# Install dependencies
+RUN bun install --frozen-lockfile
 
-# Install dependencies dengan legacy peer deps untuk mengatasi konflik valibot
-RUN npm install --legacy-peer-deps \
-    && rm -rf /tmp/*
 
 # ==========================================
-# Stage 2: Builder (dengan cleanup aggressive)
-FROM node:24-alpine AS builder
+# Stage 2: Builder
+# ==========================================
+FROM oven/bun:latest-alpine AS builder
+
 WORKDIR /app
 
-# Copy dependencies dari deps stage
+# Copy dependencies
 COPY --from=deps /app/node_modules ./node_modules
+
+# Copy source
 COPY . .
 
 # Environment variables
@@ -31,50 +35,59 @@ ENV NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production \
     SKIP_ENV_VALIDATION=1
 
-# Generate Prisma & Build dalam single layer dengan cleanup
-RUN npx prisma generate && \
-    npm run build && \
-    rm -rf /tmp/* && \
-    rm -rf .next/cache && \
-    rm -rf node_modules/.cache && \
-    find . -name "*.map" -type f -delete && \
-    find . -name "*.test.*" -type f -delete
+# Prisma generate + Next.js build
+RUN bunx prisma generate && \
+    bun run build && \
+    rm -rf /tmp/* \
+    .next/cache \
+    node_modules/.cache
+
 
 # ==========================================
-# Stage 3: Production Runner (Ultra minimal)
-FROM node:24-alpine AS runner
+# Stage 3: Production Runner
+# ==========================================
+FROM oven/bun:latest-alpine AS runner
+
 WORKDIR /app
 
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=8788 \
-    HOSTNAME="0.0.0.0"
+    HOSTNAME=0.0.0.0
 
-# Install curl dan cleanup dalam satu layer
-RUN apk add --no-cache curl \
-    && rm -rf /var/cache/apk/* /tmp/*
+# Install curl untuk healthcheck
+RUN apk add --no-cache curl
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 nextjs
+# Non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
-# Copy only production dependencies
-COPY --from=deps /app/node_modules ./node_modules
-
-# Copy hanya file yang dibutuhkan
+# Copy public
 COPY --from=builder /app/public ./public
+
+# Copy package.json
 COPY --from=builder /app/package.json ./package.json
 
-# Copy standalone build
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Copy standalone Next.js
+COPY --from=builder --chown=nextjs:nodejs \
+    /app/.next/standalone ./
 
-# Switch to non-root user
+# Copy static files
+COPY --from=builder --chown=nextjs:nodejs \
+    /app/.next/static ./.next/static
+
+# Switch user
 USER nextjs
 
 EXPOSE 8788
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-8788}/api/health || exit 1
+# Healthcheck
+HEALTHCHECK \
+    --interval=30s \
+    --timeout=10s \
+    --start-period=40s \
+    --retries=3 \
+    CMD curl -f http://localhost:${PORT}/api/health || exit 1
 
-CMD ["node", "server.js"]
+# Next.js standalone server
+CMD ["bun", "server.js"]
