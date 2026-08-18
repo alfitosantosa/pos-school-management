@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Loader2, Key } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
+import Logo from "@/public/Logo.svg";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -18,52 +19,47 @@ export default function SignIn() {
   const [rememberMe, setRememberMe] = useState(false);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 flex-col">
-      <Card className="w-full max-w-md mx-4">
-        <CardHeader>
-          <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
-          <CardDescription className="text-xs md:text-sm">Enter your email below to login to your account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 p-4">
+      <div className="w-full max-w-md">
+        {/* Logo and Brand */}
+        <div className="flex flex-col items-center mb-8">
+          <Image src={Logo} alt="Logo Rahmaniyah" className="h-10 w-10 mb-5" priority />
+          <h1 className="text-2xl font-bold text-gray-900">Rahmaniyah Al-Islamy</h1>
+          <p className="text-sm text-gray-600 mt-1">Sistem Informasi Sekolah</p>
+        </div>
+
+        {/* Sign In Card */}
+        <Card className="shadow-xl border-0">
+          <CardHeader className="space-y-1 pb-6">
+            <CardTitle className="text-2xl font-bold text-center">Masuk</CardTitle>
+            <CardDescription className="text-center">Masukkan email dan password Anda</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="user@rahmaniyah.com"
-                required
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-                value={email}
-              />
+              <Input id="email" type="email" placeholder="nama@sekolah.com" required onChange={(e) => setEmail(e.target.value)} value={email} className="h-11" />
             </div>
 
-            <div className="grid gap-2">
-              <div className="flex items-center">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="#" className="ml-auto inline-block text-sm underline">
-                  Forgot your password?
+                <Link href="#" className="text-xs text-primary hover:underline">
+                  Lupa password?
                 </Link>
               </div>
-
-              <Input id="password" type="password" placeholder="password" autoComplete="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input id="password" type="password" placeholder="••••••••" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11" />
             </div>
 
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="remember"
-                onClick={() => {
-                  setRememberMe(!rememberMe);
-                }}
-              />
-              <Label htmlFor="remember">Remember me</Label>
+            <div className="flex items-center space-x-2">
+              <Checkbox id="remember" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked as boolean)} />
+              <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">
+                Ingat saya
+              </Label>
             </div>
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11"
               disabled={loading}
               onClick={async () => {
                 await signIn.email(
@@ -72,77 +68,79 @@ export default function SignIn() {
                     password,
                     callbackURL: "/",
                   },
-
                   {
-                    onRequest: (ctx) => {
+                    onRequest: () => {
                       setLoading(true);
                     },
-                    onResponse: (ctx) => {
+                    onResponse: () => {
                       setLoading(false);
                     },
                   },
                 );
               }}
             >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : <p> Login </p>}
+              {loading ?
+                <Loader2 className="h-5 w-5 animate-spin" />
+              : "Masuk"}
             </Button>
 
-            <div className={cn("w-full gap-2 flex items-center", "justify-between flex-col")}>
-              <Button
-                variant="outline"
-                className={cn("w-full gap-2")}
-                disabled={loading}
-                onClick={async () => {
-                  await signIn.social(
-                    {
-                      provider: "google",
-                      callbackURL: "/",
-                    },
-                    {
-                      onRequest: (ctx) => {
-                        setLoading(true);
-                      },
-                      onResponse: (ctx) => {
-                        setLoading(false);
-                      },
-                    },
-                  );
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="0.98em" height="1em" viewBox="0 0 256 262">
-                  <path fill="#4285F4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"></path>
-                  <path
-                    fill="#34A853"
-                    d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055c-34.523 0-63.824-22.773-74.269-54.25l-1.531.13l-40.298 31.187l-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"
-                  ></path>
-                  <path fill="#FBBC05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82c0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602z"></path>
-                  <path fill="#EB4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0C79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"></path>
-                </svg>
-                Sign in with Google
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <div className="flex flex-col w-full gap-4 text-sm dark:text-white/70 cursor-pointer">
-            <div>
-              Sudah punya akun belum?{" "}
-              <Link href="/auth/sign-up" className="underline">
-                Daftar
-              </Link>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Atau masuk dengan</span>
+              </div>
             </div>
 
-            <div className="flex justify-center w-full border-t py-4">
-              <p className="text-center text-xs text-neutral-500">
-                built with{" "}
-                <Link href="https://better-auth.com" className="underline" target="_blank">
-                  <span className="dark:text-white/70 cursor-pointer">better-auth.</span>
-                </Link>
-              </p>
+            <Button
+              variant="outline"
+              className="w-full h-11"
+              disabled={loading}
+              onClick={async () => {
+                await signIn.social(
+                  {
+                    provider: "google",
+                    callbackURL: "/",
+                  },
+                  {
+                    onRequest: () => {
+                      setLoading(true);
+                    },
+                    onResponse: () => {
+                      setLoading(false);
+                    },
+                  },
+                );
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 256 262" className="mr-2">
+                <path fill="#4285F4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"></path>
+                <path
+                  fill="#34A853"
+                  d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055c-34.523 0-63.824-22.773-74.269-54.25l-1.531.13l-40.298 31.187l-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"
+                ></path>
+                <path fill="#FBBC05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82c0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602z"></path>
+                <path fill="#EB4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0C79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"></path>
+              </svg>
+              Google
+            </Button>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="text-sm text-center text-muted-foreground">
+              Belum punya akun?{" "}
+              <Link href="/auth/sign-up" className="text-primary hover:underline font-medium">
+                Daftar sekarang
+              </Link>
             </div>
-          </div>
-        </CardFooter>
-      </Card>
+          </CardFooter>
+        </Card>
+
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-xs text-gray-500">&copy; {new Date().getFullYear()} Yayasan Rahmaniyah Al-Islamy. All rights reserved.</p>
+        </div>
+      </div>
     </div>
   );
 }
