@@ -389,7 +389,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
   const errorCount = previewRows.filter((r) => r._errors.length > 0).length;
 
   return (
-    <div className="min-h-screen w-full max-w-7xl mx-auto my-8 p-6 space-y-6">
+    <div className="">
       {/* ── Page Header ── */}
       <div>
         <div className="font-bold text-3xl mb-1">Upload Tagihan</div>

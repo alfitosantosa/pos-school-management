@@ -183,7 +183,11 @@ function ViolationTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { 
               Batal
             </Button>
             <Button type="submit" disabled={createViolationType.isPending || updateViolationType.isPending}>
-              {createViolationType.isPending || updateViolationType.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createViolationType.isPending || updateViolationType.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -413,7 +417,7 @@ function ViolationTypeDataTable() {
 
   return (
     <>
-      <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
+      <div className="">
         <div className="font-bold text-3xl">Jenis Pelanggaran</div>
         <div className="mx-auto">
           <div className="flex items-center justify-between py-4">
@@ -435,17 +439,17 @@ function ViolationTypeDataTable() {
                     .map((column) => {
                       return (
                         <DropdownMenuCheckboxItem key={column.id} className="capitalize" checked={column.getIsVisible()} onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                          {column.id === "name"
-                            ? "Nama Pelanggaran"
-                            : column.id === "description"
-                              ? "Deskripsi"
-                              : column.id === "category"
-                                ? "Kategori"
-                                : column.id === "points"
-                                  ? "Poin"
-                                  : column.id === "academicYear"
-                                    ? "Tahun Ajaran"
-                                    : column.id}
+                          {column.id === "name" ?
+                            "Nama Pelanggaran"
+                          : column.id === "description" ?
+                            "Deskripsi"
+                          : column.id === "category" ?
+                            "Kategori"
+                          : column.id === "points" ?
+                            "Poin"
+                          : column.id === "academicYear" ?
+                            "Tahun Ajaran"
+                          : column.id}
                         </DropdownMenuCheckboxItem>
                       );
                     })}
@@ -471,7 +475,7 @@ function ViolationTypeDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length ?
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -479,13 +483,12 @@ function ViolationTypeDataTable() {
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
+                : <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data jenis pelanggaran.
                     </TableCell>
                   </TableRow>
-                )}
+                }
               </TableBody>
             </Table>
           </div>

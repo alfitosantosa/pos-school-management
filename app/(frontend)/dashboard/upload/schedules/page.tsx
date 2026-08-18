@@ -234,7 +234,7 @@ function UploadSchedules() {
   };
 
   return (
-    <div className="min-h-screen w-full max-w-7xl mx-auto my-8 p-6">
+    <div className="">
       <div className="font-bold text-3xl mb-3">Upload Page</div>
 
       <div className="mb-6">

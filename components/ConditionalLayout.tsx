@@ -26,7 +26,7 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
           <div className="flex-1" />
         </header>
         <main className="flex-1 overflow-auto">
-          <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">{children}</div>
+          <div className=" mx-auto p-4 md:p-6 lg:p-8 space-y-6">{children}</div>
         </main>
         <Footer />
       </SidebarInset>

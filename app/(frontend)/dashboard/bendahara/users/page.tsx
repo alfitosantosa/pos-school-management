@@ -28,7 +28,14 @@ import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentB
 import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
 
 // Dashboard Component - Only rendered after role verification
-function UserDashboard({ id }: { id: string }) {
+function UserDashboard({
+  majorData,
+}: {
+  majorData: {
+    id: string;
+    name: string;
+  };
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -48,7 +55,7 @@ function UserDashboard({ id }: { id: string }) {
   const [selectedUser, setSelectedUser] = React.useState<UserData | null>(null);
 
   // Fetch data with proper error handling
-  const { data: usersData = [], isLoading, refetch, error } = useGetStudentByIdMajor(id);
+  const { data: usersData = [], isLoading, refetch, error } = useGetStudentByIdMajor(majorData.id);
   const { data: betterAuthUsers = [] } = useGetBetterAuth();
 
   // Helper function to get betterAuth user info
@@ -64,7 +71,7 @@ function UserDashboard({ id }: { id: string }) {
     return Array.from(new Set(usersData.map((user: UserData) => user.role?.name).filter(Boolean)));
   }, [usersData]);
 
-  const { data: classesData, isLoading: isLoadingClasses } = useGetClassByIdMajor(id);
+  const { data: classesData, isLoading: isLoadingClasses } = useGetClassByIdMajor(majorData.id);
 
   const { data: tahfidzGroupsData, isLoading: isLoadingTahfidzGroups } = useGetTahfidzGroup();
 
@@ -494,9 +501,9 @@ function UserDashboard({ id }: { id: string }) {
   }
 
   return (
-    <div className="min-h-screen w-full max-w-7xl mx-auto my-8 p-6">
+    <div className="">
       <div className="font-bold text-3xl ">Users Menu</div>
-
+      <Badge>{majorData.name}</Badge>
       <div className="flex items-start justify-between py-4 gap-4 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           <Input placeholder="Cari nama user..." value={(table.getColumn("name")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)} className="max-w-sm" />
@@ -669,8 +676,8 @@ function UserDashboard({ id }: { id: string }) {
         </div>
       </div>
 
-      <StudentFormDialog majorId={id} open={createDialogOpen} onOpenChange={handleCloseCreateDialog} onSuccess={handleSuccess} />
-      <StudentFormDialog open={editDialogOpen} onOpenChange={handleCloseEditDialog} editData={selectedUser} onSuccess={handleSuccess} majorId={id} />
+      <StudentFormDialog majorId={majorData.id} open={createDialogOpen} onOpenChange={handleCloseCreateDialog} onSuccess={handleSuccess} />
+      <StudentFormDialog open={editDialogOpen} onOpenChange={handleCloseEditDialog} editData={selectedUser} onSuccess={handleSuccess} majorId={majorData.id} />
       <DeleteUserDialog open={deleteDialogOpen} onOpenChange={handleCloseDeleteDialog} userData={selectedUser} onSuccess={handleSuccess} />
       <DeleteUserBulkDialog open={deleteBulkDialogOpen} onOpenChange={handleCloseBulkDeleteDialog} userDatas={table.getSelectedRowModel().rows.map((row) => row.original)} onSuccess={handleSuccess} />
     </div>
@@ -685,6 +692,7 @@ export default function UserDataTable() {
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
   const userIdMajor = userData?.major?.id;
+  const majorData = userData?.major;
 
   // Show loading while checking authorization
   if (isPending || isLoadingUserData) {
@@ -700,5 +708,5 @@ export default function UserDataTable() {
   }
 
   // Render dashboard only after authorization is confirmed
-  return <UserDashboard id={userIdMajor} />;
+  return <UserDashboard majorData={majorData} />;
 }

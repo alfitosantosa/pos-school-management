@@ -519,7 +519,7 @@ const createColumns = (onEdit: (data: PaymentTypeData) => void, onDelete: (data:
 // Main DataTable Component
 // ============================================================================
 
-function PaymentTypeDataTable({ id }: { id: string }) {
+function PaymentTypeDataTable({ userMajorData }: { userMajorData: { id: string; name: string } }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -532,20 +532,20 @@ function PaymentTypeDataTable({ id }: { id: string }) {
   const [selectedPaymentType, setSelectedPaymentType] = React.useState<PaymentTypeData | null>(null);
 
   // Fetch payment types for the specific branch
-  const { data: paymentTypes = [], isLoading, refetch } = useGetPaymentTypeByIdMajor(id);
+  const { data: paymentTypes = [], isLoading, refetch } = useGetPaymentTypeByIdMajor(userMajorData.id);
 
   // Wait for async data to load before rendering
   React.useEffect(() => {
-    if (!isLoading && id) {
+    if (!isLoading && userMajorData) {
       setIsReady(true);
     }
-  }, [isLoading, id]);
+  }, [isLoading, userMajorData]);
 
   // Filter by branch ID - only after data is ready
   const filteredPaymentTypes = React.useMemo(() => {
-    if (!id || !isReady) return [];
+    if (!userMajorData.id || !isReady) return [];
     return paymentTypes;
-  }, [paymentTypes, id, isReady]);
+  }, [paymentTypes, isReady]);
 
   const handleSuccess = () => {
     refetch();
@@ -587,9 +587,9 @@ function PaymentTypeDataTable({ id }: { id: string }) {
   }
 
   return (
-    <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
-      <div className="font-bold text-3xl mb-6">Jenis Tagihan</div>
-
+    <div className="">
+      <div className="font-bold text-3xl mb-3">Jenis Tagihan</div>
+      <Badge>{userMajorData.name}</Badge>
       {/* Filter and Actions Bar */}
       <div className="flex items-center justify-between py-4">
         <Input placeholder="Cari nama pembayaran..." value={(table.getColumn("name")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)} className="max-w-sm" />
@@ -669,9 +669,9 @@ function PaymentTypeDataTable({ id }: { id: string }) {
       </div>
 
       {/* Dialogs */}
-      <PaymentTypeFormDialog open={createDialogOpen} id={id} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} />
+      <PaymentTypeFormDialog open={createDialogOpen} id={userMajorData.id} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} />
 
-      <PaymentTypeFormDialog open={editDialogOpen} id={id} onOpenChange={setEditDialogOpen} editData={selectedPaymentType} onSuccess={handleSuccess} />
+      <PaymentTypeFormDialog open={editDialogOpen} id={userMajorData.id} onOpenChange={setEditDialogOpen} editData={selectedPaymentType} onSuccess={handleSuccess} />
 
       <DeletePaymentTypeDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} paymentTypeData={selectedPaymentType} onSuccess={handleSuccess} />
     </div>
@@ -688,7 +688,7 @@ export default function PaymentTypeTable() {
 
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
-  const userIdMajor = userData?.major?.id;
+  const userMajorData = userData?.major;
 
   // Wait for all data to load before rendering
   if (isPending || isLoadingUserData) {
@@ -702,9 +702,9 @@ export default function PaymentTypeTable() {
   }
 
   // Check if bendahara has a major assigned
-  if (!userIdMajor) {
+  if (!userMajorData.id) {
     return (
-      <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
+      <div className="">
         <div className="text-center text-red-600">
           <p>Bendahara belum memiliki branch yang ditugaskan.</p>
         </div>
@@ -712,5 +712,5 @@ export default function PaymentTypeTable() {
     );
   }
 
-  return <PaymentTypeDataTable id={userIdMajor} />;
+  return <PaymentTypeDataTable userMajorData={userMajorData} />;
 }

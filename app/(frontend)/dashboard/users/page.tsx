@@ -495,7 +495,7 @@ function UserDashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full max-w-7xl mx-auto my-8 p-6">
+    <div className="">
       <div className="font-bold text-3xl ">Users Menu</div>
 
       <div className="flex items-start justify-between py-4 gap-4 flex-wrap">

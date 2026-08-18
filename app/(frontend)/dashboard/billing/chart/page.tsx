@@ -185,6 +185,9 @@ function UnpaidPaymentDashboard({ userMajorId, isAdmin }: { userMajorId?: string
   });
 
   const [selectedMajorId, setSelectedMajorId] = React.useState<string>(isAdmin ? "all" : (userMajorId ?? "all"));
+
+  const [selectedSKU, setSelectedSKU] = React.useState<string>("all");
+
   const [activeTab, setActiveTab] = React.useState("overview");
 
   const { data: majors = [] } = useGetMajors();
@@ -193,6 +196,10 @@ function UnpaidPaymentDashboard({ userMajorId, isAdmin }: { userMajorId?: string
     if (!isAdmin) return userMajorId;
     return selectedMajorId === "all" ? undefined : selectedMajorId;
   }, [isAdmin, selectedMajorId, userMajorId]);
+
+  const querySKUType = React.useMemo(() => {
+    return selectedSKU === "all" ? undefined : selectedSKU;
+  }, [selectedSKU]);
 
   const {
     data: rawData,
@@ -203,6 +210,7 @@ function UnpaidPaymentDashboard({ userMajorId, isAdmin }: { userMajorId?: string
     fromdate: dateRange?.from,
     todate: dateRange?.to,
     majorId: queryMajorId,
+    skuType: querySKUType,
     isPaid: false, // fokus dashboard ini: tunggakan / belum bayar
   });
 
@@ -252,6 +260,12 @@ function UnpaidPaymentDashboard({ userMajorId, isAdmin }: { userMajorId?: string
             <CalendarDays className="h-3 w-3" />
             {dateLabel}
           </Badge>
+          {selectedSKU !== "all" && (
+            <Badge variant="secondary" className="text-xs gap-1.5 py-1.5">
+              <ListChecks className="h-3 w-3" />
+              {selectedSKU}
+            </Badge>
+          )}
           <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
             <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />
             Refresh
@@ -262,48 +276,98 @@ function UnpaidPaymentDashboard({ userMajorId, isAdmin }: { userMajorId?: string
       {/* ── Filter Bar ── */}
       <Card>
         <CardContent className="py-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-sm font-medium text-muted-foreground">Periode:</span>
-            </div>
-
-            <DatePickerWithRange date={dateRange} setDate={setDateRange} />
-
-            {isAdmin && (
-              <>
-                <Separator orientation="vertical" className="h-8" />
+          <div className="space-y-4">
+            {/* Row 1: Main Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Date Range Picker */}
+              <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <span className="text-sm font-medium text-muted-foreground">Branch:</span>
+                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-muted-foreground">Periode</span>
                 </div>
-                <Select value={selectedMajorId} onValueChange={setSelectedMajorId}>
-                  <SelectTrigger className="w-48 h-9">
-                    <SelectValue placeholder="Semua Branch" />
+                <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+              </div>
+
+              {/* Branch Filter (Admin Only) */}
+              {isAdmin && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-muted-foreground">Branch</span>
+                  </div>
+                  <Select value={selectedMajorId} onValueChange={setSelectedMajorId}>
+                    <SelectTrigger className="w-full h-10">
+                      <SelectValue placeholder="Semua Branch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Branch</SelectItem>
+                      {(majors as any[]).map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          {m.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* SKU Type Filter */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <ListChecks className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-muted-foreground">Jenis Pembayaran</span>
+                </div>
+                <Select value={selectedSKU} onValueChange={setSelectedSKU}>
+                  <SelectTrigger className="w-full h-10">
+                    <SelectValue placeholder="Semua Jenis" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Semua Branch</SelectItem>
-                    {(majors as any[]).map((m) => (
-                      <SelectItem key={m.id} value={m.id}>
-                        {m.name}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="all">Semua Jenis</SelectItem>
+                    <SelectItem value="SPP">SPP</SelectItem>
+                    <SelectItem value="Buku">Buku</SelectItem>
+                    <SelectItem value="Seragam">Seragam</SelectItem>
+                    <SelectItem value="Kegiatan">Kegiatan</SelectItem>
+                    <SelectItem value="Catering">Catering</SelectItem>
+                    <SelectItem value="Lainya">Lainya</SelectItem>
                   </SelectContent>
                 </Select>
-              </>
-            )}
+              </div>
+            </div>
 
-            <div className="ml-auto flex items-center gap-1.5">
-              {[
-                { label: "1 Bln", months: 1 },
-                { label: "3 Bln", months: 3 },
-                { label: "6 Bln", months: 6 },
-                { label: "1 Thn", months: 12 },
-              ].map(({ label, months }) => (
-                <Button key={label} size="sm" variant="outline" className="h-8 text-xs" onClick={() => setDateRange({ from: subMonths(new Date(), months), to: new Date() })}>
-                  {label}
-                </Button>
-              ))}
+            {/* Row 2: Quick Actions */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Reset Button */}
+                {(selectedMajorId !== "all" || selectedSKU !== "all") && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-9"
+                    onClick={() => {
+                      setSelectedMajorId(isAdmin ? "all" : (userMajorId ?? "all"));
+                      setSelectedSKU("all");
+                    }}
+                  >
+                    <RefreshCw className="h-3.5 w-3.5 mr-2" />
+                    Reset Filter
+                  </Button>
+                )}
+              </div>
+
+              {/* Quick Date Shortcuts */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground mr-1">Quick:</span>
+                {[
+                  { label: "1 Bulan", months: 1 },
+                  { label: "3 Bulan", months: 3 },
+                  { label: "6 Bulan", months: 6 },
+                  { label: "1 Tahun", months: 12 },
+                ].map(({ label, months }) => (
+                  <Button key={label} size="sm" variant="secondary" className="h-8 text-xs" onClick={() => setDateRange({ from: subMonths(new Date(), months), to: new Date() })}>
+                    {label}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
         </CardContent>
