@@ -49,7 +49,10 @@ const ScheduleCard = ({ schedule }: { schedule: any }) => {
   const isDisabled = isSubmitted === true || !isTodaySchedule(schedule.dayOfWeek);
 
   // Get button text
-  const buttonText = isSubmitted ? "Sudah Diabsen" : !isTodaySchedule(schedule.dayOfWeek) ? "Bukan Hari Ini" : "Buat Absensi";
+  const buttonText =
+    isSubmitted ? "Sudah Diabsen"
+    : !isTodaySchedule(schedule.dayOfWeek) ? "Bukan Hari Ini"
+    : "Buat Absensi";
 
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200">
@@ -275,19 +278,18 @@ function TeacherAttendancePage() {
           </Card>
 
           {/* Content Section */}
-          {isLoadingSchedule ? (
+          {isLoadingSchedule ?
             <div className="space-y-6">
               {[1, 2, 3].map((i) => (
                 <ScheduleCardSkeleton key={i} />
               ))}
             </div>
-          ) : scheduleError ? (
+          : scheduleError ?
             <Alert variant="destructive">
               <AlertDescription>Terjadi kesalahan saat memuat jadwal: {(scheduleError as Error).message}</AlertDescription>
             </Alert>
-          ) : (
-            <div className="space-y-6">
-              {filteredScheduleData.length === 0 ? (
+          : <div className="space-y-6">
+              {filteredScheduleData.length === 0 ?
                 <Card className="text-center py-12">
                   <CardContent>
                     <CalendarDays className="mx-auto h-12 w-12 text-slate-400 mb-4" />
@@ -295,8 +297,7 @@ function TeacherAttendancePage() {
                     <p className="text-slate-600">Tidak ada jadwal untuk hari yang dipilih.</p>
                   </CardContent>
                 </Card>
-              ) : (
-                <>
+              : <>
                   {/* Summary Badge */}
                   <div className="flex items-center gap-2 mb-4">
                     <Badge variant="secondary" className="px-3 py-1">
@@ -309,9 +310,9 @@ function TeacherAttendancePage() {
                     <ScheduleCard key={schedule.id} schedule={schedule} />
                   ))}
                 </>
-              )}
+              }
             </div>
-          )}
+          }
         </div>
       </div>
     </>

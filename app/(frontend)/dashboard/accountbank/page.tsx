@@ -429,7 +429,7 @@ function AccountBankDashboard() {
 
   return (
     <>
-      <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
+      <div className="">
         <div className="mb-6">
           <h1 className="font-bold text-3xl mb-2">Dashboard Rekening Bank</h1>
           <p className="text-muted-foreground">Kelola rekening bank untuk setiap jurusan</p>

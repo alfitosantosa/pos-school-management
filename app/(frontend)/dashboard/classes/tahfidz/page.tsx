@@ -125,7 +125,11 @@ function TahfidzGroupFormDialog({ open, onOpenChange, editData, onSuccess }: { o
               Batal
             </Button>
             <Button type="submit" disabled={createTahfidzGroup.isPending || updateTahfidzGroup.isPending}>
-              {createTahfidzGroup.isPending || updateTahfidzGroup.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createTahfidzGroup.isPending || updateTahfidzGroup.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -343,7 +347,7 @@ function TahfidzGroupDataTable() {
 
   return (
     <>
-      <div className="min-h-screen mx-auto my-8 p-6 max-w-7xl">
+      <div className="">
         <div className="font-bold text-3xl mb-6">Kelompok Tahfidz</div>
         <div className="mx-auto">
           <div className="flex items-center justify-between py-4">
@@ -420,7 +424,7 @@ function TahfidzGroupDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length ?
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -428,13 +432,12 @@ function TahfidzGroupDataTable() {
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
+                : <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data kelompok tahfidz.
                     </TableCell>
                   </TableRow>
-                )}
+                }
               </TableBody>
             </Table>
           </div>

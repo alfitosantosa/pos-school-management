@@ -699,7 +699,7 @@ function MajorDataTable() {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="max-w-7xl mx-auto my-8 p-6 min-h-screen">
+    <div className="">
       <div className="font-bold text-3xl mb-6">Branch</div>
 
       <div className="flex items-center justify-between py-4">

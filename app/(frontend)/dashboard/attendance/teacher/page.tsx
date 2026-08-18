@@ -75,7 +75,7 @@ function TeacherAttendancePage() {
   const { data: adminData } = useGetUserByIdBetterAuth(session?.user?.id ?? "");
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 max-w-7xl mx-auto min-h-screen">
+    <div className="">
       <div className="space-y-1 sm:space-y-2">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Absensi Guru</h1>
         <p className="text-sm sm:text-base text-gray-600">Kelola kehadiran dan lihat laporan absensi guru</p>
@@ -326,19 +326,18 @@ function CheckinTab({ adminId }: CheckinTabProps) {
           <CardDescription className="text-xs sm:text-sm">Guru yang sudah melakukan check-in</CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {isLoading ?
             <div className="space-y-2 sm:space-y-3">
               {[...Array(3)].map((_, i) => (
                 <div key={i} className="h-12 sm:h-14 bg-gray-100 rounded-lg animate-pulse" />
               ))}
             </div>
-          ) : attendance.length === 0 ? (
+          : attendance.length === 0 ?
             <div className="py-6 sm:py-8 text-center text-gray-500">
               <Calendar className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 opacity-20" />
               <p className="text-xs sm:text-sm">Belum ada absensi untuk tanggal ini</p>
             </div>
-          ) : (
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+          : <div className="space-y-2 max-h-96 overflow-y-auto">
               {attendance.map((record: TeacherAttendanceRecord) => {
                 const config = STATUS_CONFIG[record.status];
                 const Icon = config.icon;
@@ -372,7 +371,7 @@ function CheckinTab({ adminId }: CheckinTabProps) {
                 );
               })}
             </div>
-          )}
+          }
         </CardContent>
       </Card>
 
@@ -578,19 +577,18 @@ function ReportsTab() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {isLoading ?
             <div className="space-y-2 sm:space-y-3">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className="h-12 sm:h-14 bg-gray-100 rounded-lg animate-pulse" />
               ))}
             </div>
-          ) : reports.length === 0 ? (
+          : reports.length === 0 ?
             <div className="py-6 sm:py-8 text-center text-gray-500">
               <BarChart3 className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 opacity-20" />
               <p className="text-xs sm:text-sm">Tidak ada data absensi untuk periode ini</p>
             </div>
-          ) : (
-            <div className="space-y-2 sm:space-y-3">
+          : <div className="space-y-2 sm:space-y-3">
               {reports.map((teacher: any) => (
                 <div key={teacher.id} className="border border-gray-200 rounded-lg overflow-hidden">
                   {/* Summary Row */}
@@ -607,7 +605,11 @@ function ReportsTab() {
                           <p className="text-xs text-gray-600">Kehadiran</p>
                           <span className="font-semibold text-green-600 text-sm">{teacher.statistics?.presentPercentage}%</span>
                         </div>
-                        <button className="p-1">{expandedTeacher === teacher.id ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}</button>
+                        <button className="p-1">
+                          {expandedTeacher === teacher.id ?
+                            <ChevronUp className="w-4 h-4 text-gray-500" />
+                          : <ChevronDown className="w-4 h-4 text-gray-500" />}
+                        </button>
                       </div>
 
                       {/* Desktop: Show all stats including terlambat */}
@@ -636,7 +638,11 @@ function ReportsTab() {
                           <p className="text-xs text-gray-600">Terlambat</p>
                           <span className="inline-block px-2 py-1 rounded bg-orange-100 text-orange-800 text-xs font-semibold">{teacher.statistics?.lateDays || 0}</span>
                         </div>
-                        <button className="p-1">{expandedTeacher === teacher.id ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}</button>
+                        <button className="p-1">
+                          {expandedTeacher === teacher.id ?
+                            <ChevronUp className="w-4 h-4 text-gray-500" />
+                          : <ChevronDown className="w-4 h-4 text-gray-500" />}
+                        </button>
                       </div>
                     </div>
 
@@ -711,7 +717,7 @@ function ReportsTab() {
                 </div>
               ))}
             </div>
-          )}
+          }
         </CardContent>
       </Card>
     </div>

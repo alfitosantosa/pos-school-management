@@ -526,7 +526,7 @@ function StudentInformation() {
   const isLoadingDetail = isLoadingBilling || isLoadingPayments;
 
   return (
-    <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen space-y-6">
+    <div className="space-y-6">
       {/* ── Page Header ── */}
       <div>
         <h1 className="font-bold text-3xl">Informasi Siswa</h1>

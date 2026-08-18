@@ -107,7 +107,7 @@ function buildWhereClause({ startDate, endDate, majorId, skuType, isPaid }: { st
     // Filter skuType melalui relasi PaymentType
     ...(skuType && {
       PaymentType: {
-        owner: skuType, // pastikan field name sesuai schema Prisma
+        skuType: skuType, // pastikan field name sesuai schema Prisma
       },
     }),
     // Filter isPaid — undefined berarti ambil semua
@@ -186,8 +186,8 @@ export async function GET(request: NextRequest) {
           startDate,
           endDate,
           majorId,
-          skuType,
           isPaid: true,
+          skuType,
         }),
         select: {
           id: true,

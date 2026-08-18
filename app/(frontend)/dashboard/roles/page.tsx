@@ -510,7 +510,7 @@ function RoleDataTable() {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto my-8 p-6 min-h-screen">
+      <div className="">
         <div className="font-bold text-3xl">Roles Menu</div>
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-2">

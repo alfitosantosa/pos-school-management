@@ -1344,9 +1344,9 @@ function PaymentDataTable({
   const hasActiveFilter = globalFilter || statusFilter !== "all" || monthFilter !== "all" || dateRange;
 
   return (
-    <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
-      <div className="font-bold text-3xl mb-6">Data Pembayaran</div>
-
+    <div>
+      <div className="font-bold text-3xl mb-3">Data Pembayaran</div>
+      <Badge>{userDataMajor.name}</Badge>
       {/* Toolbar */}
       <div className="flex items-center justify-between py-4 flex-wrap gap-y-3">
         <div className="flex items-center space-x-2 flex-wrap gap-y-2">

@@ -581,7 +581,7 @@ function PaymentTypeDataTable() {
   }
 
   return (
-    <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
+    <div className="">
       <div className="font-bold text-3xl mb-6">Jenis Tagihan</div>
 
       {/* Filter and Actions Bar */}
@@ -630,7 +630,7 @@ function PaymentTypeDataTable() {
           </DropdownMenu>
 
           {/* Add Button */}
-          <Button onClick={() => setCreateDialogOpen(true)}>
+          <Button disabled={true} onClick={() => setCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Jenis Tagihan
           </Button>
