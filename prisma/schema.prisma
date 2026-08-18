@@ -58,6 +58,7 @@ model Account {
   password              String?
   createdAt             DateTime
   updatedAt             DateTime
+  issuer                String?
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
