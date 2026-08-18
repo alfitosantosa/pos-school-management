@@ -308,7 +308,7 @@ export function AppSidebar() {
       {/* Header */}
       <SidebarHeader className="border-b px-6 py-4">
         <div className="flex items-center gap-3">
-          <Image src={Logo} alt="Logo" className="h-10 w-10" />
+          <Image src={Logo} alt="Logo" className="h-10 w-10" loading="eager" />
           <div className="flex flex-col">
             <span className="text-sm font-semibold">Rahmaniyah</span>
             <span className="text-xs text-muted-foreground">Sistem Informasi</span>
