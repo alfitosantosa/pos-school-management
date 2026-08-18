@@ -2,10 +2,9 @@ import { type Metadata, type Viewport } from "next";
 import { Inter } from "next/font/google";
 import { ReactQueryProvider } from "./client/providers";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
-
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import ConditionalLayout from "@/components/ConditionalLayout";
 
 // Optimized font loading with next/font
 const inter = Inter({
@@ -37,9 +36,9 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <Toaster />
         <ReactQueryProvider>
-          <Navbar />
-          {children}
-          <Footer />
+          <TooltipProvider>
+            <ConditionalLayout>{children}</ConditionalLayout>
+          </TooltipProvider>
         </ReactQueryProvider>
       </body>
     </html>

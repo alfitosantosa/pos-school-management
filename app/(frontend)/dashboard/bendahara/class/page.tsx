@@ -368,8 +368,8 @@ function ClassDataTable({ id }: { id: string }) {
 
   return (
     <>
-      <div className=" min-h-screen mx-auto my-8 p-6 max-w-7xl">
-        <div className="font-bold text-3xl">Kelas </div>
+      <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
+        <div className="font-bold text-3xl">Data Kelas </div>
         <div className=" mx-auto">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-2 flex-wrap gap-y-2">

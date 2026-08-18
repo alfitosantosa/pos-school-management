@@ -10,8 +10,8 @@ import { Loader2, X } from "lucide-react";
 import { signIn, signUp } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
+import Logo from "@/public/Logo.svg";
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
@@ -37,86 +37,78 @@ export default function SignUp() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 flex-col">
-      <Card className="w-full max-w-md mx-4">
-        <CardHeader>
-          <CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
-          <CardDescription className="text-xs md:text-sm">Enter your information to create an account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 p-4">
+      <div className="w-full max-w-md">
+        {/* Logo and Brand */}
+        <div className="flex flex-col items-center mb-8">
+          <Image src={Logo} alt="Logo Rahmaniyah" className="h-10 w-10 mb-5" priority />
+          <h1 className="text-2xl font-bold text-gray-900">Rahmaniyah Al-Islamy</h1>
+          <p className="text-sm text-gray-600 mt-1">Sistem Informasi Sekolah</p>
+        </div>
+
+        {/* Sign Up Card */}
+        <Card className="shadow-xl border-0">
+          <CardHeader className="space-y-1 pb-6">
+            <CardTitle className="text-2xl font-bold text-center">Daftar</CardTitle>
+            <CardDescription className="text-center">Buat akun baru untuk melanjutkan</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="first-name">First name</Label>
-                <Input
-                  id="first-name"
-                  placeholder="Max"
-                  required
-                  onChange={(e) => {
-                    setFirstName(e.target.value);
-                  }}
-                  value={firstName}
-                />
+              <div className="space-y-2">
+                <Label htmlFor="first-name">Nama Depan</Label>
+                <Input id="first-name" placeholder="Ahmad" required onChange={(e) => setFirstName(e.target.value)} value={firstName} className="h-11" />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="last-name">Last name</Label>
-                <Input
-                  id="last-name"
-                  placeholder="Robinson"
-                  required
-                  onChange={(e) => {
-                    setLastName(e.target.value);
-                  }}
-                  value={lastName}
-                />
+              <div className="space-y-2">
+                <Label htmlFor="last-name">Nama Belakang</Label>
+                <Input id="last-name" placeholder="Ramadhan" required onChange={(e) => setLastName(e.target.value)} value={lastName} className="h-11" />
               </div>
             </div>
-            <div className="grid gap-2">
+
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-                value={email}
-              />
+              <Input id="email" type="email" placeholder="nama@sekolah.com" required onChange={(e) => setEmail(e.target.value)} value={email} className="h-11" />
             </div>
-            <div className="grid gap-2">
+
+            <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="Password" />
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="••••••••" className="h-11" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Confirm Password</Label>
-              <Input id="password_confirmation" type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} autoComplete="new-password" placeholder="Confirm Password" />
+
+            <div className="space-y-2">
+              <Label htmlFor="password_confirmation">Konfirmasi Password</Label>
+              <Input id="password_confirmation" type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} autoComplete="new-password" placeholder="••••••••" className="h-11" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="image">Profile Image (optional)</Label>
-              <div className="flex items-end gap-4">
+
+            <div className="space-y-2">
+              <Label htmlFor="image">Foto Profil (opsional)</Label>
+              <div className="flex items-center gap-4">
                 {imagePreview && (
-                  <div className="relative w-16 h-16 rounded-sm overflow-hidden">
-                    <Image src={imagePreview} alt="Profile preview" layout="fill" objectFit="cover" />
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200">
+                    <Image src={imagePreview} alt="Preview" fill className="object-cover" />
                   </div>
                 )}
-                <div className="flex items-center gap-2 w-full">
-                  <Input id="image" type="file" accept="image/*" onChange={handleImageChange} className="w-full" />
+                <div className="flex items-center gap-2 flex-1">
+                  <Input id="image" type="file" accept="image/*" onChange={handleImageChange} className="h-11" />
                   {imagePreview && (
-                    <X
-                      className="cursor-pointer"
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => {
                         setImage(null);
                         setImagePreview(null);
                       }}
-                    />
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   )}
                 </div>
               </div>
             </div>
+
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11"
               disabled={loading}
               onClick={async () => {
                 await signUp.email({
@@ -142,11 +134,23 @@ export default function SignUp() {
                 });
               }}
             >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : "Create an account"}
+              {loading ?
+                <Loader2 className="h-5 w-5 animate-spin" />
+              : "Buat Akun"}
             </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Atau daftar dengan</span>
+              </div>
+            </div>
+
             <Button
               variant="outline"
-              className={cn("w-full gap-2")}
+              className="w-full h-11"
               disabled={loading}
               onClick={async () => {
                 await signIn.social(
@@ -155,17 +159,17 @@ export default function SignUp() {
                     callbackURL: "/",
                   },
                   {
-                    onRequest: (ctx) => {
+                    onRequest: () => {
                       setLoading(true);
                     },
-                    onResponse: (ctx) => {
+                    onResponse: () => {
                       setLoading(false);
                     },
-                  }
+                  },
                 );
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="0.98em" height="1em" viewBox="0 0 256 262">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 256 262" className="mr-2">
                 <path fill="#4285F4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"></path>
                 <path
                   fill="#34A853"
@@ -174,21 +178,24 @@ export default function SignUp() {
                 <path fill="#FBBC05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82c0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602z"></path>
                 <path fill="#EB4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0C79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"></path>
               </svg>
-              Sign in with Google
+              Google
             </Button>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <div className="flex justify-center w-full border-t py-4">
-            <p className="text-center text-xs text-neutral-500">
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="text-sm text-center text-muted-foreground">
               Sudah punya akun?{" "}
-              <Link href="/auth/sign-in" className="underline">
+              <Link href="/auth/sign-in" className="text-primary hover:underline font-medium">
                 Masuk
               </Link>
-            </p>
-          </div>
-        </CardFooter>
-      </Card>
+            </div>
+          </CardFooter>
+        </Card>
+
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-xs text-gray-500">&copy; {new Date().getFullYear()} Yayasan Rahmaniyah Al-Islamy. All rights reserved.</p>
+        </div>
+      </div>
     </div>
   );
 }
