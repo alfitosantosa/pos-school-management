@@ -83,10 +83,10 @@ export default function Unauthorized() {
                 <CardDescription>Navigasi cepat ke halaman yang dapat diakses</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Link href="/dashboard" className="block">
+                <Link href="/auth/login" className="block">
                   <Button size="lg" className="w-full justify-center gap-2">
                     <Home className="h-4 w-4" />
-                    Kembali ke Dashboard
+                    Ke Halaman Login
                   </Button>
                 </Link>
 
