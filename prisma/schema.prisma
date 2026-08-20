@@ -9,6 +9,14 @@ datasource db {
   provider = "postgresql"
 }
 
+model Client {
+  id              String  @id @unique
+  name            String
+  imageUrl        String
+
+@@map("client")
+}
+
 model User {
   id            String    @id @unique
   name          String
