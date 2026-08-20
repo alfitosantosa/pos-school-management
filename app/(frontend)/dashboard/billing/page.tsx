@@ -850,6 +850,13 @@ function BillingDataTable({
       },
     },
     {
+      accessorKey: "updatedAt",
+      header: "Update / Tanggal Bayar",
+      cell: ({ row }) => {
+        return <div className="text-xs">{new Date(row.getValue("updatedAt")).toLocaleString("id-ID")}</div>;
+      },
+    },
+    {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {

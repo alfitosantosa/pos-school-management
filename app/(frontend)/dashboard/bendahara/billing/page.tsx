@@ -31,6 +31,7 @@ import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassByI
 import { DatePickerWithRange } from "@/components/date/datePicker";
 import { DateRange } from "react-day-picker";
 import { usePaymentsItemsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentItemsByDate";
+import { id } from "date-fns/locale";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -859,7 +860,14 @@ function BillingDataTable({
       accessorKey: "createdAt",
       header: "Tanggal Pembuatan",
       cell: ({ row }) => {
-        return <div className="text-xs">{new Date(row.getValue("createdAt")).toLocaleDateString("id-ID")}</div>;
+        return <div className="text-xs">{new Date(row.getValue("createdAt")).toLocaleString("id-ID")}</div>;
+      },
+    },
+    {
+      accessorKey: "updatedAt",
+      header: "Update / Tanggal Bayar",
+      cell: ({ row }) => {
+        return <div className="text-xs">{new Date(row.getValue("updatedAt")).toLocaleString("id-ID")}</div>;
       },
     },
     {
