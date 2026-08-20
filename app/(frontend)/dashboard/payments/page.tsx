@@ -23,8 +23,8 @@ import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
 import { useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
-import { usePaymentItemsUnpaidStudent, userPaymentItemsSetPaid } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
-import { useGetAccountBank, useGetAccountBankByIdMajor } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
+import { usePaymentItemsSetPaid, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { useGetAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
 import Loading from "@/components/loading";
 import { StudentCombobox } from "@/components/ui/student-combobox";
 import { useSession } from "@/lib/auth-client";
@@ -368,7 +368,7 @@ function PaymentFormDialog({
 }) {
   const createPayment = useCreatePayment();
   const updatePayment = useUpdatePayment();
-  const setPaidMutation = userPaymentItemsSetPaid();
+  const setPaidMutation = usePaymentItemsSetPaid();
   const [selectedStudentId, setSelectedStudentId] = React.useState<string>("");
 
   const [totalTransfer, setTotalTransfer] = React.useState<number | "">("");
@@ -424,6 +424,7 @@ function PaymentFormDialog({
       setValue("studentId", editData.studentId);
       setValue("bankRef", editData.bankRef);
       setValue("status", editData.status);
+      setValue("majorId", editData.majorId);
     }
   }, [open, editData?.id, setValue]);
 
@@ -504,7 +505,7 @@ function PaymentFormDialog({
         bankRef: editData.bankRef || "",
         notes: editData.notes || "",
         bendaharaId: userDataId || "",
-        majorId: userDataMajorId || "",
+        majorId: editData.majorId || "",
         items:
           editData.paymentItems?.length ?
             editData.paymentItems.map((item) => ({

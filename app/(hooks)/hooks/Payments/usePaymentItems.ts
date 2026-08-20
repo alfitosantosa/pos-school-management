@@ -161,7 +161,7 @@ export const usePaymentItemsByMajorId = (majorId: string) => {
   });
 };
 
-export const userPaymentItemsSetPaid = () => {
+export const usePaymentItemsSetPaid = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: any) => {
@@ -205,9 +205,7 @@ export const usePaymentItemsByStudentId = (id: string) => {
   });
 };
 
-
-export const usePaymentItemsByFilterDate 
- = (startDate: string, endDate: string) => {
+export const usePaymentItemsByFilterDate = (startDate: string, endDate: string) => {
   return useQuery({
     queryKey: ["payment-items-filter-date", startDate, endDate],
     queryFn: async () => {
