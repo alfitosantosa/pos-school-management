@@ -23,7 +23,7 @@ import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
 import { useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
-import { usePaymentItemsUnpaidStudent, userPaymentItemsSetPaid } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { usePaymentItemsSetPaid, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
 import { useGetAccountBankByIdMajor } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
 import Loading from "@/components/loading";
 import { StudentCombobox } from "@/components/ui/student-combobox";
@@ -367,7 +367,7 @@ function PaymentFormDialog({
 }) {
   const createPayment = useCreatePayment();
   const updatePayment = useUpdatePayment();
-  const setPaidMutation = userPaymentItemsSetPaid();
+  const setPaidMutation = usePaymentItemsSetPaid();
   const [selectedStudentId, setSelectedStudentId] = React.useState<string>("");
 
   const [totalTransfer, setTotalTransfer] = React.useState<number | "">("");

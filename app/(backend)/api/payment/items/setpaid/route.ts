@@ -32,6 +32,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "paymentItemsIds must be a non-empty array" }, { status: 400 });
     }
 
+    const getPaymentId = await prisma.paymentItems.findUnique({
+      where: { id: paymentItemsIds[0] },
+      select: { paymentId: true },
+    });
+
+    //set unpaid selain yang paymentItemsIds
+    await prisma.paymentItems.updateMany({
+      where: {
+        paymentId: getPaymentId?.paymentId,
+        id: { notIn: paymentItemsIds },
+      },
+      data: {
+        isPaid: false,
+        paymentId: null,
+      },
+    });
+
     // Update multiple payment items to isPaid: true
     const result = await prisma.paymentItems.updateMany({
       where: {
