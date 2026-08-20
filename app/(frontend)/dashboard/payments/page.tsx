@@ -1067,8 +1067,8 @@ function PaymentDataTable({
     todate: dateRange?.to,
     majorId: undefined, // ✅ FIX: Pass majorId directly (undefined is OK)
   });
-  // const { data: allStudents = [] } = useGetStudents();
-  // const { data: allAccountBanks = [] } = useGetAccountBank();
+  const { data: allStudents = [] } = useGetStudents();
+  const { data: allAccountBanks = [] } = useGetAccountBank();
 
   // Callback hooks
   const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
@@ -1581,7 +1581,7 @@ function PaymentDataTable({
       </div>
 
       {/* Dialogs */}
-      {/* <PaymentFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allAccountBanks={allAccountBanks} userDataId={userDataId} userDataMajorId={majorId} />
+      <PaymentFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allAccountBanks={allAccountBanks} userDataId={userDataId} userDataMajorId={majorId} />
       <PaymentFormDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
@@ -1591,7 +1591,7 @@ function PaymentDataTable({
         allAccountBanks={allAccountBanks}
         userDataId={userDataId}
         userDataMajorId={majorId}
-      /> */}
+      />
       <DeletePaymentDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} paymentData={selectedPayment} onSuccess={handleSuccess} />
     </div>
   );
