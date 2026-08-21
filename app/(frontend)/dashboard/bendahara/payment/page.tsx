@@ -616,7 +616,7 @@ function PaymentFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
+      <DialogContent className="max-w-[110h] max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editData ? "Edit Pembayaran" : "Tambah Pembayaran Baru"}</DialogTitle>
           <DialogDescription>{editData ? "Perbarui informasi pembayaran siswa" : "Buat pembayaran baru untuk siswa dengan memilih item tagihan yang belum dibayar"}</DialogDescription>
