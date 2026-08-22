@@ -668,7 +668,7 @@ function PaymentFormDialog({
               )}
             />
             {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}
-            {selectedStudentId && isLoadingUnpaid && <p className="text-sm text-muted-foreground">Memuat tagihan belum dibayar...</p>}
+            {(!selectedStudentId || !editData?.studentId) && isLoadingUnpaid && <p className="text-sm text-muted-foreground">Memuat tagihan belum dibayar...</p>}
             {selectedStudentId && !isLoadingUnpaid && unpaidItems.length === 0 && <p className="text-sm text-green-600">✓ Tidak ada tagihan yang belum dibayar</p>}
           </div>
 
@@ -809,7 +809,7 @@ function PaymentFormDialog({
 
             {errors.items && typeof errors.items === "object" && "message" in errors.items && <p className="text-sm text-red-500">{(errors.items as any).message}</p>}
 
-            {!selectedStudentId && (
+            {!selectedStudentId && !editData && (
               <div className="text-center p-8 border rounded-lg bg-muted/20">
                 <User className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">Pilih siswa terlebih dahulu untuk melihat tagihan</p>
@@ -858,7 +858,7 @@ function PaymentFormDialog({
                             <p className="text-sm font-medium">{currentItem?.name}</p>
                             {isPaid ?
                               <Badge className="bg-green-600 text-white ">Lunas</Badge>
-                            : <Badge className="bg-orange-600 text-white ">Belum Lunas</Badge>}
+                            : <Badge className="bg-red-600 text-white ">Belum Lunas</Badge>}
                           </div>
                         </div>
                         <div className="col-span-2 text-center">
