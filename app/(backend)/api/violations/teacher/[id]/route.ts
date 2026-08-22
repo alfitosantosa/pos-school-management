@@ -30,7 +30,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     });
 
     // Get all classIds from the teacher's schedules
-    const classIds = schedules.map((schedule:any) => schedule.classId);
+    const classIds = schedules.map((schedule) => schedule.classId);
 
     // Fetch violations for those classes
     const violationsFromIdTeacher = await prisma.violation.findMany({

@@ -135,12 +135,6 @@ export async function GET(request: NextRequest) {
   const todate = searchParams.get("todate");
   const majorId = searchParams.get("majorId") ?? undefined;
   const skuType = searchParams.get("skuType") ?? undefined;
-  // Default focus: unpaid (isPaid=false). Bisa di-override via query param.
-  const isPaidRaw = searchParams.get("isPaid");
-  const isPaid =
-    isPaidRaw === null ?
-      false // ← default ke false (unpaid dashboard)
-    : isPaidRaw === "true"; //   atau sesuai param yang dikirim
 
   // ── 1. Validate dates ───────────────────────────────────────────────────
   const dateResult = parseAndValidateDate(fromdate, todate);

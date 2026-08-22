@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Document, Page, Text, View, StyleSheet, pdf, Image } from "@react-pdf/renderer";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,7 +105,6 @@ const toTerbilang = (v: number) => {
 const PW = 420;
 const PH = 595;
 const PH_MARGIN = 20; // horizontal page margin
-const PV_BODY = 10; // vertical body padding top
 
 const C = {
   // Navy palette — formal

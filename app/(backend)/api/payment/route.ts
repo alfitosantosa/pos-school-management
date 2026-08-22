@@ -34,82 +34,82 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-  try {
-    // ✅ Optimized: Use select to fetch only needed fields
-    // - Dropped: student.class (never accessed), createdBy (only bendaharaId used)
-    // - Kept: all fields accessed in UI (student.name, major.name, accountBank, paymentItems with paymentType)
-    const payments = await prisma.payment.findMany({
-      select: {
-        id: true,
-        amount: true,
-        status: true,
-        createdAt: true,
-        dueDate: true,
-        receiptNumber: true,
-        month: true,
-        bankRef: true,
-        notes: true,
-        paymentDate: true,
-        student: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            parentPhone: true,
-            class: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-        major: {
-          select: {
-            id: true,
-            name: true,
-            code: true,
-          },
-        },
-        accountBank: {
-          select: {
-            id: true,
-            accountNumber: true,
-            accountName: true,
-            accountBank: true,
-          },
-        },
-        paymentItems: {
-          select: {
-            id: true,
-            paymentId: true,
-            paymentTypeId: true,
-            amount: true,
-            quantity: true,
-            subtotal: true,
-            month: true,
-            year: true,
-            skuType: true,
-            name: true,
-            PaymentType: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    return NextResponse.json(payments);
-  } catch (error) {
-    console.error("Error fetching payments:", error);
-    return NextResponse.json({ error: "Failed to fetch payments" }, { status: 500 });
-  }
-}
+// export async function GET() {
+//   try {
+//     // ✅ Optimized: Use select to fetch only needed fields
+//     // - Dropped: student.class (never accessed), createdBy (only bendaharaId used)
+//     // - Kept: all fields accessed in UI (student.name, major.name, accountBank, paymentItems with paymentType)
+//     const payments = await prisma.payment.findMany({
+//       select: {
+//         id: true,
+//         amount: true,
+//         status: true,
+//         createdAt: true,
+//         dueDate: true,
+//         receiptNumber: true,
+//         month: true,
+//         bankRef: true,
+//         notes: true,
+//         paymentDate: true,
+//         student: {
+//           select: {
+//             id: true,
+//             name: true,
+//             email: true,
+//             parentPhone: true,
+//             class: {
+//               select: {
+//                 name: true,
+//               },
+//             },
+//           },
+//         },
+//         major: {
+//           select: {
+//             id: true,
+//             name: true,
+//             code: true,
+//           },
+//         },
+//         accountBank: {
+//           select: {
+//             id: true,
+//             accountNumber: true,
+//             accountName: true,
+//             accountBank: true,
+//           },
+//         },
+//         paymentItems: {
+//           select: {
+//             id: true,
+//             paymentId: true,
+//             paymentTypeId: true,
+//             amount: true,
+//             quantity: true,
+//             subtotal: true,
+//             month: true,
+//             year: true,
+//             skuType: true,
+//             name: true,
+//             PaymentType: {
+//               select: {
+//                 id: true,
+//                 name: true,
+//               },
+//             },
+//           },
+//         },
+//       },
+//       orderBy: {
+//         createdAt: "desc",
+//       },
+//     });
+//     return NextResponse.json(payments);
+//   } catch (error) {
+//     console.error("Error fetching payments:", error);
+//     return NextResponse.json({ error: "Failed to fetch payments" }, { status: 500 });
+//   }
+// }
 
 export async function POST(request: NextRequest) {
   try {

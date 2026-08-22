@@ -23,7 +23,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ idTeac
       },
     });
     return NextResponse.json(tahfidzRecordByIdTeacher);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
   }
 }

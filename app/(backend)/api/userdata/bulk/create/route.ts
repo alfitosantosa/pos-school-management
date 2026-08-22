@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     // Process and clean data
     const cleanedUsers = users.map((user) => {
       // Create base user object
-      const userData: any = {
+      const userData: Record<string, string | null> = {
         name: user.name,
         email: user.email || null,
         nik: user.nik || null,
@@ -221,18 +221,19 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 },
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string; code?: string; meta?: { target?: string[] } };
     console.error("[Bulk Create] Error caught:", {
-      message: error.message,
-      code: error.code,
-      meta: error.meta,
+      message: err.message,
+      code: err.code,
+      meta: err.meta,
       timestamp: new Date().toISOString(),
     });
 
     // Handle Prisma-specific errors
-    if (error.code === "P2002") {
+    if (err.code === "P2002") {
       console.log("[Bulk Create] Duplicate entry detected:", {
-        field: error.meta?.target,
+        field: err.meta?.target,
         target: error.meta?.target?.[0],
       });
       return NextResponse.json(

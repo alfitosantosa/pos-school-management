@@ -155,7 +155,7 @@ function UploadUsers() {
       }
       const readXlsxFile = (await import("read-excel-file")).default;
 
-      let allUsers: any[] = [];
+      const allUsers: any[] = [];
 
       for (const file of files) {
         const rows = await readXlsxFile(file);

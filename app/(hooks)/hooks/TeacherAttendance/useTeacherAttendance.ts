@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/api-client";
-import type { CreateTeacherAttendanceInput, UpdateTeacherAttendanceInput, BulkTeacherAttendanceInput, TeacherAttendanceRecord, TeacherAttendanceReport } from "@/app/types/teacher-attendance";
+import type { CreateTeacherAttendanceInput, UpdateTeacherAttendanceInput, BulkTeacherAttendanceInput, TeacherAttendanceRecord, TeacherAttendanceReport } from "@/app/(types)/types/teacher-attendance-types";
 
 export const useGetTeacherAttendance = (date?: string, teacherId?: string) => {
   const params = new URLSearchParams();

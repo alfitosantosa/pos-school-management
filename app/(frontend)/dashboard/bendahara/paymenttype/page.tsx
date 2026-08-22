@@ -144,7 +144,7 @@ const FixedBadge = ({ isFixed }: { isFixed: boolean }) => <Badge className={`tex
 // Form Dialog Component
 // ============================================================================
 
-function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: { id: String; open: boolean; onOpenChange: (open: boolean) => void; editData?: PaymentTypeData | null; onSuccess: () => void }) {
+function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: { id: string; open: boolean; onOpenChange: (open: boolean) => void; editData?: PaymentTypeData | null; onSuccess: () => void }) {
   const createPaymentType = useCreatePaymentType();
   const updatePaymentType = useUpdatePaymentType();
 

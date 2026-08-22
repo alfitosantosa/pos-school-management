@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     const date = searchParams.get("date");
     const teacherId = searchParams.get("teacherId");
 
-    const whereClause: any = {};
+    const whereClause: Record<string, unknown> = {};
 
     if (date) {
       const targetDate = new Date(date);

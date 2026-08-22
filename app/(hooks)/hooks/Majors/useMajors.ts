@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
 import { CACHE_STRATEGIES } from "@/app/client/providers";
+import { MajorDataTypes, majorTypes } from "@/app/(types)";
 
 export const useGetMajors = () => {
   return useQuery({
@@ -21,7 +22,7 @@ export const useGetMajors = () => {
 export const useCreateMajor = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: MajorDataTypes) => {
       const res = await apiPost("/api/major", data);
       return res.data;
     },
@@ -37,7 +38,7 @@ export const useCreateMajor = () => {
 export const useUpdateMajor = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: majorTypes) => {
       const res = await apiPut("/api/major", data);
       return res.data;
     },

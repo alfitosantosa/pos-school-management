@@ -25,9 +25,9 @@ import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { ClassDataTypes, ClassFormValues, classSchemaForm } from "@/app/types/class-types";
+import { ClassDataTypes, ClassFormValues, classSchemaForm } from "@/app/(types)/types/class-types";
 import { z } from "zod";
-import { AcademicYearDataTypes } from "@/app/types/academicyear-types";
+import { AcademicYearDataTypes } from "@/app/(types)/types/academicyear-types";
 import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
 
 // Create/Edit Dialog Component

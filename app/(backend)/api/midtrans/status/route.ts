@@ -22,9 +22,10 @@ export async function GET(request: NextRequest) {
     const coreApi = getCoreApi();
     const status = await coreApi.transaction.status(orderId);
     return NextResponse.json(status);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error getting transaction status:", error);
-    return NextResponse.json({ error: error.message || "Failed to get transaction status" }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Failed to get transaction status";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 

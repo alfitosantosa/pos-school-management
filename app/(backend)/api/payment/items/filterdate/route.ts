@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     endDate.setHours(23, 59, 59, 999);
 
     // Build where clause dynamically
-    const whereClause: any = {
+    const whereClause: Record<string, unknown> = {
       createdAt: {
         gte: startDate,
         lte: endDate,

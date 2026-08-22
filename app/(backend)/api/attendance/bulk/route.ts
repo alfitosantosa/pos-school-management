@@ -39,13 +39,13 @@ export async function PUT(request: NextRequest) {
   const { attendances } = await request.json();
 
   try {
-    const updatePromises = attendances.map((attendance: any) =>
+    const updatePromises = attendances.map((attendance: { id: string; [key: string]: unknown }) =>
       prisma.attendance.update({
         where: {
           id: attendance.id,
         },
         data: attendance,
-      })
+      }),
     );
     const updatedAttendances = await Promise.all(updatePromises);
     return NextResponse.json(updatedAttendances);

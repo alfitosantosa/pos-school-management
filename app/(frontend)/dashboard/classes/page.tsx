@@ -26,10 +26,10 @@ import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { ClassDataTypes, ClassFormValues, classSchemaForm } from "@/app/types/class-types";
+import { ClassDataTypes, ClassFormValues, classSchemaForm } from "@/app/(types)/types/class-types";
 import { z } from "zod";
-import { MajorDataTypes } from "@/app/types/majors-types";
-import { AcademicYearDataTypes } from "@/app/types/academicyear-types";
+import { MajorDataTypes } from "@/app/(types)/types/majors-types";
+import { AcademicYearDataTypes } from "@/app/(types)/types/academicyear-types";
 
 // Create/Edit Dialog Component
 function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: ClassDataTypes | null; onSuccess: () => void }) {

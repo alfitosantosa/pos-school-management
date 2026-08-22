@@ -18,7 +18,7 @@
 //   @@map("schedules")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 //use params for get id

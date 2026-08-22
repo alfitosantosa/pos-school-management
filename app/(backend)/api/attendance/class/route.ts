@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     const attendanceRecords = await prisma.attendance.findMany({
       where: {
         studentId: {
-          in: classStudents.map((s: any) => s.id),
+          in: classStudents.map((s) => s.id),
         },
         date: {
           gte: new Date(startDate),

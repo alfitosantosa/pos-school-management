@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
-    const whereClause: any = {};
+    const whereClause: Record<string, unknown> = {};
 
     if (startDate && endDate) {
       whereClause.date = {
@@ -54,9 +54,7 @@ export async function GET(req: NextRequest) {
       const sickDays = attendance.filter((a) => a.status === "sakit").length;
       const leaveDays = attendance.filter((a) => a.status === "izin").length;
       const absentDays = attendance.filter((a) => a.status === "alfa").length;
-      const lateDays = attendance.filter(
-        (a) => a.status === "terlambat",
-      ).length;
+      const lateDays = attendance.filter((a) => a.status === "terlambat").length;
 
       return {
         id: teacher.id,
@@ -73,8 +71,7 @@ export async function GET(req: NextRequest) {
           leaveDays,
           absentDays,
           lateDays,
-          presentPercentage:
-            totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(2) : "0",
+          presentPercentage: totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(2) : "0",
         },
       };
     });
@@ -82,9 +79,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(stats);
   } catch (error) {
     console.error("Error fetching attendance reports:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch reports" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch reports" }, { status: 500 });
   }
 }

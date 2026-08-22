@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       },
     });
     return NextResponse.json(schedule);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Jadwal dengan kombinasi kelas, mata pelajaran, guru, hari, dan jam yang sam a sudah ada." }, { status: 409 });
   }
 }
@@ -97,7 +97,7 @@ export async function PUT(request: NextRequest) {
       },
     });
     return NextResponse.json(schedule);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Jadwal dengan kombinasi kelas, mata pelajaran, guru, hari, dan jam yang sama sudah ada." }, { status: 409 });
   }
 }

@@ -71,7 +71,8 @@ export async function exportToExcelBilling(data: PaymentItemData[], filename: st
     // Write file
     XLSX.writeFile(wb, filename);
     toast.success("Data berhasil diexport ke Excel!");
-  } catch (error: any) {
-    toast.error("Gagal mengexport data: " + error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    toast.error("Gagal mengexport data: " + errorMessage);
   }
 }

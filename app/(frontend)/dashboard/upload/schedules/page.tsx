@@ -98,7 +98,7 @@ function UploadSchedules() {
       }
       const readXlsxFile = (await import("read-excel-file")).default;
 
-      let allSchedules: any[] = [];
+      const allSchedules: any[] = [];
 
       for (const file of files) {
         const rows = await readXlsxFile(file);

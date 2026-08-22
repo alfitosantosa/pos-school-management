@@ -243,7 +243,7 @@ Terima kasih.
         const selectedTemplate = templates[randomTemplateIndex];
 
         // Personalize message for each student
-        let personalizedMessage = selectedTemplate
+        const personalizedMessage = selectedTemplate
           .replace("{name}", student.name)
           .replace("{status}", statusLabel)
           .replace("{notes}", notes ? `📝 *Catatan:* ${notes}` : "");

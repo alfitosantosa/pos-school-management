@@ -25,7 +25,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { exportTeacherAttendanceToExcel, exportTeacherAttendanceDetailToExcel } from "@/lib/export/exportTeacherAttendances";
 import { toast } from "sonner";
-import type { AttendanceStatus, TeacherAttendanceRecord, Teacher, StatusConfigMap, CheckinTabProps, AttendanceStats } from "@/app/types/teacher-attendance";
+import type { AttendanceStatus, TeacherAttendanceRecord, Teacher, StatusConfigMap, CheckinTabProps, AttendanceStats } from "@/app/(types)/types/teacher-attendance-types";
 import { unauthorized } from "next/navigation";
 import Loading from "@/components/loading";
 

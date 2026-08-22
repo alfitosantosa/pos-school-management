@@ -31,19 +31,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate each schedule
-    const validatedSchedules = schedules.map((schedule: any) => {
-      return {
-        classId: schedule.classId,
-        subjectId: schedule.subjectId,
-        teacherId: schedule.teacherId,
-        academicYearId: schedule.academicYearId,
-        dayOfWeek: parseInt(schedule.dayOfWeek) || 1,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-        room: schedule.room || null,
-        isActive: schedule.isActive !== undefined ? schedule.isActive : true,
-      };
-    });
+    const validatedSchedules = schedules.map(
+      (schedule: { classId: string; subjectId: string; teacherId: string; academicYearId: string; dayOfWeek: number | string; startTime: string; endTime: string; room?: string | null; isActive?: boolean }) => {
+        return {
+          classId: schedule.classId,
+          subjectId: schedule.subjectId,
+          teacherId: schedule.teacherId,
+          academicYearId: schedule.academicYearId,
+          dayOfWeek: parseInt(String(schedule.dayOfWeek)) || 1,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+          room: schedule.room || null,
+          isActive: schedule.isActive !== undefined ? schedule.isActive : true,
+        };
+      },
+    );
 
     const result = await prisma.schedule.createMany({
       data: validatedSchedules,
@@ -55,11 +57,11 @@ export async function POST(request: NextRequest) {
       created: result.count,
       total: schedules.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating schedules:", error);
 
     // Handle specific Prisma errors
-    if (error.code === "P2002") {
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
       return NextResponse.json({ error: "Duplicate schedule detected. Some schedules may already exist." }, { status: 409 });
     }
 

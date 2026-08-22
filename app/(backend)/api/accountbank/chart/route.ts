@@ -241,7 +241,6 @@ export async function GET(request: NextRequest) {
     const totalTransaction = payments.length;
     const allItemsCount = allPaymentItems.length;
     const unpaidItemsCount = unpaidPaymentItems.length;
-    const paidItemsCount = allItemsCount - unpaidItemsCount;
 
     const totalPaidAmount = allPaymentItems.filter((i) => i.isPaid).reduce((s, i) => s + Number(i.subtotal ?? 0), 0);
     const totalUnpaidAmount = unpaidPaymentItems.reduce((s, i) => s + Number(i.subtotal ?? 0), 0);

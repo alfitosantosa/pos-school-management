@@ -9,11 +9,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -25,6 +25,7 @@ import Loading from "@/components/loading";
 import { useSession } from "@/lib/auth-client";
 import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { RoleDataTypes } from "@/app/(types)";
 
 // Type definitions
 export type RoleData = {
@@ -172,7 +173,7 @@ const availablePermissions = [
 ];
 
 // Create/Edit Dialog Component
-function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: RoleData | null; onSuccess: () => void }) {
+function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: RoleDataTypes | null; onSuccess: () => void }) {
   const createRole = useCreateRole();
   const updateRole = useUpdateRole();
   const [selectedPermissions, setSelectedPermissions] = React.useState<string[]>([]);
@@ -218,26 +219,22 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
   };
 
   const onSubmit = async (data: RoleFormValues) => {
-    try {
-      const submitData = {
-        ...data,
-        permissions: selectedPermissions,
-      };
+    const submitData = {
+      ...data,
+      permissions: selectedPermissions,
+    };
 
-      if (editData) {
-        await updateRole.mutateAsync({ id: editData.id, ...submitData });
-        toast.success("Role berhasil diperbarui!");
-      } else {
-        await createRole.mutateAsync(submitData);
-        toast.success("Role berhasil dibuat!");
-      }
-      reset();
-      setSelectedPermissions([]);
-      onOpenChange(false);
-      onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    if (editData) {
+      await updateRole.mutateAsync({ id: editData.id, ...submitData });
+      toast.success("Role berhasil diperbarui!");
+    } else {
+      await createRole.mutateAsync(submitData);
+      toast.success("Role berhasil dibuat!");
     }
+    reset();
+    setSelectedPermissions([]);
+    onOpenChange(false);
+    onSuccess();
   };
 
   return (
@@ -303,15 +300,10 @@ function DeleteRoleDialog({ open, onOpenChange, roleData, onSuccess }: { open: b
 
   const handleDelete = async () => {
     if (!roleData) return;
-
-    try {
-      await deleteRole.mutateAsync(roleData.id);
-      toast.success("Role berhasil dihapus!");
-      onOpenChange(false);
-      onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus role");
-    }
+    await deleteRole.mutateAsync(roleData.id);
+    toast.success("Role berhasil dihapus!");
+    onOpenChange(false);
+    onSuccess();
   };
 
   return (
@@ -613,10 +605,10 @@ export default function UserDataTable() {
   }
 
   // Check if user is Admin
-  // if (userRole !== "Admin") {
-  //   unauthorized();
-  //   return null;
-  // }
+  if (userRole !== "Admin") {
+    unauthorized();
+    return null;
+  }
 
   // Render dashboard only after authorization is confirmed
   return <RoleDataTable />;

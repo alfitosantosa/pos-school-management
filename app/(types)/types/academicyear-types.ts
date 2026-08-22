@@ -1,41 +1,47 @@
-// model AcademicYear {
-//   id             String          @id @default(cuid())
-//   year           String          @unique
-//   startDate      DateTime
-//   endDate        DateTime
-//   isActive       Boolean         @default(false)
-//   createdAt      DateTime        @default(now())
-//   updatedAt      DateTime        @updatedAt
-//   calendarEvents CalendarEvent[]
-//   classes        Class[]
-//   schedules      Schedule[]
-//   students       Student[]
-//   violationTypes ViolationType[]
-
-//   @@map("academic_years")
-// }
-
+// Academic Year Types
 import { z } from "zod";
 
-// Type definitions
-// export type AcademicYearData = {
-//   id: string;
-//   year: string;
-//   startDate: string;
-//   endDate: string;
-//   isActive: boolean;
-//   createdAt: string;
-//   updatedAt: string;
-//   _count: {
-//     students: number;
-//     schedules: number;
-//     calendarEvents: number;
-//     classes: number;
-//   };
-// };
+export interface AcademicYearTypes {
+  id: string;
+  year: string;
+  startDate: Date | string;
+  endDate: Date | string;
+  isActive: boolean;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  // Relations
+  classes?: ClassAcademicYearTypes[];
+  schedules?: ScheduleAcademicYearTypes[];
+  students?: StudentAcademicYearTypes[];
+  _count?: {
+    students: number;
+    schedules: number;
+    calendarEvents: number;
+    classes: number;
+  };
+}
 
+interface ClassAcademicYearTypes {
+  id: string;
+  name: string;
+  grade: number;
+}
+
+interface ScheduleAcademicYearTypes {
+  id: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+}
+
+interface StudentAcademicYearTypes {
+  id: string;
+  name: string;
+}
+
+// Zod schema for form validation
 const academicYearDataTypes = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   year: z.string().min(1, "Tahun ajaran wajib diisi"),
   startDate: z.string().min(1, "Tanggal mulai wajib diisi"),
   endDate: z.string().min(1, "Tanggal selesai wajib diisi"),
