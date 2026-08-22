@@ -283,6 +283,7 @@ const paymentItemSchema = z.object({
   month: z.string(),
   year: z.string(),
   selected: z.boolean().default(true),
+  isPaid: z.boolean().optional(), // Flag to indicate if item is already paid
 });
 
 const paymentSchema = z.object({
@@ -430,31 +431,52 @@ function PaymentFormDialog({
   const unpaidItemsKey = unpaidItemsData?.map((i: PaymentItemData) => i.id).join(",") ?? "";
 
   const memoizedUnpaidItems = React.useMemo(() => {
-    if (!unpaidItemsData?.length) return [];
-    return unpaidItemsData.map((item: PaymentItemData) => ({
-      id: item.id,
-      name: item.name,
-      amount: item.amount,
-      quantity: item.quantity,
-      subtotal: item.subtotal,
-      month: item.month,
-      year: item.year,
-      selected: true,
-    }));
+    // Start with existing payment items from editData
+    const existingItems =
+      editData?.paymentItems?.map((item) => ({
+        id: item.id,
+        name: item.name,
+        amount: item.amount,
+        quantity: item.quantity,
+        subtotal: item.subtotal,
+        month: item.month,
+        year: item.year,
+        selected: true,
+        isPaid: true, // Mark existing payment items as paid
+      })) || [];
+
+    // Add unpaid items
+    const newUnpaidItems =
+      unpaidItemsData?.map((item: PaymentItemData) => ({
+        id: item.id,
+        name: item.name,
+        amount: item.amount,
+        quantity: item.quantity,
+        subtotal: item.subtotal,
+        month: item.month,
+        year: item.year,
+        selected: true,
+        isPaid: false, // Mark new items as unpaid
+      })) || [];
+
+    // Concatenate both arrays
+    return [...existingItems, ...newUnpaidItems];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unpaidItemsKey]);
+  }, [unpaidItemsKey, editData?.paymentItems]);
 
   React.useEffect(() => {
     if (memoizedUnpaidItems.length > 0) {
       replace(memoizedUnpaidItems);
-      setUnpaidItems(unpaidItemsData);
+      // Combine both editData.paymentItems and unpaidItemsData for setUnpaidItems
+      const allItems = [...(editData?.paymentItems || []), ...(unpaidItemsData || [])];
+      setUnpaidItems(allItems);
     } else if (!editData) {
       // ✅ Jangan replace jika mode edit dan unpaid kosong
       replace([]);
       setUnpaidItems([]);
     }
     setTotalTransfer("");
-  }, [unpaidItemsKey]);
+  }, [unpaidItemsKey, editData?.paymentItems]);
 
   // Stable serialized key — hanya berubah jika selected/subtotal benar-benar berbeda
   const itemsKey = watchedItems?.map((item) => `${item.selected}:${item.subtotal}`).join("|") ?? "";
@@ -824,6 +846,7 @@ function PaymentFormDialog({
                   {fields.map((field, index) => {
                     const currentItem = watchedItems?.[index];
                     const isSelected = currentItem?.selected ?? true;
+                    const isPaid = currentItem?.isPaid ?? false;
 
                     return (
                       <div key={field.id} className={`grid border p-3 rounded-lg grid-cols-12 gap-2 items-center transition-all ${isSelected ? "bg-blue-50 border-blue-200" : "bg-muted/20 opacity-60"}`}>
@@ -831,7 +854,12 @@ function PaymentFormDialog({
                           <Checkbox checked={isSelected} onCheckedChange={() => toggleItemSelection(index)} />
                         </div>
                         <div className="col-span-3">
-                          <p className="text-sm font-medium">{currentItem?.name}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium">{currentItem?.name}</p>
+                            {isPaid ?
+                              <Badge className="bg-green-600 text-white ">Lunas</Badge>
+                            : <Badge className="bg-orange-600 text-white ">Belum Lunas</Badge>}
+                          </div>
                         </div>
                         <div className="col-span-2 text-center">
                           <Badge variant="outline" className="text-xs">

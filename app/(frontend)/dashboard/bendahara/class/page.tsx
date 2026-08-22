@@ -89,7 +89,7 @@ function ClassFormDialog({ id, open, onOpenChange, editData, onSuccess }: { id: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>{editData ? "Edit Kelas" : "Tambah Kelas Baru"}</DialogTitle>
         </DialogHeader>
@@ -368,7 +368,7 @@ function ClassDataTable({ id }: { id: string }) {
 
   return (
     <>
-      <div className="mx-auto my-8 p-6 max-w-7xl min-h-screen">
+      <div>
         <div className="font-bold text-3xl">Data Kelas </div>
         <div className=" mx-auto">
           <div className="flex items-center justify-between py-4">
