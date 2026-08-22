@@ -59,16 +59,5 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("Error creating schedules:", error);
-
-    // Handle specific Prisma errors
-    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
-      return NextResponse.json({ error: "Duplicate schedule detected. Some schedules may already exist." }, { status: 409 });
-    }
-
-    if (error.code === "P2003") {
-      return NextResponse.json({ error: "Invalid foreign key. Please check if Class, Subject, Teacher, and Academic Year IDs exist." }, { status: 400 });
-    }
-
-    return NextResponse.json({ error: "Failed to create schedules. Please check your data and try again." }, { status: 500 });
   }
 }
