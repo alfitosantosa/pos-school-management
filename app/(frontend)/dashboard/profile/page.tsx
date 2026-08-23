@@ -6,11 +6,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { useSession } from "@/lib/authClients";
-import { Award, BookOpen, Building2, Calendar, CheckCircle, GraduationCap, Key, Mail, MapPin, Phone, School, Shield, User, Users } from "lucide-react";
-import Image from "next/image";
-import React from "react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { UserX, Shield, User, Mail, Phone, MapPin, Calendar, GraduationCap, Building2, Award, Clock, CheckCircle, Key, Users, BookOpen, School } from "lucide-react";
 
 const NoUserDataComponent = ({ authUser }: { authUser: any }) => {
   return (
