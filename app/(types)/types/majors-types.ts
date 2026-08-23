@@ -18,7 +18,11 @@ export type MajorDataTypes = z.infer<typeof MajorSchema>;
 export const majorSchemaForm = z.object({
   code: z.string().min(1, "Kode jurusan wajib diisi"),
   name: z.string().min(1, "Nama jurusan wajib diisi"),
-  description: z.string().min(1, "Deskripsi jurusan wajib diisi"),
+  description: z.string().optional(),
+  address: z.string().optional(),
+  phone: z.string().optional(),
+  adminName: z.string().optional(),
+  signatureUrl: z.string().optional(),
   isActive: z.boolean(),
 });
 
@@ -40,7 +44,7 @@ export type MajorFormValues = z.infer<typeof majorSchemaForm>;
 //   @@map("majors")
 // }
 
-export interface majorTypes {
+export type majorTypes = {
   id: string;
   code: string;
   name: string;
@@ -48,7 +52,9 @@ export interface majorTypes {
   isActive: boolean;
   adminName?: string;
   signatureUrl?: string;
-  classes: [];
-  students: [];
-  subjects: [];
-}
+  _count: {
+    classes: number;
+    students: number;
+    subjects: number;
+  };
+};

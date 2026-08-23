@@ -1,33 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useBulkCreateTeacherAttendance, useDeleteTeacherAttendance, useGetTeacherAttendance, useGetTeacherAttendanceReports, useUpdateTeacherAttendance } from "@/app/(hooks)/hooks/TeacherAttendance/useTeacherAttendance";
 import { useGetTeachers } from "@/app/(hooks)/hooks/Users/useTeachers";
-import {
-  useGetTeacherAttendance,
-  useCreateTeacherAttendance,
-  useGetTeacherAttendanceReports,
-  useBulkCreateTeacherAttendance,
-  useUpdateTeacherAttendance,
-  useDeleteTeacherAttendance,
-} from "@/app/(hooks)/hooks/TeacherAttendance/useTeacherAttendance";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import type { AttendanceStats, AttendanceStatus, CheckinTabProps, StatusConfigMap, TeacherAttendanceRecord } from "@/app/(types)/types/teacher-attendance-types";
+import Loading from "@/components/loading";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Clock, Search, Plus, Calendar, BarChart3, Edit2, Download, Trash2, ChevronDown, ChevronUp, Check, Activity, FileText, X } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSession } from "@/lib/authClients";
+import { exportTeacherAttendanceDetailToExcel, exportTeacherAttendanceToExcel } from "@/lib/export/exportTeacherAttendances";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { exportTeacherAttendanceToExcel, exportTeacherAttendanceDetailToExcel } from "@/lib/export/exportTeacherAttendances";
-import { toast } from "sonner";
-import type { AttendanceStatus, TeacherAttendanceRecord, Teacher, StatusConfigMap, CheckinTabProps, AttendanceStats } from "@/app/(types)/types/teacher-attendance-types";
+import { Activity, BarChart3, Calendar, Check, ChevronDown, ChevronUp, Clock, Download, Edit2, FileText, Plus, Search, Trash2, X } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import Loading from "@/components/loading";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const STATUS_CONFIG: StatusConfigMap = {
   hadir: {

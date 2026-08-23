@@ -1,3 +1,5 @@
+import { UserDataTypes } from "@/app/(types)";
+import { attendanceTypes } from "@/app/(types)/types/attendance-types";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
@@ -14,7 +16,7 @@ export interface StudentAttendanceExportData {
   "Persentase Kehadiran": string;
 }
 
-export const exportStudentAttendanceToExcel = async (student: any, attendances: any[], startDate: string, endDate: string, filename?: string) => {
+export const exportStudentAttendanceToExcel = async (student: UserDataTypes, attendances: attendanceTypes[], startDate: string, endDate: string, filename?: string) => {
   try {
     // Dynamically import xlsx only on client side
     if (typeof window === "undefined") {
@@ -26,11 +28,11 @@ export const exportStudentAttendanceToExcel = async (student: any, attendances: 
     // Calculate statistics
     const stats = {
       total: attendances.length,
-      present: attendances.filter((a: any) => a.status === "present").length,
-      late: attendances.filter((a: any) => a.status === "late").length,
-      sick: attendances.filter((a: any) => a.status === "sick").length,
-      excused: attendances.filter((a: any) => a.status === "excused").length,
-      absent: attendances.filter((a: any) => a.status === "absent").length,
+      present: attendances.filter((a) => a.status === "present").length,
+      late: attendances.filter((a) => a.status === "late").length,
+      sick: attendances.filter((a) => a.status === "sick").length,
+      excused: attendances.filter((a) => a.status === "excused").length,
+      absent: attendances.filter((a) => a.status === "absent").length,
     };
 
     const presentPercentage = stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0;
@@ -72,8 +74,6 @@ export const exportStudentAttendanceToExcel = async (student: any, attendances: 
     ws["!cols"] = colWidths;
 
     // Create filename
-    const startDateFormatted = format(new Date(startDate), "dd MMM yyyy", { locale: idLocale });
-    const endDateFormatted = format(new Date(endDate), "dd MMM yyyy", { locale: idLocale });
     const exportFilename = filename || `rekap-absensi-${student.name.replace(/\s+/g, "-")}-${format(new Date(), "yyyy-MM-dd")}.xlsx`;
 
     // Write file
@@ -94,7 +94,7 @@ export const exportStudentAttendanceToExcel = async (student: any, attendances: 
   }
 };
 
-export const exportStudentAttendanceDailyToExcel = async (student: any, attendances: any[], startDate: string, endDate: string, filename?: string) => {
+export const exportStudentAttendanceDailyToExcel = async (student: UserDataTypes, attendances: attendanceTypes[], startDate: string, endDate: string, filename?: string) => {
   try {
     // Create daily attendance summary for student
     const dailyAttendanceSummary: Record<string, any> = {};
@@ -147,7 +147,7 @@ export const exportStudentAttendanceDailyToExcel = async (student: any, attendan
       totalDays: Object.keys(dailyAttendanceSummary).length,
     };
 
-    Object.values(dailyAttendanceSummary).forEach((stats: any) => {
+    Object.values(dailyAttendanceSummary).forEach((stats) => {
       overallTotals.totalHadir += stats.hadir;
       overallTotals.totalTerlambat += stats.terlambat;
       overallTotals.totalSakit += stats.sakit;
@@ -258,7 +258,7 @@ export const exportStudentAttendanceDailyToExcel = async (student: any, attendan
   }
 };
 
-export const exportStudentAttendanceDetailToExcel = async (student: any, attendances: any[], startDate: string, endDate: string, filename?: string) => {
+export const exportStudentAttendanceDetailToExcel = async (student: UserDataTypes, attendances: attendanceTypes[], startDate: string, endDate: string, filename?: string) => {
   try {
     // Dynamically import xlsx only on client side
     if (typeof window === "undefined") {
@@ -303,7 +303,7 @@ export const exportStudentAttendanceDetailToExcel = async (student: any, attenda
     XLSX.utils.book_append_sheet(wb, wsSummary, "Ringkasan");
 
     // Sheet 2: Detail records
-    const detailData: any[] = attendances.map((attendance: any) => ({
+    const detailData = attendances.map((attendance) => ({
       "Nama Siswa": student.name,
       Tanggal: format(new Date(attendance.date), "dd/MM/yyyy", { locale: idLocale }),
       "Mata Pelajaran": attendance.schedule?.subject?.name || "-",

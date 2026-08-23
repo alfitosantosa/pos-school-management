@@ -1,18 +1,15 @@
 "use client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { PaymentTypeInput, PaymentTypeTypes } from "@/app/(types)";
 import { CACHE_STRATEGIES } from "@/app/client/providers";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetPaymentTypes = () => {
   return useQuery({
     queryKey: ["paymentTypes"],
     queryFn: async () => {
-      try {
-        const res = await apiGet("/api/paymenttype");
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment types");
-      }
+      const res = await apiGet<PaymentTypeTypes[]>("/api/paymenttype");
+      return res.data;
     },
     // ✅ Payment types are static - cache for 1 hour
     ...CACHE_STRATEGIES.static,
@@ -22,7 +19,7 @@ export const useGetPaymentTypes = () => {
 export const useCreatePaymentType = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: PaymentTypeInput) => {
       const res = await apiPost("/api/paymenttype", data);
       return res.data;
     },
@@ -35,7 +32,7 @@ export const useCreatePaymentType = () => {
 export const useUpdatePaymentType = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: PaymentTypeInput) => {
       const res = await apiPut("/api/paymenttype", data);
       return res.data;
     },
@@ -60,10 +57,6 @@ export const useDeletePaymentType = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paymentType"] });
     },
-    onError: (error: any) => {
-      console.error("Error deleting payment type:", error);
-      throw new Error(error?.response?.data?.message || "Failed to delete payment type");
-    },
   });
 };
 
@@ -71,12 +64,8 @@ export const useGetPaymentTypeById = (id: string) => {
   return useQuery({
     queryKey: ["paymentType", id],
     queryFn: async () => {
-      try {
-        const res = await apiGet(`/api/paymenttype/${id}`);
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment type");
-      }
+      const res = await apiGet(`/api/paymenttype/${id}`);
+      return res.data;
     },
   });
 };
@@ -85,12 +74,8 @@ export const useGetPaymentTypeByIdMajor = (id: string) => {
   return useQuery({
     queryKey: ["paymentType", id],
     queryFn: async () => {
-      try {
-        const res = await apiGet(`/api/paymenttype/major/${id}`);
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment type");
-      }
+      const res = await apiGet<PaymentTypeTypes[]>(`/api/paymenttype/major/${id}`);
+      return res.data;
     },
   });
 };

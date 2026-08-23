@@ -1,7 +1,7 @@
 "use client";
-
+import { attendanceClassResponseTypes } from "@/app/(types)/types/attendance-types";
+import { apiGet } from "@/lib/apiClients";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api-client";
 
 export const useGetAttendanceByClass = (classId?: string, startDate?: string, endDate?: string) => {
   const params = new URLSearchParams();
@@ -10,10 +10,10 @@ export const useGetAttendanceByClass = (classId?: string, startDate?: string, en
   if (endDate) params.append("endDate", endDate);
 
   return useQuery({
-    queryKey: ["attendanceByClass", classId, startDate, endDate],
+    queryKey: ["attendanceByClass", classId, startDate, endDate, params],
     queryFn: async () => {
-      const response = await apiGet(`/api/attendance/class${params.toString() ? `?${params}` : ""}`);
-      return response.data?.data;
+      const response = await apiGet<attendanceClassResponseTypes>(`/api/attendance/class${params.toString() ? `?${params}` : ""}`);
+      return response.data;
     },
     enabled: !!classId && !!startDate && !!endDate,
   });

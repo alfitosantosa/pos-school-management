@@ -1,72 +1,43 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Calendar, User, AlertTriangle, Search, X, Check } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-
-// Import hooks
-import { useGetViolations, useCreateViolation, useUpdateViolation, useDeleteViolation } from "@/app/(hooks)/hooks/Violations/useViolations";
-import { useGetTypeViolations } from "@/app/(hooks)/hooks/Violations/useTypeViolations";
 import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
 import { useGetUsers } from "@/app/(hooks)/hooks/Users/useUsers";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useGetTypeViolations } from "@/app/(hooks)/hooks/Violations/useTypeViolations";
+import { useCreateViolation, useDeleteViolation, useGetViolations, useUpdateViolation } from "@/app/(hooks)/hooks/Violations/useViolations";
+import { ClassDataTypes, UserDataTypes } from "@/app/(types)";
+import { ViolationTypes, ViolationInput } from "@/app/(types)/types/violation-types";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { AlertTriangle, ArrowUpDown, Calendar, Check, ChevronDown, MoreHorizontal, Pencil, Plus, Trash2, User, X } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
-// Type definitions
-export type ViolationData = {
-  id: string;
-  studentId: string;
-  violationTypeId: string;
-  classId: string;
-  description?: string;
-  status: string;
-  reportedBy: string;
-  createdAt: string;
-  date: string;
-  resolutionDate?: string;
-  resolutionNotes?: string;
-  student?: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  violationType?: {
-    id: string;
-    name: string;
-    points: number;
-    category: string;
-  };
-  class?: {
-    id: string;
-    name: string;
-    grade: number;
-  };
-};
+// Import hooks
+// Type definitions removed - using ViolationTypes from types file
 
 // Searchable Student Select Component
 interface SearchableStudentSelectProps {
-  students: any[];
+  students: UserDataTypes[];
   value?: string;
   onValueChange: (value: string) => void;
   placeholder?: string;
@@ -127,14 +98,12 @@ function SearchableStudentSelect({ students, value, onValueChange, placeholder =
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className={cn("w-full justify-between h-auto min-h-10 px-3 py-2", !selectedStudent && "text-muted-foreground", className)} disabled={disabled}>
           <div className="flex flex-1 items-center gap-2 overflow-hidden">
-            {selectedStudent ? (
+            {selectedStudent ?
               <div className="flex flex-col items-start flex-1 min-w-0">
                 <span className="font-medium truncate w-full">{selectedStudent.name}</span>
                 <span className="text-xs text-muted-foreground truncate w-full">{selectedStudent.email}</span>
               </div>
-            ) : (
-              <span className="truncate">{placeholder}</span>
-            )}
+            : <span className="truncate">{placeholder}</span>}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {selectedStudent && !disabled && <X className="h-4 w-4 opacity-50 hover:opacity-100 cursor-pointer" onClick={handleClear} />}
@@ -196,7 +165,7 @@ const violationStatuses = [
 ];
 
 // Create/Edit Dialog Component
-function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: ViolationData | null; onSuccess: () => void }) {
+function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: ViolationTypes | null; onSuccess: () => void }) {
   const createViolation = useCreateViolation();
   const updateViolation = useUpdateViolation();
   const { data: violationTypes } = useGetTypeViolations();
@@ -205,7 +174,7 @@ function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open
 
   // Filter students from users data (role.name === "Student")
   const students = React.useMemo(() => {
-    return usersData.filter((user: any) => user.role?.name === "Student");
+    return usersData.filter((user) => user.role?.name === "Student");
   }, [usersData]);
 
   const {
@@ -237,8 +206,17 @@ function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open
       setValue("description", editData.description || "");
       setValue("status", editData.status);
       setValue("reportedBy", editData.reportedBy);
-      setValue("date", editData.date.split("T")[0]);
-      setValue("resolutionDate", editData.resolutionDate ? editData.resolutionDate.split("T")[0] : "");
+      // Handle both Date and string types
+      const dateStr = editData.date instanceof Date ? editData.date.toISOString() : editData.date;
+      setValue("date", dateStr.split("T")[0]);
+      // Handle resolutionDate
+      const resolutionDateStr =
+        editData.resolutionDate ?
+          editData.resolutionDate instanceof Date ?
+            editData.resolutionDate.toISOString()
+          : editData.resolutionDate
+        : "";
+      setValue("resolutionDate", resolutionDateStr ? resolutionDateStr.split("T")[0] : "");
       setValue("resolutionNotes", editData.resolutionNotes || "");
     } else {
       reset({
@@ -257,7 +235,7 @@ function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open
       };
 
       if (editData) {
-        await updateViolation.mutateAsync({ id: editData.id, ...formattedData });
+        await updateViolation.mutateAsync({ id: editData.id, ...formattedData } as ViolationInput);
         toast.success("Pelanggaran berhasil diperbarui!");
       } else {
         await createViolation.mutateAsync(formattedData);
@@ -282,13 +260,11 @@ function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Siswa</Label>
-              {usersLoading ? (
+              {usersLoading ?
                 <div className="flex items-center justify-center h-10 border rounded-md">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                 </div>
-              ) : (
-                <SearchableStudentSelect students={students} value={selectedStudentId} onValueChange={(value) => setValue("studentId", value)} placeholder="Cari nama siswa..." className="w-full" />
-              )}
+              : <SearchableStudentSelect students={students} value={selectedStudentId} onValueChange={(value) => setValue("studentId", value)} placeholder="Cari nama siswa..." className="w-full" />}
               {errors.studentId && <p className="text-sm text-red-500">{errors.studentId.message}</p>}
             </div>
 
@@ -382,7 +358,11 @@ function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open
               Batal
             </Button>
             <Button type="submit" disabled={createViolation.isPending || updateViolation.isPending}>
-              {createViolation.isPending || updateViolation.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createViolation.isPending || updateViolation.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -392,7 +372,7 @@ function ViolationFormDialog({ open, onOpenChange, editData, onSuccess }: { open
 }
 
 // Delete Confirmation Dialog
-function DeleteViolationDialog({ open, onOpenChange, violationData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; violationData: ViolationData | null; onSuccess: () => void }) {
+function DeleteViolationDialog({ open, onOpenChange, violationData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; violationData: ViolationTypes | null; onSuccess: () => void }) {
   const deleteViolation = useDeleteViolation();
 
   const handleDelete = async () => {
@@ -437,7 +417,7 @@ function ViolationDataTable() {
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [selectedViolation, setSelectedViolation] = React.useState<ViolationData | null>(null);
+  const [selectedViolation, setSelectedViolation] = React.useState<ViolationTypes | null>(null);
 
   // Additional filter states
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
@@ -496,7 +476,7 @@ function ViolationDataTable() {
     return searchableText.includes(searchValue);
   }, []);
 
-  const columns: ColumnDef<ViolationData>[] = [
+  const columns: ColumnDef<ViolationTypes>[] = [
     {
       id: "select",
       header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
@@ -769,21 +749,21 @@ function ViolationDataTable() {
                       .map((column) => {
                         return (
                           <DropdownMenuCheckboxItem key={column.id} className="capitalize" checked={column.getIsVisible()} onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                            {column.id === "student"
-                              ? "Siswa"
-                              : column.id === "class"
-                                ? "Kelas"
-                                : column.id === "violationType"
-                                  ? "Jenis Pelanggaran"
-                                  : column.id === "date"
-                                    ? "Tanggal"
-                                    : column.id === "status"
-                                      ? "Status"
-                                      : column.id === "reportedBy"
-                                        ? "Dilaporkan Oleh"
-                                        : column.id === "description"
-                                          ? "Deskripsi"
-                                          : column.id}
+                            {column.id === "student" ?
+                              "Siswa"
+                            : column.id === "class" ?
+                              "Kelas"
+                            : column.id === "violationType" ?
+                              "Jenis Pelanggaran"
+                            : column.id === "date" ?
+                              "Tanggal"
+                            : column.id === "status" ?
+                              "Status"
+                            : column.id === "reportedBy" ?
+                              "Dilaporkan Oleh"
+                            : column.id === "description" ?
+                              "Deskripsi"
+                            : column.id}
                           </DropdownMenuCheckboxItem>
                         );
                       })}
@@ -817,7 +797,7 @@ function ViolationDataTable() {
               )}
               {classFilter !== "all" && (
                 <Badge variant="secondary" className="gap-1">
-                  Kelas: {classes?.find((c: any) => c.id === classFilter)?.name}
+                  Kelas: {classes?.find((c: ClassDataTypes) => c.id === classFilter)?.name}
                   <X className="h-3 w-3 cursor-pointer" onClick={() => setClassFilter("all")} />
                 </Badge>
               )}
@@ -836,7 +816,7 @@ function ViolationDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length ?
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -844,8 +824,7 @@ function ViolationDataTable() {
                       ))}
                     </TableRow>
                   ))
-                ) : (
-                  <TableRow>
+                : <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       <div className="flex flex-col items-center justify-center space-y-2">
                         <AlertTriangle className="h-8 w-8 text-muted-foreground" />
@@ -867,7 +846,7 @@ function ViolationDataTable() {
                       </div>
                     </TableCell>
                   </TableRow>
-                )}
+                }
               </TableBody>
             </Table>
           </div>

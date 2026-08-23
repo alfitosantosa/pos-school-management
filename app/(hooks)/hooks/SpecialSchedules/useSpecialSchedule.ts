@@ -1,12 +1,13 @@
 "use client";
+import { SpecialScheduleData } from "@/app/(frontend)/dashboard/specialschedule/page";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
 
 export const useGetSpecialSchedules = () => {
   return useQuery({
     queryKey: ["specialSchedules"],
     queryFn: async () => {
-      const response = await apiGet("/api/specialschedule");
+      const response = await apiGet<SpecialScheduleData[]>("/api/specialschedule");
       return response.data;
     },
   });

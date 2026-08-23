@@ -1,30 +1,55 @@
-// Payment Types
-export interface PaymentTypes {
+// ─── Payment Data ─────────────────────────────────────────────────────────────
+// Primary type used across both payment pages and hooks.
+export interface PaymentData {
   id: string;
   studentId: string;
+  bendaharaId: string;
   amount: number | string;
-  dueDate?: Date | string | null;
-  status?: string;
+  dueDate?: string | null;
+  status: string;
   notes?: string | null;
-  createdAt?: Date | string;
-  paymentDate: Date | string;
+  createdAt: string;
+  paymentDate: string;
+  transferDate: string;
   receiptNumber: string;
+  bankRef: string;
   accountBankId: string;
   majorId: string;
   month: string;
-  bendaharaId: string;
-  bankRef?: string | null;
-  transferDate?: Date | string | null;
   // Relations
-  student?: StudentPaymentTypes;
-  accountBank?: AccountBankTypes;
-  major?: MajorPaymentTypes;
-  createdBy?: BendaharaTypes;
-  paymentItems?: PaymentItemTypes[];
-  paymentTransaction?: PaymentTransactionTypes | null;
+  student?: {
+    id: string;
+    name: string;
+    parentPhone?: string | null;
+    class?: { name: string } | null;
+    major?: { id: string; name: string } | null;
+    nisn?: string | null;
+    email?: string | null;
+  };
+  major?: {
+    id: string;
+    name: string;
+    adminName?: string | null;
+    signatureUrl?: string | null;
+    code?: string;
+  };
+  accountBank?: {
+    id: string;
+    accountName: string;
+    accountBank?: string;
+    accountNumber: string;
+  };
+  paymentItems?: import("./payment-items-types").PaymentItemData[];
+  paymentTransaction?: PaymentTransactionData | null;
+  createdBy?: {
+    id: string;
+    name: string;
+    email?: string | null;
+  };
 }
 
-export interface PaymentTransactionTypes {
+// ─── Payment Transaction ──────────────────────────────────────────────────────
+export interface PaymentTransactionData {
   id: string;
   paymentId: string;
   transactionId: string;
@@ -36,53 +61,35 @@ export interface PaymentTransactionTypes {
   fraudStatus: string;
   finishRedirectUrl: string;
   createdAt?: Date | string;
-  payment?: PaymentTypes;
+  payment?: PaymentData;
 }
 
-// Minimal relation types
-interface StudentPaymentTypes {
-  id: string;
-  name: string;
-  email?: string | null;
-  nisn?: string | null;
-  class?: {
-    id: string;
-    name: string;
-  } | null;
-  major?: {
-    id: string;
-    name: string;
-  } | null;
-}
-
-interface AccountBankTypes {
-  id: string;
-  accountName: string;
-  accountBank: string;
-  accountNumber: string;
+// ─── Input for create/update ──────────────────────────────────────────────────
+export interface PaymentInput {
+  id?: string;
+  studentId: string;
+  bendaharaId: string;
   majorId: string;
-}
-
-interface MajorPaymentTypes {
-  id: string;
-  code: string;
-  name: string;
-}
-
-interface BendaharaTypes {
-  id: string;
-  name: string;
-  email?: string | null;
-}
-
-interface PaymentItemTypes {
-  id: string;
-  name: string;
-  amount: number | string;
-  subtotal: number | string;
-  quantity: number | string;
-  isPaid: boolean;
+  accountBankId: string;
   month: string;
-  year: string;
-  skuType: string;
+  amount: number;
+  status: string;
+  paymentDate: string;
+  transferDate?: string;
+  dueDate?: string;
+  receiptNumber: string;
+  bankRef: string;
+  notes?: string | null;
 }
+
+// ─── Input for marking items as paid ─────────────────────────────────────────
+export interface SetPaidInput {
+  paymentItemsIds: string[];
+  paymentId: string;
+}
+
+// ─── Backward-compat aliases (used by non-payment hooks/pages) ────────────────
+/** @deprecated Use PaymentData instead */
+export type PaymentTypes = PaymentData;
+/** @deprecated Use PaymentTransactionData instead */
+export type PaymentTransactionTypes = PaymentTransactionData;

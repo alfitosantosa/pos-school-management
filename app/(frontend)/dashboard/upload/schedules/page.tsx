@@ -2,21 +2,21 @@
 
 import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
 import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
-import { useGetTeachers } from "@/app/(hooks)/hooks/Users/useTeachers";
-import { useGetSubjects } from "@/app/(hooks)/hooks/Subjects/useSubjects";
 import { useBulkCreateSchedulesData } from "@/app/(hooks)/hooks/Schedules/useBulkSchedules";
+import { useGetSubjects } from "@/app/(hooks)/hooks/Subjects/useSubjects";
+import { useGetTeachers } from "@/app/(hooks)/hooks/Users/useTeachers";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { FileText, X, Upload, Download, AlertCircle } from "lucide-react";
-import { useState } from "react";
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/authClients";
+import { AlertCircle, Download, FileText, Upload, X } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import Loading from "@/components/loading";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export type typeData = {
   id: string;
@@ -154,9 +154,12 @@ function UploadSchedules() {
       }
 
       // Send bulk create request
-      const result = await bulkCreateMutation.mutateAsync({ schedules: allSchedules });
+      const result = (await bulkCreateMutation.mutateAsync({ schedules: allSchedules })) as {
+        created?: number;
+        total?: number;
+      };
 
-      if (result.created) {
+      if (result?.created) {
         toast.success(`Berhasil upload ${result.created} dari ${result.total} jadwal`);
       } else {
         toast.warning("Tidak ada jadwal baru yang ditambahkan");
@@ -398,7 +401,7 @@ function UploadSchedules() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {academicYearData.map((data: typeData) => (
+              {academicYearData.map((data) => (
                 <TableRow key={data.id}>
                   <TableCell>{data.year}</TableCell>
                   <TableCell className="font-mono text-xs">{data.id}</TableCell>
@@ -423,7 +426,7 @@ function UploadSchedules() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {classData.map((data: typeData) => (
+              {classData.map((data) => (
                 <TableRow key={data.id}>
                   <TableCell>{data.name}</TableCell>
                   <TableCell className="font-mono text-xs">{data.id}</TableCell>

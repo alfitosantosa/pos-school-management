@@ -15,6 +15,7 @@
 //   @@map("payment_transactions")
 // }
 
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -43,7 +44,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newTransaction);
   } catch (error) {
-    console.error("Error creating payment transaction:", error);
-    return NextResponse.json({ error: "Failed to create payment transaction" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

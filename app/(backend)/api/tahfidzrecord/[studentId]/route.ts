@@ -17,8 +17,9 @@
 //   @@map("tahfidz_records")
 // }
 
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ studentId: string }> }) {
   const { studentId } = await params;
@@ -39,7 +40,6 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ studen
     });
     return NextResponse.json(tahfidzRecords);
   } catch (error) {
-    console.error("Error fetching tahfidz records:", error);
-    return NextResponse.json({ error: "Failed to fetch tahfidz records" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

@@ -17,8 +17,9 @@
 //   @@map("violations")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -47,8 +48,7 @@ export async function GET() {
     });
     return NextResponse.json(violations);
   } catch (error) {
-    console.error("Error fetching violations:", error);
-    return NextResponse.json({ error: "Failed to fetch violations" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 

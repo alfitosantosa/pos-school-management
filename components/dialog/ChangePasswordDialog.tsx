@@ -1,20 +1,14 @@
 "use client";
 
-import * as React from "react";
+import { getErrorMessage } from "@/app/(types)";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner"; // atau react-hot-toast
+import { authClient } from "@/lib/authClients";
 import { Loader2 } from "lucide-react";
+import * as React from "react";
+import { toast } from "sonner";
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -23,12 +17,7 @@ interface ChangePasswordDialogProps {
   userName: string;
 }
 
-export function ChangePasswordDialog({
-  open,
-  onOpenChange,
-  userId,
-  userName,
-}: ChangePasswordDialogProps) {
+export function ChangePasswordDialog({ open, onOpenChange, userId, userName }: ChangePasswordDialogProps) {
   const [newPassword, setNewPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
@@ -55,7 +44,7 @@ export function ChangePasswordDialog({
     setIsLoading(true);
 
     try {
-      const { data, error } = await authClient.admin.setUserPassword({
+      const { error } = await authClient.admin.setUserPassword({
         userId: userId,
         newPassword: newPassword,
       });
@@ -66,13 +55,13 @@ export function ChangePasswordDialog({
       }
 
       toast.success(`Password untuk ${userName} berhasil diubah`);
-      
+
       // Reset form dan tutup dialog
       setNewPassword("");
       setConfirmPassword("");
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error?.message || "Terjadi kesalahan");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
@@ -100,43 +89,18 @@ export function ChangePasswordDialog({
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="new-password">Password Baru</Label>
-              <Input
-                id="new-password"
-                type="password"
-                placeholder="Masukkan password baru"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                disabled={isLoading}
-                required
-                minLength={8}
-              />
-              <p className="text-xs text-muted-foreground">
-                Minimal 8 karakter
-              </p>
+              <Input id="new-password" type="password" placeholder="Masukkan password baru" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={isLoading} required minLength={8} />
+              <p className="text-xs text-muted-foreground">Minimal 8 karakter</p>
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="confirm-password">Konfirmasi Password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                placeholder="Konfirmasi password baru"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isLoading}
-                required
-                minLength={8}
-              />
+              <Input id="confirm-password" type="password" placeholder="Konfirmasi password baru" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isLoading} required minLength={8} />
             </div>
           </div>
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={isLoading}
-            >
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
               Batal
             </Button>
             <Button type="submit" disabled={isLoading}>

@@ -1,16 +1,17 @@
 "use client";
 
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { useRouter, usePathname } from "next/navigation";
-import Image from "next/image";
-import Logo from "@/public/Logo.svg";
-import { useSession, signOut } from "@/lib/auth-client";
-import { LogOut, User } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { signOut, useSession } from "@/lib/authClients";
+import Logo from "@/public/Logo.svg";
+import { LogOut, User } from "lucide-react";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const permissionLabels: Record<string, string> = {
   "/": "Home",

@@ -1,20 +1,50 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { CheckCircle, XCircle, Clock, AlertCircle, Users, BookOpen, MapPin, Search, TrendingUp, AlertTriangle, User, BarChart3, PieChart as PieChartIcon, RefreshCw, CalendarDays, Activity } from "lucide-react";
-import type { DateRange } from "react-day-picker";
-
-import { useAttendanceByDate } from "@/app/(hooks)/hooks/Attendances/useAttendanceByDate";
-import { DatePickerWithRange } from "@/components/date/datePicker";
+import { useAttendanceByDate } from '@/app/(hooks)/hooks/Attendances/useAttendanceByDate';
+import { DatePickerWithRange } from '@/components/date/datePicker';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Activity,
+  AlertCircle,
+  AlertTriangle,
+  BarChart3,
+  BookOpen,
+  CalendarDays,
+  CheckCircle,
+  Clock,
+  MapPin,
+  PieChart as PieChartIcon,
+  RefreshCw,
+  Search,
+  TrendingUp,
+  User,
+  Users,
+  XCircle,
+} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

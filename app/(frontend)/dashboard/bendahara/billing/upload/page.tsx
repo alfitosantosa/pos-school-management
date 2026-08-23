@@ -1,22 +1,22 @@
 "use client";
 
+import { BulkUploadPaymentItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
+import { useGetStudentByIdMajorActive } from "@/app/(hooks)/hooks/Users/useGetStudentById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
-import { FileText, X, Upload, Download, AlertCircle, CheckCircle2, Info, Users, CreditCard, Calendar, Layers } from "lucide-react";
-import { useState, useMemo } from "react";
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/authClients";
+import { AlertCircle, Calendar, CheckCircle2, CreditCard, Download, FileText, Info, Layers, Upload, Users, X } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import Loading from "@/components/loading";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetStudentByIdMajorActive } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
-import { BulkUploadPaymentItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type typeData = {
@@ -28,16 +28,16 @@ export type typeData = {
 };
 
 export type PaymentTypeData = {
-  skuType: any;
+  skuType: string;
   id: string;
   name: string;
-  amount: string;
+  amount: number;
   owner: string;
   isMonthly: boolean;
   isActive: boolean;
   isFixedAmount: boolean;
   isFixedQuantity: boolean;
-  quantity: string;
+  quantity: number;
   major?: { name: string };
 };
 
@@ -100,20 +100,20 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
   // Build lookup maps for validation & display
   const studentMap = useMemo(() => {
     const map = new Map<string, string>();
-    (students as any[]).forEach((s) => map.set(s.id, s.name));
+    students.forEach((s) => map.set(s.id, s.name));
     return map;
   }, [students]);
 
   const paymentTypeMap = useMemo(() => {
     const map = new Map<string, PaymentTypeData>();
-    (paymentTypes as PaymentTypeData[]).forEach((pt) => map.set(pt.id, pt));
+    paymentTypes.forEach((pt) => map.set(pt.id, pt));
     return map;
   }, [paymentTypes]);
 
   // Unique skuTypes from paymentTypes
   const skuTypes = useMemo(() => {
     const set = new Set<string>();
-    (paymentTypes as PaymentTypeData[]).forEach((pt) => {
+    paymentTypes.forEach((pt) => {
       if (pt.skuType) set.add(pt.skuType);
     });
     return Array.from(set);
@@ -203,6 +203,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
       const worksheet = workbook.Sheets[targetSheet];
 
       // Convert sheet to array of arrays
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
 
       const parsed: PreviewRow[] = [];
@@ -295,14 +296,15 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
       console.log("payload", payload);
 
       const result = await bulkUploadMutation.mutateAsync(payload);
-      setUploadResult(result);
-      toast.success(`Berhasil membuat ${result.count ?? validRows.length} item tagihan!`);
+      setUploadResult(result as { count: number; skipped: number; total: number });
+      toast.success(`Berhasil membuat ${(result as { count: number }).count ?? validRows.length} item tagihan!`);
       setFiles([]);
       setPreviewRows([]);
       const fileInput = document.getElementById("billing-file-upload") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
-    } catch (err: any) {
-      toast.error(err?.message || "Gagal mengupload data");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Gagal mengupload data";
+      toast.error(errorMessage);
     }
   };
 
@@ -311,8 +313,8 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
     try {
       const XLSX = await import("xlsx");
 
-      const firstStudent = (students as any[])[0];
-      const firstPT = (paymentTypes as PaymentTypeData[])[0];
+      const firstStudent = students[0];
+      const firstPT = paymentTypes[0];
       const currentMonth = String(new Date().getMonth() + 1).padStart(2, "0");
 
       const wsData = [
@@ -323,8 +325,8 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
           firstStudent?.id ?? "student-id-disini",
           firstPT?.id ?? "payment-type-id-disini",
           1,
-          firstPT ? parseFloat(firstPT.amount) : 100000,
-          firstPT ? parseFloat(firstPT.amount) : 100000,
+          firstPT ? firstPT.amount : 100000,
+          firstPT ? firstPT.amount : 100000,
           currentMonth,
           String(currentYear),
           firstPT?.name ?? "SPP Bulanan",
@@ -351,7 +353,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
     try {
       const XLSX = await import("xlsx");
 
-      const wsData = [["ID (gunakan di kolom Student ID)", "Nama Siswa", "NISN", "Kelas"], ...(students as any[]).map((s) => [s.id, s.name, s.nisn ?? "-", s.class?.name ?? "-"])];
+      const wsData = [["ID (gunakan di kolom Student ID)", "Nama Siswa", "NISN", "Kelas"], ...students.map((s) => [s.id, s.name, s.nisn ?? "-", s.class?.name ?? "-"])];
 
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -371,7 +373,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
 
       const wsData = [
         ["ID (gunakan di kolom Payment Type ID)", "Nama", "Nominal", "Owner", "Tipe SKU", "Bulanan?", "Nominal Tetap?", "Qty Tetap?"],
-        ...(paymentTypes as PaymentTypeData[]).map((pt) => [pt.id, pt.name, parseFloat(pt.amount), pt.owner, pt.skuType, pt.isMonthly ? "Ya" : "Tidak", pt.isFixedAmount ? "Ya" : "Tidak", pt.isFixedQuantity ? "Ya" : "Tidak"]),
+        ...paymentTypes.map((pt) => [pt.id, pt.name, pt.amount, pt.owner, pt.skuType, pt.isMonthly ? "Ya" : "Tidak", pt.isFixedAmount ? "Ya" : "Tidak", pt.isFixedQuantity ? "Ya" : "Tidak"]),
       ];
 
       const wb = XLSX.utils.book_new();
@@ -421,18 +423,18 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
         </div>
         <p className="text-sm text-muted-foreground mb-4">Download daftar siswa dan jenis tagihan untuk mendapatkan ID yang dibutuhkan saat mengisi template.</p>
         <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={exportStudentList} disabled={!(students as any[]).length}>
+          <Button variant="outline" onClick={exportStudentList} disabled={!students.length}>
             <Users className="h-4 w-4 mr-2" />
             Export Daftar Siswa
             <Badge variant="secondary" className="ml-2 text-xs">
-              {(students as any[]).length} siswa
+              {students.length} siswa
             </Badge>
           </Button>
-          <Button variant="outline" onClick={exportPaymentTypeList} disabled={!(paymentTypes as any[]).length}>
+          <Button variant="outline" onClick={exportPaymentTypeList} disabled={!paymentTypes.length}>
             <CreditCard className="h-4 w-4 mr-2" />
             Export Jenis Tagihan
             <Badge variant="secondary" className="ml-2 text-xs">
-              {(paymentTypes as any[]).length} jenis
+              {paymentTypes.length} jenis
             </Badge>
           </Button>
         </div>
@@ -665,7 +667,7 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
             <div className="flex items-center gap-2">
               <CreditCard className="h-5 w-5 text-purple-500" />
               <div className="text-lg font-bold">Jenis Tagihan</div>
-              <Badge variant="secondary">{(paymentTypes as any[]).length} jenis</Badge>
+              <Badge variant="secondary">{paymentTypes.length} jenis</Badge>
             </div>
             <p className="text-xs text-muted-foreground">Copy ID → paste ke kolom Payment Type ID di template</p>
           </div>
@@ -683,10 +685,10 @@ function UploadBilling({ majorId, majorName }: { majorId: string; majorName?: st
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(paymentTypes as PaymentTypeData[]).map((pt) => (
+                {paymentTypes.map((pt) => (
                   <TableRow key={pt.id}>
                     <TableCell className="font-medium">{pt.name}</TableCell>
-                    <TableCell className="tabular-nums">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(parseFloat(pt.amount))}</TableCell>
+                    <TableCell className="tabular-nums">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(pt.amount)}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className="text-xs">
                         {pt.skuType}

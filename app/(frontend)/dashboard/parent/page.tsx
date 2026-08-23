@@ -1,22 +1,19 @@
 "use client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { User, Calendar, CheckCircle, XCircle, AlertCircle, Clock, AlertTriangle, BookOpen, GraduationCap, Mail, Phone, FileText, Award, ChevronLeft, ChevronRight, ArrowUpDown, TrendingUp, TrendingDown } from "lucide-react";
-import { useState, useMemo } from "react";
 import { useGetAttendanceByIdStudent } from "@/app/(hooks)/hooks/Attendances/useAttendaceByIdStudent";
 import { useGetStudentsByIds } from "@/app/(hooks)/hooks/Users/useStudentByIds";
-import { useGetUserById } from "@/app/(hooks)/hooks/Users/useUserById";
-import { useGetViolationsByIdStudent } from "@/app/(hooks)/hooks/Violations/useViolationsByIdStudent";
-
-import { useSession } from "@/lib/auth-client";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useGetViolationsByIdStudent } from "@/app/(hooks)/hooks/Violations/useViolationsByIdStudent";
 import Loading from "@/components/loading";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSession } from "@/lib/authClients";
+import { AlertCircle, AlertTriangle, ArrowUpDown, Award, BookOpen, Calendar, CheckCircle, ChevronLeft, ChevronRight, Clock, FileText, GraduationCap, Mail, Phone, User, XCircle } from "lucide-react";
+import { useMemo, useState } from "react";
 
 // Simple Table Component
 function SimpleTable({ columns, data, emptyMessage = "Tidak ada data" }: any) {
@@ -258,7 +255,15 @@ export default function ParentPage() {
     {
       key: "status",
       header: "Status",
-      render: (row: any) => <Badge variant={row.status === "RESOLVED" ? "default" : "secondary"}>{row.status === "RESOLVED" ? "Selesai" : row.status === "APPEALED" ? "Banding" : "Aktif"}</Badge>,
+      render: (row: any) => (
+        <Badge variant={row.status === "RESOLVED" ? "default" : "secondary"}>
+          {row.status === "RESOLVED" ?
+            "Selesai"
+          : row.status === "APPEALED" ?
+            "Banding"
+          : "Aktif"}
+        </Badge>
+      ),
     },
   ];
 
@@ -462,22 +467,21 @@ export default function ParentPage() {
                   <div className="text-sm text-muted-foreground">
                     {violationStats.activeCount} pelanggaran aktif dari {violationStats.total} total
                   </div>
-                  {violationStats.totalPoints > 50 ? (
+                  {violationStats.totalPoints > 50 ?
                     <Badge variant="destructive" className="mt-2">
                       <AlertCircle className="h-3 w-3 mr-1" />
                       Perlu Perhatian
                     </Badge>
-                  ) : violationStats.totalPoints > 20 ? (
+                  : violationStats.totalPoints > 20 ?
                     <Badge variant="secondary" className="mt-2">
                       <AlertCircle className="h-3 w-3 mr-1" />
                       Hati-hati
                     </Badge>
-                  ) : (
-                    <Badge variant="default" className="mt-2">
+                  : <Badge variant="default" className="mt-2">
                       <CheckCircle className="h-3 w-3 mr-1" />
                       Baik
                     </Badge>
-                  )}
+                  }
                 </div>
               </CardContent>
             </Card>
@@ -503,7 +507,11 @@ export default function ParentPage() {
                   <CardTitle>Riwayat Kehadiran</CardTitle>
                   <CardDescription>Data kehadiran lengkap dari {selectedStudent?.name}</CardDescription>
                 </CardHeader>
-                <CardContent>{loadingAttendance ? <Loading /> : <SimpleTable columns={attendanceColumns} data={attendanceStudent} emptyMessage="Belum ada data kehadiran" />}</CardContent>
+                <CardContent>
+                  {loadingAttendance ?
+                    <Loading />
+                  : <SimpleTable columns={attendanceColumns} data={attendanceStudent} emptyMessage="Belum ada data kehadiran" />}
+                </CardContent>
               </Card>
             </TabsContent>
 
@@ -515,20 +523,18 @@ export default function ParentPage() {
                   <CardDescription>Catatan pelanggaran dari {selectedStudent?.name}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {loadingViolations ? (
+                  {loadingViolations ?
                     <div className="text-center py-12">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
                       <p className="text-muted-foreground">Memuat data pelanggaran...</p>
                     </div>
-                  ) : violationStudent.length === 0 ? (
+                  : violationStudent.length === 0 ?
                     <div className="text-center py-12">
                       <Award className="h-12 w-12 mx-auto text-green-600 mb-4" />
                       <h3 className="font-semibold text-lg">Tidak Ada Pelanggaran</h3>
                       <p className="text-muted-foreground">{selectedStudent?.name} belum memiliki catatan pelanggaran</p>
                     </div>
-                  ) : (
-                    <SimpleTable columns={violationsColumns} data={violationStudent} emptyMessage="Belum ada data pelanggaran" />
-                  )}
+                  : <SimpleTable columns={violationsColumns} data={violationStudent} emptyMessage="Belum ada data pelanggaran" />}
                 </CardContent>
               </Card>
             </TabsContent>

@@ -1,14 +1,15 @@
 "use client";
 
+import { ScheduleTypes } from "@/app/(types)";
+import { apiGet } from "@/lib/apiClients";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api-client";
 
 export const useGetScheduleById = (id: string) => {
   return useQuery({
     queryKey: ["schedule", id],
     queryFn: async () => {
       try {
-        const res = await apiGet(`/api/schedules/${id}`);
+        const res = await apiGet<ScheduleTypes[]>(`/api/schedules/${id}`);
         return res.data;
       } catch (error) {
         console.error(error);
@@ -23,7 +24,7 @@ export const useGetScheduleByIdTeacher = (id: string) => {
     queryKey: ["schedules"],
     queryFn: async () => {
       try {
-        const res = await apiGet(`/api/schedules/teacher/${id}`);
+        const res = await apiGet<ScheduleTypes[]>(`/api/schedules/teacher/${id}`);
         return res.data;
       } catch (error) {
         console.error(error);
@@ -38,7 +39,7 @@ export const useGetScheduleByIdAcademicYearActive = (id: string) => {
     queryKey: ["schedules"],
     queryFn: async () => {
       try {
-        const res = await apiGet(`/api/schedules/active/teacher/${id}`);
+        const res = await apiGet<ScheduleTypes[]>(`/api/schedules/active/teacher/${id}`);
         return res.data;
       } catch (error) {
         console.error(error);
@@ -47,5 +48,3 @@ export const useGetScheduleByIdAcademicYearActive = (id: string) => {
     enabled: !!id,
   });
 };
-
-

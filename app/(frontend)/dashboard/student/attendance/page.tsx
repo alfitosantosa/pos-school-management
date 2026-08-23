@@ -1,24 +1,21 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Calendar, Clock, Users, Search, X, MapPin, GraduationCap, BookOpen, CheckCircle, XCircle, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { useGetSchedules } from "@/app/(hooks)/hooks/Schedules/useSchedules";
-
 import { useGetAttendanceByIdStudent } from "@/app/(hooks)/hooks/Attendances/useAttendaceByIdStudent";
+import { useGetSchedules } from "@/app/(hooks)/hooks/Schedules/useSchedules";
 import { useGetStudentById } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-
-import { useSession } from "@/lib/auth-client";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Loading from "@/components/loading";
-import { unauthorized } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { AlertCircle, ArrowUpDown, BookOpen, Calendar, CheckCircle, ChevronDown, Clock, GraduationCap, Search, Users, X, XCircle } from "lucide-react";
+import * as React from "react";
 
 // Type definitions
 export type AttendanceData = {
@@ -360,8 +357,8 @@ export default function AttendanceDataTable() {
     },
   ];
 
-  const table = useReactTable({
-    data: attendances,
+  const table = useReactTable<AttendanceData>({
+    data: attendances as AttendanceData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -447,7 +444,7 @@ export default function AttendanceDataTable() {
               <div>
                 <h2 className="text-xl font-semibold text-blue-900">{studentData.name}</h2>
                 {studentData.email && <p className="text-sm text-blue-700">{studentData.email}</p>}
-                {studentData.studentId && <p className="text-sm text-blue-700">NIS: {studentData.studentId}</p>}
+                {studentData.id && <p className="text-sm text-blue-700">NIS: {studentData.nisn}</p>}
               </div>
             </div>
           </div>

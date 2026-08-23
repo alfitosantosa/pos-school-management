@@ -1,39 +1,36 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Calendar, Clock, Users, Search, X, MapPin, GraduationCap, BookOpen } from "lucide-react";
-
+import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useCreateSchedule, useDeleteSchedule, useGetSchedules, useUpdateSchedule } from "@/app/(hooks)/hooks/Schedules/useSchedules";
+import { useGetSubjects } from "@/app/(hooks)/hooks/Subjects/useSubjects";
+import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetTeachers } from "@/app/(hooks)/hooks/Users/useTeachers";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { AcademicYearTypes, ClassDataTypes } from "@/app/(types)";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TeacherCombobox } from "@/components/ui/teacher-combobox";
-import { useForm } from "react-hook-form";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, BookOpen, Calendar, ChevronDown, Clock, GraduationCap, MapPin, MoreHorizontal, Pencil, Plus, Search, Trash2, Users, X } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
 
 // Import hooks
-import { useGetSchedules, useCreateSchedule, useUpdateSchedule, useDeleteSchedule } from "@/app/(hooks)/hooks/Schedules/useSchedules";
-import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
-import { useGetSubjects } from "@/app/(hooks)/hooks/Subjects/useSubjects";
-import { useGetTeachers } from "@/app/(hooks)/hooks/Users/useTeachers";
-import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
-import { ScheduleTypes } from "@/app/(types)/types/schedule-types";
-import { AcademicYearTypes } from "@/app/(types)";
-
 // Type definitions
 export type ScheduleData = {
   id: string;
@@ -210,7 +207,7 @@ function ScheduleFormDialog({ open, onOpenChange, editData, onSuccess }: { open:
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">— Tidak ada —</SelectItem>
-                  {classes?.map((cls: any) => (
+                  {classes?.map((cls: ClassDataTypes) => (
                     <SelectItem key={cls.id} value={cls.id}>
                       {cls.name}
                     </SelectItem>
@@ -610,8 +607,8 @@ function ScheduleDataTable() {
     },
   ];
 
-  const table = useReactTable({
-    data: schedules,
+  const table = useReactTable<ScheduleData>({
+    data: schedules as ScheduleData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -700,7 +697,7 @@ function ScheduleDataTable() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Kelas</SelectItem>
-                {classes?.map((cls: any) => (
+                {classes?.map((cls: ClassDataTypes) => (
                   <SelectItem key={cls.id} value={cls.id}>
                     {cls.name}
                   </SelectItem>

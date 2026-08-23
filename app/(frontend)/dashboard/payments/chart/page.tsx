@@ -1,27 +1,25 @@
 "use client";
 
-import * as React from "react";
-import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { addDays, format, subMonths } from "date-fns";
-import { id as localeId } from "date-fns/locale";
-import type { DateRange } from "react-day-picker";
-import { TrendingUp, TrendingDown, CreditCard, Receipt, Building2, CalendarDays, RefreshCw, BarChart2, PieChart as PieIcon, Activity, ArrowUpRight } from "lucide-react";
-
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { usePaymentsDashboardByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { DatePickerWithRange } from "@/components/date/datePicker";
+import Loading from "@/components/loading";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-
-import { usePaymentsDashboardByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
-import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import Loading from "@/components/loading";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSession } from "@/lib/authClients";
+import { format, subMonths } from "date-fns";
+import { id as localeId } from "date-fns/locale";
+import { Activity, BarChart2, Building2, CalendarDays, CreditCard, PieChart as PieIcon, Receipt, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
 import { unauthorized } from "next/navigation";
+import * as React from "react";
+import type { DateRange } from "react-day-picker";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type DashboardData = {

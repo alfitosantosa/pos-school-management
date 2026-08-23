@@ -1,73 +1,38 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Calendar, Clock, Users, Search, X, CheckCircle, XCircle, AlertCircle, Download } from "lucide-react";
-import { DateRange } from "react-day-picker";
-
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { DatePickerWithRange } from "@/components/date/datePicker";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-
-// Import hooks
-import { useCreateAttendance, useUpdateAttendance, useDeleteAttendance } from "@/app/(hooks)/hooks/Attendances/useAttendance";
+import { useCreateAttendance, useDeleteAttendance, useUpdateAttendance } from "@/app/(hooks)/hooks/Attendances/useAttendance";
+import { useAttendanceByDate } from "@/app/(hooks)/hooks/Attendances/useAttendanceByDate";
 import { useGetSchedules } from "@/app/(hooks)/hooks/Schedules/useSchedules";
 import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useAttendanceByDate } from "@/app/(hooks)/hooks/Attendances/useAttendanceByDate";
+import { attendanceTypes } from "@/app/(types)/types/attendance-types";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState, Row } from "@tanstack/react-table";
+import { AlertCircle, ArrowUpDown, Calendar, CheckCircle, ChevronDown, Clock, Download, MoreHorizontal, Pencil, Plus, Search, Trash2, Users, X, XCircle } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { DateRange } from "react-day-picker";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
-// Type definitions
-export type AttendanceData = {
-  id: string;
-  studentId: string;
-  scheduleId: string;
-  status: string;
-  notes?: string;
-  date: string;
-  createdAt: string;
-  schedule?: {
-    id: string;
-    class?: {
-      id: string;
-      name: string;
-    };
-    subject?: {
-      id: string;
-      name: string;
-      code: string;
-    };
-    teacher?: {
-      id: string;
-      name: string;
-    };
-    dayOfWeek: number;
-    startTime: string;
-    endTime: string;
-    room?: string;
-  };
-  student?: {
-    id: string;
-    name: string;
-    email?: string;
-    nisn: string;
-  };
-};
+// Import hooks
+// Type definitions - Use attendanceTypes from types file
+export type AttendanceData = attendanceTypes;
 
 // Form schema
 const attendanceSchema = z.object({
@@ -132,7 +97,7 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
     if (editData) {
       setValue("studentId", editData.studentId);
       setValue("scheduleId", editData.scheduleId);
-      setValue("status", editData.status as any);
+      setValue("status", editData.status as "present" | "absent" | "late" | "excused" | "sick");
       setValue("notes", editData.notes || "");
       setValue("date", editData.date.split("T")[0]);
     } else {
@@ -161,8 +126,9 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan saat menyimpan data";
+      toast.error(errorMessage);
     }
   };
 
@@ -182,7 +148,7 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
                   <SelectValue placeholder="Pilih Siswa" />
                 </SelectTrigger>
                 <SelectContent>
-                  {students.map((student: any) => (
+                  {students.map((student) => (
                     <SelectItem key={student.id} value={student.id}>
                       {student.name}
                     </SelectItem>
@@ -199,7 +165,7 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
                   <SelectValue placeholder="Pilih Jadwal" />
                 </SelectTrigger>
                 <SelectContent>
-                  {schedules?.map((schedule: any) => (
+                  {schedules?.map((schedule) => (
                     <SelectItem key={schedule.id} value={schedule.id}>
                       {schedule.class?.name} - {schedule.subject?.name} ({DAYS_MAP[schedule.dayOfWeek as keyof typeof DAYS_MAP]} {schedule.startTime})
                     </SelectItem>
@@ -213,7 +179,7 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Status Kehadiran</Label>
-              <Select value={selectedStatus || ""} onValueChange={(value) => setValue("status", value as any)}>
+              <Select value={selectedStatus || ""} onValueChange={(value) => setValue("status", value as "present" | "absent" | "late" | "excused" | "sick")}>
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih Status" />
                 </SelectTrigger>
@@ -248,7 +214,11 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
               Batal
             </Button>
             <Button type="submit" disabled={createAttendance.isPending || updateAttendance.isPending}>
-              {createAttendance.isPending || updateAttendance.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createAttendance.isPending || updateAttendance.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -269,8 +239,9 @@ function DeleteAttendanceDialog({ open, onOpenChange, attendanceData, onSuccess 
       toast.success("Data kehadiran berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus data kehadiran");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan saat menghapus data";
+      toast.error(errorMessage || "Gagal menghapus data kehadiran");
     }
   };
 
@@ -352,7 +323,7 @@ function AttendanceDataTable() {
 
       selectedRows.forEach((row) => {
         const attendance = row.original;
-        const schedule = schedules.find((s: any) => s.id === attendance.scheduleId);
+        const schedule = schedules.find((s) => s.id === attendance.scheduleId);
         const date = new Date(attendance.date);
 
         wsData.push([
@@ -396,13 +367,13 @@ function AttendanceDataTable() {
 
   const uniqueClasses = React.useMemo(() => {
     const classes = schedules
-      .filter((schedule: any) => schedule.class)
-      .map((schedule: any) => schedule.class)
-      .filter((cls: any, index: number, arr: any[]) => arr.findIndex((c: any) => c.id === cls.id) === index);
+      .filter((schedule) => schedule.class)
+      .map((schedule) => schedule.class)
+      .filter((cls, index: number, arr) => arr.findIndex((c) => c?.id === cls?.id) === index);
     return classes;
   }, [schedules]);
 
-  const globalFilterFn = React.useCallback((row: any, columnId: string, filterValue: string) => {
+  const globalFilterFn = React.useCallback((row: Row<AttendanceData>, columnId: string, filterValue: string) => {
     if (!filterValue) return true;
 
     const searchValue = filterValue.toLowerCase();
@@ -425,11 +396,11 @@ function AttendanceDataTable() {
   }, []);
 
   const classFilterFn = React.useCallback(
-    (row: any, columnId: string, filterValue: string) => {
+    (row: Row<AttendanceData>, columnId: string, filterValue: string) => {
       if (filterValue === "all") return true;
 
       const scheduleId = row.original.scheduleId;
-      const schedule = schedules.find((s: any) => s.id === scheduleId);
+      const schedule = schedules.find((s) => s.id === scheduleId);
 
       return schedule?.class?.id === filterValue;
     },
@@ -499,7 +470,7 @@ function AttendanceDataTable() {
       header: "Jadwal Pelajaran",
       cell: ({ row }) => {
         const scheduleId = row.original.scheduleId;
-        const schedule = schedules.find((s: any) => s.id === scheduleId);
+        const schedule = schedules.find((s) => s.id === scheduleId);
 
         if (!schedule) return "-";
 
@@ -554,13 +525,11 @@ function AttendanceDataTable() {
         const notes = row.getValue("notes") as string;
         return (
           <div className="max-w-[200px]">
-            {notes ? (
+            {notes ?
               <div className="text-sm truncate" title={notes}>
                 {notes}
               </div>
-            ) : (
-              <span className="text-muted-foreground">-</span>
-            )}
+            : <span className="text-muted-foreground">-</span>}
           </div>
         );
       },
@@ -701,11 +670,14 @@ function AttendanceDataTable() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Kelas</SelectItem>
-                {uniqueClasses?.map((cls: any) => (
-                  <SelectItem key={cls.id} value={cls.id}>
-                    {cls.name}
-                  </SelectItem>
-                ))}
+                {uniqueClasses?.map(
+                  (cls) =>
+                    cls && (
+                      <SelectItem key={cls.id} value={cls.id}>
+                        {cls.name}
+                      </SelectItem>
+                    ),
+                )}
               </SelectContent>
             </Select>
 
@@ -797,7 +769,7 @@ function AttendanceDataTable() {
             )}
             {classFilter !== "all" && (
               <Badge variant="secondary" className="gap-1">
-                Kelas: {uniqueClasses?.find((c: any) => c.id === classFilter)?.name}
+                Kelas: {uniqueClasses?.find((c) => c?.id === classFilter)?.name}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setClassFilter("all")} />
               </Badge>
             )}
@@ -816,7 +788,7 @@ function AttendanceDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {table.getRowModel().rows?.length ?
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -824,8 +796,7 @@ function AttendanceDataTable() {
                     ))}
                   </TableRow>
                 ))
-              ) : (
-                <TableRow>
+              : <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <CheckCircle className="h-8 w-8 text-muted-foreground" />
@@ -847,7 +818,7 @@ function AttendanceDataTable() {
                     </div>
                   </TableCell>
                 </TableRow>
-              )}
+              }
             </TableBody>
           </Table>
         </div>

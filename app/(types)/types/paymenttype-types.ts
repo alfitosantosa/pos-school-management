@@ -1,9 +1,31 @@
-// Payment Type Types
+// ─── PaymentType for page forms / dropdowns ───────────────────────────────────
+// This is what both payment pages call "PaymentTypeData".
+export interface PaymentTypeForPage {
+  id: string;
+  name: string;
+  description?: string;
+  amount: string | number;
+  isMonthly: boolean;
+  isActive: boolean;
+  isFixedAmount: boolean;
+  isFixedQuantity: boolean;
+  quantity: number | string;
+  subtotal: string | number;
+  owner: string;
+  majorId: string;
+  skuType: string;
+  major?: { id: string; name: string };
+  student?: {
+    class?: { name: string };
+  };
+}
+
+// ─── Full PaymentType (from API / Prisma) ─────────────────────────────────────
 export interface PaymentTypeTypes {
   id: string;
   name: string;
   description: string;
-  amount: number | string;
+  amount: number;
   isMonthly: boolean;
   isActive: boolean;
   isFixedAmount: boolean;
@@ -32,7 +54,7 @@ interface PaymentItemPaymentTypeTypes {
   isPaid: boolean;
 }
 
-// Input types
+// ─── Input for create/update ──────────────────────────────────────────────────
 export interface PaymentTypeInput {
   name: string;
   description: string;
@@ -47,3 +69,7 @@ export interface PaymentTypeInput {
   majorId: string;
   skuType: string;
 }
+
+// ─── Backward-compat alias ────────────────────────────────────────────────────
+/** @deprecated Use PaymentTypeForPage for form/display usage */
+export type PaymentTypeData = PaymentTypeForPage;

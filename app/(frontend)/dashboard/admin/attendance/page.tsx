@@ -1,20 +1,20 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarDays, Clock, MapPin, BookOpen, Users, GraduationCap, Eye, Plus, LucidePanelTopClose } from "lucide-react";
-import Link from "next/link";
-import { useState, useMemo } from "react";
-import { useGetScheduleAcademicYearActive } from "@/app/(hooks)/hooks/Schedules/useSchedules";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
-import Loading from "@/components/loading";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { useAttendanceIsSubmitted } from "@/app/(hooks)/hooks/Attendances/useAttendanceIsSubmitted";
+import { useGetScheduleAcademicYearActive } from "@/app/(hooks)/hooks/Schedules/useSchedules";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSession } from "@/lib/authClients";
+import { BookOpen, CalendarDays, Clock, Eye, GraduationCap, LucidePanelTopClose, MapPin, Plus, Users } from "lucide-react";
+import Link from "next/link";
+import { unauthorized } from "next/navigation";
+import { useMemo, useState } from "react";
 
 const ScheduleCard = ({ schedule }: { schedule: any }) => {
   const isTodaySchedule = (dayOfWeek: number) => {

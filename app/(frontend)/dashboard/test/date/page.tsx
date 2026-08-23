@@ -1,8 +1,8 @@
 "use client";
 
-import { DatePickerWithRange } from "@/components/date/datePicker";
-import { useState } from "react";
-import { DateRange } from "react-day-picker";
+import { DatePickerWithRange } from '@/components/date/datePicker';
+import { useState } from 'react';
+import { DateRange } from 'react-day-picker';
 
 export default function DatePage() {
   const [date, setDate] = useState<DateRange | undefined>({

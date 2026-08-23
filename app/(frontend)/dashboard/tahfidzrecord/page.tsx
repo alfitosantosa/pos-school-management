@@ -1,34 +1,33 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, BookOpen, User, Star, CalendarDays } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
-
-import { useGetTahfidzRecords, useCreateTahfidzRecord, useUpdateTahfidzRecord, useDeleteTahfidzRecord } from "@/app/(hooks)/hooks/TahfidzRecord/useTahfidzRecord";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useGetQuranSurah } from "@/app/(hooks)/hooks/TahfidzRecord/useQuranSurah";
+import { useCreateTahfidzRecord, useDeleteTahfidzRecord, useGetTahfidzRecords, useUpdateTahfidzRecord } from "@/app/(hooks)/hooks/TahfidzRecord/useTahfidzRecord";
 import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
 import { useGetTeachers } from "@/app/(hooks)/hooks/Users/useTeachers";
-import { useGetQuranSurah } from "@/app/(hooks)/hooks/TahfidzRecord/useQuranSurah";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { format } from "date-fns";
+import { id as localeId } from "date-fns/locale";
+import { ArrowUpDown, BookOpen, CalendarDays, ChevronDown, FileText, MoreHorizontal, Pencil, Plus, Search, Star, Trash2, User, X } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type SurahQuranData = {
@@ -326,7 +325,11 @@ function TahfidzFormDialog({
               Batal
             </Button>
             <Button type="submit" disabled={createRecord.isPending || updateRecord.isPending}>
-              {createRecord.isPending || updateRecord.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createRecord.isPending || updateRecord.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -447,14 +450,12 @@ function TahfidzRecordDataTable() {
         const surah = row.original.surah;
         return (
           <div>
-            {surah ? (
+            {surah ?
               <>
                 <div className="font-medium">{surah.name}</div>
                 <div className="text-xs text-muted-foreground">{surah.nameLatin}</div>
               </>
-            ) : (
-              <span className="text-muted-foreground">-</span>
-            )}
+            : <span className="text-muted-foreground">-</span>}
             {row.original.startVerse != null && row.original.endVerse != null && (
               <div className="text-xs text-muted-foreground mt-0.5">
                 Ayat {row.original.startVerse} – {row.original.endVerse}
@@ -700,7 +701,7 @@ function TahfidzRecordDataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -708,8 +709,7 @@ function TahfidzRecordDataTable() {
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -730,7 +730,7 @@ function TahfidzRecordDataTable() {
                   </div>
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>

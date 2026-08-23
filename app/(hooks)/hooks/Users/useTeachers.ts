@@ -1,13 +1,13 @@
 "use client";
+import { UserDataTypes } from "@/app/(types)";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
 
 export const useGetTeachers = () => {
   return useQuery({
     queryKey: ["teachers"],
     queryFn: async () => {
-      const res = await apiGet("/api/teachers");
-      if (res.status >= 400) throw new Error(res.data?.error || "Failed to fetch teachers");
+      const res = await apiGet<UserDataTypes[]>("/api/teachers");
       return res.data;
     },
   });

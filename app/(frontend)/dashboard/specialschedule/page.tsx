@@ -1,34 +1,32 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Calendar, Clock, Search, X, CalendarDays, FileText, Tag, Eye, EyeOff } from "lucide-react";
-
+import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
+import { useCreateSpecialSchedule, useDeleteSpecialSchedule, useGetSpecialSchedules, useUpdateSpecialSchedule } from "@/app/(hooks)/hooks/SpecialSchedules/useSpecialSchedule";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { useForm } from "react-hook-form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, Calendar, CalendarDays, ChevronDown, Eye, EyeOff, FileText, MoreHorizontal, Pencil, Plus, Search, Tag, Trash2, X } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 // Import hooks
-import { useGetSpecialSchedules, useCreateSpecialSchedule, useUpdateSpecialSchedule, useDeleteSpecialSchedule } from "@/app/(hooks)/hooks/SpecialSchedules/useSpecialSchedule";
-import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { toast } from "sonner";
-
 // Type definitions
 export type SpecialScheduleData = {
   id: string;
@@ -217,7 +215,11 @@ function SpecialScheduleFormDialog({ open, onOpenChange, editData, onSuccess }: 
               Batal
             </Button>
             <Button type="submit" disabled={createSpecialSchedule.isPending || updateSpecialSchedule.isPending}>
-              {createSpecialSchedule.isPending || updateSpecialSchedule.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createSpecialSchedule.isPending || updateSpecialSchedule.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -411,17 +413,16 @@ function SpecialScheduleDataTable() {
         const isPublished = row.getValue("isPublished");
         return (
           <Badge variant={isPublished ? "default" : "secondary"}>
-            {isPublished ? (
+            {isPublished ?
               <>
                 <Eye className="mr-1 h-3 w-3" />
                 Dipublikasi
               </>
-            ) : (
-              <>
+            : <>
                 <EyeOff className="mr-1 h-3 w-3" />
                 Draft
               </>
-            )}
+            }
           </Badge>
         );
       },
@@ -557,7 +558,12 @@ function SpecialScheduleDataTable() {
 
             {/* Publish Status Filter */}
             <Select
-              value={publishStatusFilter === null ? "all" : publishStatusFilter ? "published" : "draft"}
+              value={
+                publishStatusFilter === null ? "all"
+                : publishStatusFilter ?
+                  "published"
+                : "draft"
+              }
               onValueChange={(value) => {
                 if (value === "all") {
                   setPublishStatusFilter(null);
@@ -679,7 +685,7 @@ function SpecialScheduleDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {table.getRowModel().rows?.length ?
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -687,8 +693,7 @@ function SpecialScheduleDataTable() {
                     ))}
                   </TableRow>
                 ))
-              ) : (
-                <TableRow>
+              : <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <Calendar className="h-8 w-8 text-muted-foreground" />
@@ -710,7 +715,7 @@ function SpecialScheduleDataTable() {
                     </div>
                   </TableCell>
                 </TableRow>
-              )}
+              }
             </TableBody>
           </Table>
         </div>

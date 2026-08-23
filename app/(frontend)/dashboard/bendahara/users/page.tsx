@@ -1,41 +1,31 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, BookOpen, GraduationCap, User, Mail, Shield, Image as ImageIcon } from "lucide-react";
-
+import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
+import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetBetterAuth } from "@/app/(hooks)/hooks/Users/useBetterAuth";
+import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { majorTypes } from "@/app/(types)";
+import { BetterAuthUser, DeleteUserBulkDialog, DeleteUserDialog, UserData } from "@/components/dialog/DialogUser";
+import { StudentFormDialog } from "@/components/dialog/DialogUserBendahara";
+import Loading from "@/components/loading";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { useSession } from "@/lib/authClients";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, BookOpen, ChevronDown, GraduationCap, Image as ImageIcon, Mail, MoreHorizontal, Pencil, Plus, Shield, Trash2, User } from "lucide-react";
+import Image from "next/image";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
 
 // Import hooks
-import { useGetBetterAuth } from "@/app/(hooks)/hooks/Users/useBetterAuth";
-
 // Import dialog components
-import { DeleteUserDialog, UserData, BetterAuthUser, DeleteUserBulkDialog } from "@/components/dialog/DialogUser";
-import { StudentFormDialog } from "@/components/dialog/DialogUserBendahara";
-import Image from "next/image";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { unauthorized } from "next/navigation";
-import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
-import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
-import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
-
 // Dashboard Component - Only rendered after role verification
-function UserDashboard({
-  majorData,
-}: {
-  majorData: {
-    id: string;
-    name: string;
-  };
-}) {
+function UserDashboard({ majorData }: { majorData: majorTypes }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -61,14 +51,14 @@ function UserDashboard({
   // Helper function to get betterAuth user info
   const getBetterAuthUserInfo = React.useCallback(
     (userId: string): BetterAuthUser | undefined => {
-      return betterAuthUsers.find((user: any) => user.id === userId);
+      return betterAuthUsers.find((user) => user.id === userId);
     },
     [betterAuthUsers],
   );
 
   // Get unique values for filters
   const uniqueRoles = React.useMemo(() => {
-    return Array.from(new Set(usersData.map((user: UserData) => user.role?.name).filter(Boolean)));
+    return Array.from(new Set(usersData.map((user) => user.role?.name).filter(Boolean)));
   }, [usersData]);
 
   const { data: classesData, isLoading: isLoadingClasses } = useGetClassByIdMajor(majorData.id);
@@ -76,7 +66,7 @@ function UserDashboard({
   const { data: tahfidzGroupsData, isLoading: isLoadingTahfidzGroups } = useGetTahfidzGroup();
 
   const uniqueMajors = React.useMemo(() => {
-    return Array.from(new Set(usersData.map((user: UserData) => user.major?.name).filter(Boolean)));
+    return Array.from(new Set(usersData.map((user) => user.major?.name).filter(Boolean)));
   }, [usersData]);
 
   // Define columns with useMemo to prevent recreation
@@ -208,11 +198,11 @@ function UserDashboard({
         },
         cell: ({ row }) => {
           const tahfidzGroupData = row.original.tahfidzGroup;
-          return <div>{tahfidzGroupData?.name || "-"}</div>;
+          return <div>{(tahfidzGroupData as { name?: string } | null)?.name || "-"}</div>;
         },
         sortingFn: (rowA, rowB) => {
-          const tahfidzA = rowA.original.tahfidzGroup?.name || "";
-          const tahfidzB = rowB.original.tahfidzGroup?.name || "";
+          const tahfidzA = (rowA.original.tahfidzGroup as { name?: string } | null)?.name || "";
+          const tahfidzB = (rowB.original.tahfidzGroup as { name?: string } | null)?.name || "";
           return tahfidzA.localeCompare(tahfidzB);
         },
         filterFn: (row, columnId, filterValue) => {
@@ -376,7 +366,7 @@ function UserDashboard({
 
   // Initialize table
   const table = useReactTable({
-    data: usersData,
+    data: usersData as UserData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -536,7 +526,7 @@ function UserDashboard({
             <DropdownMenuContent>
               <DropdownMenuItem onClick={() => handleClassFilter(null)}>Semua Kelas</DropdownMenuItem>
               <DropdownMenuSeparator />
-              {classesData?.map((className: any) => (
+              {classesData?.map((className) => (
                 <DropdownMenuItem key={String(className?.name)} onClick={() => handleClassFilter(className?.name as string)}>
                   {className?.name as string}
                 </DropdownMenuItem>
@@ -554,7 +544,7 @@ function UserDashboard({
             <DropdownMenuContent>
               <DropdownMenuItem onClick={() => handleTahfidzGroupFilter(null)}>Semua Tahfidz Group</DropdownMenuItem>
               <DropdownMenuSeparator />
-              {tahfidzGroupsData?.map((tahfidzGroupName: any) => (
+              {tahfidzGroupsData?.map((tahfidzGroupName) => (
                 <DropdownMenuItem key={String(tahfidzGroupName?.name)} onClick={() => handleTahfidzGroupFilter(tahfidzGroupName?.name as string)}>
                   {tahfidzGroupName?.name as string}
                 </DropdownMenuItem>
@@ -644,7 +634,7 @@ function UserDashboard({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -652,12 +642,13 @@ function UserDashboard({
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data user.
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>
@@ -679,7 +670,7 @@ function UserDashboard({
       <StudentFormDialog majorId={majorData.id} open={createDialogOpen} onOpenChange={handleCloseCreateDialog} onSuccess={handleSuccess} />
       <StudentFormDialog open={editDialogOpen} onOpenChange={handleCloseEditDialog} editData={selectedUser} onSuccess={handleSuccess} majorId={majorData.id} />
       <DeleteUserDialog open={deleteDialogOpen} onOpenChange={handleCloseDeleteDialog} userData={selectedUser} onSuccess={handleSuccess} />
-      <DeleteUserBulkDialog open={deleteBulkDialogOpen} onOpenChange={handleCloseBulkDeleteDialog} userDatas={table.getSelectedRowModel().rows.map((row) => row.original)} onSuccess={handleSuccess} />
+      <DeleteUserBulkDialog open={deleteBulkDialogOpen} onOpenChange={handleCloseBulkDeleteDialog} userDatas={table.getSelectedRowModel().rows.map((row) => row.original as UserData)} onSuccess={handleSuccess} />
     </div>
   );
 }
@@ -691,7 +682,6 @@ export default function UserDataTable() {
 
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
-  const userIdMajor = userData?.major?.id;
   const majorData = userData?.major;
 
   // Show loading while checking authorization
@@ -708,5 +698,5 @@ export default function UserDataTable() {
   }
 
   // Render dashboard only after authorization is confirmed
-  return <UserDashboard majorData={majorData} />;
+  return <UserDashboard majorData={majorData as majorTypes} />;
 }

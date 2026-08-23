@@ -1,26 +1,22 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Calendar, User, AlertTriangle, Search, X, Check } from "lucide-react";
-
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetStudentById } from "@/app/(hooks)/hooks/Users/useGetStudentById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { useGetViolationsByIdStudent } from "@/app/(hooks)/hooks/Violations/useViolationsByIdStudent";
+import Loading from "@/components/loading";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-
-import { useGetViolationsByIdStudent } from "@/app/(hooks)/hooks/Violations/useViolationsByIdStudent";
-import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
-import { useGetStudentById } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { AlertTriangle, ArrowUpDown, Calendar, ChevronDown, MoreHorizontal, Search, User, X } from "lucide-react";
 import Image from "next/image";
-import Loading from "@/components/loading";
+import * as React from "react";
 
 export type ViolationData = {
   id: string;
@@ -251,8 +247,10 @@ export default function ViolationDataTable() {
     },
   ];
 
-  const table = useReactTable({
-    data: violations,
+  const violationRows: ViolationData[] = Array.isArray(violations) ? (violations as ViolationData[]) : [];
+
+  const table = useReactTable<ViolationData>({
+    data: violationRows,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -301,7 +299,7 @@ export default function ViolationDataTable() {
         {dataStudent && (
           <div className="bg-card rounded-lg border p-6 mb-6">
             <div className="flex items-center space-x-4">
-              <Image className="rounded-full " src={dataStudent.avatarUrl} alt="Avatar" width={50} height={50} />
+              <Image className="rounded-full " src={dataStudent.avatarUrl ?? "/avatar-placeholder.png"} alt="Avatar" width={50} height={50} />
 
               <div className="flex-1">
                 <h2 className="text-xl font-semibold">{dataStudent.name || "Nama Siswa"}</h2>
@@ -325,7 +323,7 @@ export default function ViolationDataTable() {
               </div>
 
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-35">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>

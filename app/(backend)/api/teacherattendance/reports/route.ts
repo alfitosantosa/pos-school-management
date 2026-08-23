@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
@@ -78,7 +79,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(stats);
   } catch (error) {
-    console.error("Error fetching attendance reports:", error);
-    return NextResponse.json({ error: "Failed to fetch reports" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

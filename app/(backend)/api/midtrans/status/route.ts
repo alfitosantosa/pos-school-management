@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const midtransClient = require("midtrans-client");
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
 // cara pakai GET /api/midtrans/status?orderId=KWT-X2O4AIFK5NVUGR9LAAAA
 

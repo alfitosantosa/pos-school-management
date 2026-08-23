@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,8 +15,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     }
 
     return NextResponse.json(major);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Failed to fetch major";
-    return NextResponse.json({ success: false, message: errorMessage }, { status: 500 });
+  } catch (error) {
+    return handlePrismaError(error);
   }
 }

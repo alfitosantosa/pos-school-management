@@ -1,3 +1,6 @@
+import { majorTypes } from "./majors-types";
+import { PaymentTypes } from "./payment-types";
+
 // Account Bank Types
 export interface AccountBankTypes {
   id: string;
@@ -5,10 +8,13 @@ export interface AccountBankTypes {
   accountBank: string;
   accountNumber: string;
   majorId: string;
+  isActive?: boolean;
   createdAt?: Date | string;
   // Relations
-  majors?: MajorBankTypes;
-  payments?: PaymentBankTypes[];
+  majors?: majorTypes;
+  /** Alias for majors — used in payment page dropdowns */
+  major?: { id: string; name: string };
+  payments?: PaymentTypes[];
 }
 
 interface MajorBankTypes {
@@ -21,14 +27,6 @@ interface MajorBankTypes {
   phone?: string | null;
   adminName?: string | null;
   signatureUrl?: string | null;
-}
-
-interface PaymentBankTypes {
-  id: string;
-  receiptNumber: string;
-  amount: number | string;
-  status: string;
-  paymentDate: Date | string;
 }
 
 // Dashboard/Chart types
@@ -103,4 +101,12 @@ export interface DashboardResult {
   revenueMonthly: RevenueMonthly[];
   monthlyByAccount: MonthlyByAccount[];
   topAccounts: TopAccount[];
+}
+
+export interface AccountBankInput {
+  id?: string;
+  accountName: string;
+  accountBank: string;
+  accountNumber: string;
+  majorId: string;
 }

@@ -23,8 +23,9 @@
 //   @@map("schedules")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -97,8 +98,8 @@ export async function PUT(request: NextRequest) {
       },
     });
     return NextResponse.json(schedule);
-  } catch {
-    return NextResponse.json({ error: "Jadwal dengan kombinasi kelas, mata pelajaran, guru, hari, dan jam yang sama sudah ada." }, { status: 409 });
+  } catch (error) {
+    return handlePrismaError(error);
   }
 }
 
@@ -110,7 +111,6 @@ export async function DELETE(request: NextRequest) {
     });
     return NextResponse.json({ message: "Schedule deleted successfully" });
   } catch (error) {
-    console.error("Error deleting schedule:", error);
-    return NextResponse.json({ error: "Failed to delete schedule" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

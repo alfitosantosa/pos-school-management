@@ -1,24 +1,22 @@
 "use client";
 
-import React from "react";
-import { useGetScheduleByIdAcademicYearActive } from "@/app/(hooks)/hooks/Schedules/useGetScheduleById";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarDays, Clock, MapPin, BookOpen, Users, GraduationCap, Eye, Plus } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { unauthorized } from "next/navigation";
-import Loading from "@/components/loading";
 import { useAttendanceIsSubmitted } from "@/app/(hooks)/hooks/Attendances/useAttendanceIsSubmitted";
+import { useGetScheduleByIdAcademicYearActive } from "@/app/(hooks)/hooks/Schedules/useGetScheduleById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { ScheduleTypes } from "@/app/(types)";
+import Loading from "@/components/loading";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSession } from "@/lib/authClients";
+import { BookOpen, CalendarDays, Clock, Eye, GraduationCap, MapPin, Plus, Users } from "lucide-react";
+import Link from "next/link";
+import { unauthorized } from "next/navigation";
+import React, { useState } from "react";
 
 const ScheduleCard = ({ schedule }: { schedule: ScheduleTypes }) => {
   const getDayName = (dayOfWeek: number) => {

@@ -17,7 +17,7 @@ export interface ViolationTypes {
   class?: ClassViolationTypes;
 }
 
-export interface ViolationTypeTypes {
+export type ViolationTypeTypes = {
   id: string;
   name: string;
   description: string;
@@ -27,12 +27,13 @@ export interface ViolationTypeTypes {
   // Relations
   academicYear?: AcademicYearViolationTypes;
   violations?: ViolationTypes[];
-}
+};
 
 interface StudentViolationTypes {
   id: string;
   name: string;
   nisn?: string | null;
+  email?: string | null;
   class?: {
     id: string;
     name: string;

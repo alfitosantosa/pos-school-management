@@ -1,7 +1,7 @@
 "use client";
 
+import { apiPost } from "@/lib/apiClients";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiPost } from "@/lib/api-client";
 
 export const useBulkCreateUserData = () => {
   const queryClient = useQueryClient();

@@ -1,11 +1,12 @@
+import { attendanceTypes } from "@/app/(types)/types/attendance-types";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
 
 export const useGetAttendance = () => {
   return useQuery({
     queryKey: ["attendance"],
     queryFn: async () => {
-      const response = await apiGet("/api/attendance");
+      const response = await apiGet<attendanceTypes[]>("/api/attendance");
       return response.data;
     },
   });

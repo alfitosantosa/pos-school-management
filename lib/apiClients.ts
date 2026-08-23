@@ -9,7 +9,7 @@ interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
 }
 
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   data: T;
   status: number;
   statusText: string;
@@ -33,7 +33,7 @@ function buildUrl(url: string, params?: Record<string, string | number | boolean
 /**
  * Make a GET request
  */
-export async function apiGet<T = any>(url: string, options?: FetchOptions): Promise<ApiResponse<T>> {
+export async function apiGet<T = unknown>(url: string, options?: FetchOptions): Promise<ApiResponse<T>> {
   const fullUrl = buildUrl(url, options?.params);
 
   const response = await fetch(fullUrl, {
@@ -56,7 +56,7 @@ export async function apiGet<T = any>(url: string, options?: FetchOptions): Prom
 /**
  * Make a POST request
  */
-export async function apiPost<T = any>(url: string, body?: any, options?: FetchOptions): Promise<ApiResponse<T>> {
+export async function apiPost<T = unknown>(url: string, body?: unknown, options?: FetchOptions): Promise<ApiResponse<T>> {
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -78,7 +78,7 @@ export async function apiPost<T = any>(url: string, body?: any, options?: FetchO
 /**
  * Make a PUT request
  */
-export async function apiPut<T = any>(url: string, body?: any, options?: FetchOptions): Promise<ApiResponse<T>> {
+export async function apiPut<T = unknown>(url: string, body?: unknown, options?: FetchOptions): Promise<ApiResponse<T>> {
   const response = await fetch(url, {
     method: "PUT",
     headers: {
@@ -100,7 +100,7 @@ export async function apiPut<T = any>(url: string, body?: any, options?: FetchOp
 /**
  * Make a DELETE request
  */
-export async function apiDelete<T = any>(url: string, options?: FetchOptions): Promise<ApiResponse<T>> {
+export async function apiDelete<T = unknown>(url: string, options?: FetchOptions): Promise<ApiResponse<T>> {
   const response = await fetch(url, {
     method: "DELETE",
     headers: {
@@ -121,7 +121,7 @@ export async function apiDelete<T = any>(url: string, options?: FetchOptions): P
 /**
  * Make a PATCH request
  */
-export async function apiPatch<T = any>(url: string, body?: any, options?: FetchOptions): Promise<ApiResponse<T>> {
+export async function apiPatch<T = unknown>(url: string, body?: unknown, options?: FetchOptions): Promise<ApiResponse<T>> {
   const response = await fetch(url, {
     method: "PATCH",
     headers: {

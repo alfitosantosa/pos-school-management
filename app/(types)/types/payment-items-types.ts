@@ -1,59 +1,56 @@
-// Payment Items Types
-export interface PaymentItemsTypes {
+// ─── Payment Item Data ────────────────────────────────────────────────────────
+// Primary type used across billing, bendahara/payment, and payments pages.
+export interface PaymentItemData {
   id: string;
   paymentId?: string | null;
   studentId: string;
   paymentTypeId: string;
-  quantity: number | string;
-  amount: number | string;
-  subtotal: number | string;
-  isPaid: boolean;
   month: string;
-  name: string;
   year: string;
+  isPaid: boolean;
+  isMonthly: boolean;
+  isActive: boolean;
+  isFixedAmount: boolean;
+  isFixedQuantity: boolean;
+  quantity: number;
+  amount: number;
+  subtotal: number;
+  name: string;
   skuType: string;
   createdAt?: Date | string;
   updatedAt?: Date | string;
-  // Relations
-  student?: StudentItemTypes;
-  payment?: PaymentItemPaymentTypes | null;
-  PaymentType?: PaymentTypeItemTypes;
-}
-
-// Relation types
-interface StudentItemTypes {
-  id: string;
-  name: string;
-  email?: string | null;
-  nisn?: string | null;
-  class?: {
+  // Relations — lowercase `paymentType` matches both pages
+  paymentType?: PaymentTypeItemData;
+  // Capital `PaymentType` alias so billing page (which uses capital) also works
+  PaymentType?: PaymentTypeItemData;
+  student?: {
     id: string;
     name: string;
-  } | null;
-  major?: {
+    class?: { name: string } | null;
+    major?: { id: string; name: string } | null;
+    email?: string | null;
+    nisn?: string | null;
+  };
+  payment?: {
     id: string;
-    name: string;
-  } | null;
-}
-
-interface PaymentItemPaymentTypes {
-  id: string;
-  receiptNumber: string;
-  status: string;
-  accountBankId: string;
-  paymentDate: Date | string;
-  accountBank?: {
-    id: string;
-    accountName: string;
-    accountBank: string;
-    accountNumber: string;
+    receiptNumber: string;
+    status: string;
+    accountBankId?: string;
+    paymentDate?: Date | string;
+    accountBank?: {
+      id: string;
+      accountName: string;
+      accountBank: string;
+      accountNumber: string;
+    };
   };
 }
 
-interface PaymentTypeItemTypes {
+// ─── PaymentType relation (minimal, for item display) ────────────────────────
+export interface PaymentTypeItemData {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   amount: number | string;
   isMonthly: boolean;
   isActive: boolean;
@@ -61,21 +58,22 @@ interface PaymentTypeItemTypes {
   owner: string;
 }
 
-// Input types for API
+// ─── Input for create/update ──────────────────────────────────────────────────
 export interface PaymentItemsInput {
+  id?: string;
   studentId: string;
   paymentTypeId: string;
-  quantity: number;
-  amount: number;
+  quantity?: number | string;
+  amount?: number;
   subtotal: number;
   isPaid?: boolean;
   month: string;
   name: string;
   year: string;
-  skuType: string;
+  skuType?: string;
 }
 
-// Filter types
+// ─── Filter types ─────────────────────────────────────────────────────────────
 export interface PaymentItemsFilterTypes {
   startDate?: Date | string;
   endDate?: Date | string;
@@ -84,3 +82,7 @@ export interface PaymentItemsFilterTypes {
   isPaid?: boolean;
   skuType?: string;
 }
+
+// ─── Backward-compat alias ────────────────────────────────────────────────────
+/** @deprecated Use PaymentItemData instead */
+export type PaymentItemsTypes = PaymentItemData & { length?: number };

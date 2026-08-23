@@ -56,8 +56,9 @@
 //   @@map("users")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -77,8 +78,7 @@ export async function GET() {
     });
     return NextResponse.json(users);
   } catch (error) {
-    console.error("Error fetching users:", error);
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -100,8 +100,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
-    console.error("Error creating user:", error);
-    return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -124,8 +123,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error("Error updating user:", error);
-    return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 export async function DELETE(request: NextRequest) {
@@ -141,7 +139,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json(deletedUser);
   } catch (error) {
-    console.error("Error deleting user:", error);
-    return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

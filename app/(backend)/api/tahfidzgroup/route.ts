@@ -12,91 +12,87 @@
 //   @@map("tahfidz_groups")
 // }
 
-"use server";
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
-    try {
-        // ✅ Optimized: Explicit select for clarity and future-proofing
-        // Fields used: id, name, grade, capacity, isActive, _count.students
-        const tahfidzGroups = await prisma.tahfidzGroup.findMany({
-          select: {
-            id: true,
-            name: true,
-            grade: true,
-            capacity: true,
-            isActive: true,
-            _count: { select: { students: true } },
-          },
-          orderBy: { grade: "asc" },
-        });
-        return NextResponse.json(tahfidzGroups);
-    } catch (error) {
-        console.error("Error fetching tahfidz groups:", error);
-        return NextResponse.json({ error: "Failed to fetch tahfidz groups" }, { status: 500 });
-    }
+  try {
+    // ✅ Optimized: Explicit select for clarity and future-proofing
+    // Fields used: id, name, grade, capacity, isActive, _count.students
+    const tahfidzGroups = await prisma.tahfidzGroup.findMany({
+      select: {
+        id: true,
+        name: true,
+        grade: true,
+        capacity: true,
+        isActive: true,
+        _count: { select: { students: true } },
+      },
+      orderBy: { grade: "asc" },
+    });
+    return NextResponse.json(tahfidzGroups);
+  } catch (error) {
+    return handlePrismaError(error);
+  }
 }
 
 export async function POST(request: NextRequest) {
-    try {
-        const { name, grade, capacity } = await request.json();
-        if (!name || !grade) {
-            return NextResponse.json({ error: "Name, grade, and capacity are required" }, { status: 400 });
-        }
-
-        const newTahfidzGroup = await prisma.tahfidzGroup.create({
-            data: {
-                name,
-                grade,
-                capacity: capacity || 40,
-            },
-        });
-
-        return NextResponse.json(newTahfidzGroup, { status: 201 });
-    } catch (error) {
-        console.error("Error creating tahfidz group:", error);
-        return NextResponse.json({ error: "Failed to create tahfidz group" }, { status: 500 });
+  try {
+    const { name, grade, capacity } = await request.json();
+    if (!name || !grade) {
+      return NextResponse.json({ error: "Name, grade, and capacity are required" }, { status: 400 });
     }
+
+    const newTahfidzGroup = await prisma.tahfidzGroup.create({
+      data: {
+        name,
+        grade,
+        capacity: capacity || 40,
+      },
+    });
+
+    return NextResponse.json(newTahfidzGroup, { status: 201 });
+  } catch (error) {
+    return handlePrismaError(error);
+  }
 }
 
 export async function PUT(request: NextRequest) {
-    try {
-        const { id, name, grade, capacity } = await request.json();
-        if (!id || !name || !grade) {
-            return NextResponse.json({ error: "ID, name, grade, and capacity are required" }, { status: 400 });
-        }
-
-        const updatedTahfidzGroup = await prisma.tahfidzGroup.update({
-            where: { id },
-            data: {
-                name,
-                grade,
-                capacity: capacity || 40,
-            },
-        });
-
-        return NextResponse.json(updatedTahfidzGroup);
-    } catch (error) {
-        console.error("Error updating tahfidz group:", error);
-        return NextResponse.json({ error: "Failed to update tahfidz group" }, { status: 500 });
+  try {
+    const { id, name, grade, capacity } = await request.json();
+    if (!id || !name || !grade) {
+      return NextResponse.json({ error: "ID, name, grade, and capacity are required" }, { status: 400 });
     }
+
+    const updatedTahfidzGroup = await prisma.tahfidzGroup.update({
+      where: { id },
+      data: {
+        name,
+        grade,
+        capacity: capacity || 40,
+      },
+    });
+
+    return NextResponse.json(updatedTahfidzGroup);
+  } catch (error) {
+    return handlePrismaError(error);
+  }
 }
 
 export async function DELETE(request: NextRequest) {
-    try {
-        const { id } = await request.json();
-        if (!id) {
-            return NextResponse.json({ error: "ID is required" }, { status: 400 });
-        }
-
-        const deletedTahfidzGroup = await prisma.tahfidzGroup.delete({
-            where: { id },
-        });
-
-        return NextResponse.json(deletedTahfidzGroup);
-    } catch (error) {
-        console.error("Error deleting tahfidz group:", error);
-        return NextResponse.json({ error: "Failed to delete tahfidz group" }, { status: 500 });
+  try {
+    const { id } = await request.json();
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
+
+    const deletedTahfidzGroup = await prisma.tahfidzGroup.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(deletedTahfidzGroup);
+  } catch (error) {
+    return handlePrismaError(error);
+  }
 }

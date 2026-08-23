@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
-import { PrismaError } from "@/app/(types)/types/error-types";
+import { NextRequest, NextResponse } from "next/server";
 
 function replaceUndefinedWithNull<T>(value: T): T {
   if (Array.isArray(value)) {
@@ -222,69 +222,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 },
     );
-  } catch (error: unknown) {
-    const err = error as PrismaError;
-    console.error("[Bulk Create] Error caught:", {
-      message: err.message,
-      code: err.code,
-      meta: err.meta,
-      timestamp: new Date().toISOString(),
-    });
-
-    // Handle Prisma-specific errors
-    if (err.code === "P2002") {
-      console.log("[Bulk Create] Duplicate entry detected:", {
-        field: err.meta?.target,
-        target: err.meta?.target?.[0],
-      });
-      return NextResponse.json(
-        {
-          error: "Duplicate entry found",
-          details: "Some users may already exist with the same unique fields (email, NIK, NISN, etc.)",
-          field: err.meta?.target?.[0],
-          suggestion: `Check if any ${err.meta?.target?.[0]} values already exist in the database`,
-        },
-        { status: 409 },
-      );
-    }
-
-    if (err.code === "P2003") {
-      console.log("[Bulk Create] Foreign key constraint failed:", {
-        field: err.meta?.field_name,
-      });
-      return NextResponse.json(
-        {
-          error: "Foreign key constraint failed",
-          details: "Invalid reference to role, class, major, or academic year",
-          field: err.meta?.field_name,
-          suggestion: "Verify all foreign key IDs match the available options",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (err.code === "P2000") {
-      console.log("[Bulk Create] Value too long for column:", {
-        column: err.meta?.column_name,
-      });
-      return NextResponse.json(
-        {
-          error: "Value too long for column",
-          details: err.meta?.column_name,
-          suggestion: `Check that the ${err.meta?.column_name} value is not too long`,
-        },
-        { status: 400 },
-      );
-    }
-
-    return NextResponse.json(
-      {
-        error: "Failed to create users",
-        details: err.message,
-        code: err.code,
-        suggestion: "Check the error code and message above for details",
-      },
-      { status: 500 },
-    );
+  } catch (error) {
+    return handlePrismaError(error);
   }
 }

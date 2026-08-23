@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Document, Page, Text, View, StyleSheet, pdf, Image } from "@react-pdf/renderer";
+import { Document, Image, Page, pdf, StyleSheet, Text, View } from '@react-pdf/renderer';
+import React from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES

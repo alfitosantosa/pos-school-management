@@ -1,25 +1,25 @@
 "use client";
 
-import * as React from "react";
-import { User, X, Upload, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-import Image from "next/image";
-
-import { useCreateUser, useUpdateUser } from "@/app/(hooks)/hooks/Users/useUsers";
 import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
 import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
-import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
 import { useGetRoles } from "@/app/(hooks)/hooks/Roles/useRoles";
+import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
+import { useCreateUser, useUpdateUser } from "@/app/(hooks)/hooks/Users/useUsers";
+import { getErrorMessage } from "@/app/(types)";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, Upload, User, X } from "lucide-react";
+import Image from "next/image";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type StudentData = {
@@ -141,8 +141,8 @@ function AvatarUpload({ currentAvatarUrl, onUploadSuccess, disabled = false }: {
       setPreviewUrl(data.fileUrl);
       onUploadSuccess(data.fileUrl);
       toast.success("Avatar berhasil diunggah!");
-    } catch (error: any) {
-      toast.error(error.message || "Gagal mengunggah avatar");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     } finally {
       setIsUploading(false);
     }
@@ -214,7 +214,7 @@ export function StudentFormDialog({ open, onOpenChange, onSuccess, majorId, majo
   const { data: tahfidzGroups = [], isLoading: tahfidzGroupsLoading } = useGetTahfidzGroup();
   const { data: roles = [] } = useGetRoles();
 
-  const studentRoleId = React.useMemo(() => (roles as any[]).find((r) => r.name.trim() === "Student")?.id ?? "", [roles]);
+  const studentRoleId = React.useMemo(() => roles.find((r) => r.name.trim() === "Student")?.id ?? "", [roles]);
 
   const {
     register,
@@ -224,6 +224,7 @@ export function StudentFormDialog({ open, onOpenChange, onSuccess, majorId, majo
     formState: { errors },
     reset,
   } = useForm<StudentFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(studentSchema as any),
     defaultValues: { status: "active" },
   });
@@ -310,8 +311,8 @@ export function StudentFormDialog({ open, onOpenChange, onSuccess, majorId, majo
       reset({ status: "active" });
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan saat menyimpan data siswa");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -468,9 +469,9 @@ export function StudentFormDialog({ open, onOpenChange, onSuccess, majorId, majo
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    {(classes as any[]).length === 0 && !classesLoading ?
+                    {classes.length === 0 && !classesLoading ?
                       <div className="px-3 py-4 text-sm text-muted-foreground text-center">Tidak ada kelas untuk branch ini</div>
-                    : (classes as any[]).map((cls) => (
+                    : classes.map((cls) => (
                         <SelectItem key={cls.id} value={cls.id}>
                           {cls.name}
                         </SelectItem>
@@ -479,7 +480,7 @@ export function StudentFormDialog({ open, onOpenChange, onSuccess, majorId, majo
                   </SelectContent>
                 </Select>
                 {errors.classId && <p className="text-sm text-red-500">{errors.classId.message}</p>}
-                {!classesLoading && (classes as any[]).length > 0 && <p className="text-xs text-muted-foreground">{(classes as any[]).length} kelas tersedia untuk branch ini</p>}
+                {!classesLoading && classes.length > 0 && <p className="text-xs text-muted-foreground">{classes.length} kelas tersedia untuk branch ini</p>}
               </div>
 
               <div className="space-y-2">
@@ -491,7 +492,7 @@ export function StudentFormDialog({ open, onOpenChange, onSuccess, majorId, majo
                     <SelectValue placeholder={academicYearsLoading ? "Memuat..." : "Pilih tahun akademik"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {(academicYears as any[]).map((year) => (
+                    {academicYears.map((year) => (
                       <SelectItem key={year.id} value={year.id}>
                         {year.year}
                       </SelectItem>
@@ -512,7 +513,7 @@ export function StudentFormDialog({ open, onOpenChange, onSuccess, majorId, majo
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">— Tidak ada —</SelectItem>
-                  {(tahfidzGroups as any[]).map((group) => (
+                  {tahfidzGroups.map((group) => (
                     <SelectItem key={group.id} value={group.id}>
                       {group.name}
                     </SelectItem>

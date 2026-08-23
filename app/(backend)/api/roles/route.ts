@@ -9,8 +9,9 @@
 //   @@map("roles")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -78,8 +79,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(updatedRole);
   } catch (error) {
-    console.error("Error updating role:", error);
-    return NextResponse.json({ error: "Failed to update role" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -96,7 +96,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json(deletedRole);
   } catch (error) {
-    console.error("Error deleting role:", error);
-    return NextResponse.json({ error: "Failed to delete role" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

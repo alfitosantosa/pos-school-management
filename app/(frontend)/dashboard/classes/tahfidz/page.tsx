@@ -1,30 +1,29 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, X } from "lucide-react";
-
+import { useCreateTahfidzGroup, useDeleteTahfidzGroup, useGetTahfidzGroup, useUpdateTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { getErrorMessage, TahfidzGrade, TahfidzGradesArray } from "@/app/(types)";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Pencil, Plus, Trash2, X } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
 
 // Import hooks
-import { useGetTahfidzGroup, useCreateTahfidzGroup, useUpdateTahfidzGroup, useDeleteTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-
 // Type definitions
 export type TahfidzGroupData = {
   id: string;
@@ -89,8 +88,8 @@ function TahfidzGroupFormDialog({ open, onOpenChange, editData, onSuccess }: { o
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -150,8 +149,8 @@ function DeleteTahfidzGroupDialog({ open, onOpenChange, tahfidzGroupData, onSucc
       toast.success("Kelompok tahfidz berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus kelompok tahfidz");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -343,7 +342,7 @@ function TahfidzGroupDataTable() {
   }
 
   // Get unique grades for filter
-  const uniqueGrades = Array.from(new Set(tahfidzGroups.map((group: TahfidzGroupData) => group.grade))).sort();
+  const uniqueGrades: TahfidzGradesArray = Array.from(new Set(tahfidzGroups.map((group: TahfidzGroupData) => group.grade))).sort() as TahfidzGradesArray;
 
   return (
     <>
@@ -361,7 +360,7 @@ function TahfidzGroupDataTable() {
                 className="flex h-10 w-[180px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="all">Semua Tingkat</option>
-                {uniqueGrades.map((grade: any) => (
+                {uniqueGrades.map((grade: TahfidzGrade) => (
                   <option key={grade} value={grade}>
                     Kelas {grade}
                   </option>

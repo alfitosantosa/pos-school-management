@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 //use params for get id
 
@@ -21,7 +22,6 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     });
     return NextResponse.json(attendance);
   } catch (error) {
-    console.error("Error fetching attendance by student:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }

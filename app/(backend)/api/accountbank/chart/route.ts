@@ -1,9 +1,11 @@
 // app/api/accountbank/dashboard/route.ts
 "use server";
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/prisma/generated/client";
+import { NextRequest, NextResponse } from "next/server";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type AccountBankSummary = {
@@ -399,15 +401,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("[accountbank/dashboard] Error:", error);
-
-    const message =
-      process.env.NODE_ENV === "development" ?
-        error instanceof Error ?
-          error.message
-        : String(error)
-      : "Terjadi kesalahan pada server";
-
-    return NextResponse.json({ error: "Failed to fetch account bank dashboard", detail: message }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

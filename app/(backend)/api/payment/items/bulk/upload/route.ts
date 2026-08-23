@@ -20,6 +20,7 @@
 //   @@map("payment_items")
 // }
 
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -162,24 +163,7 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
-    console.error("Error creating payment items:", error);
-
-    // Handle Prisma-specific errors
-    if (error instanceof Error) {
-      if (error.message.includes("Unique constraint failed")) {
-        return NextResponse.json(
-          {
-            error: "Duplikasi data terdeteksi",
-            message: error.message,
-          },
-          { status: 409 },
-        );
-      }
-
-      return NextResponse.json({ error: "Gagal membuat payment items", message: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ error: "Gagal membuat payment items", message: "Unknown error occurred" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -227,7 +211,6 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching payment items:", error);
-    return NextResponse.json({ error: "Gagal mengambil payment items" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

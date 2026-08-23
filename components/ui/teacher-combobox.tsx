@@ -1,15 +1,16 @@
 "use client";
 
-import * as React from "react";
-import { Check, ChevronDown, X, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { UserDataTypes } from "@/app/(types)";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { Check, ChevronDown, Search, X } from "lucide-react";
+import * as React from "react";
 
 interface TeacherComboboxProps {
-  teachers: any[];
+  teachers: UserDataTypes[];
   value?: string;
   onValueChange: (value: string) => void;
   placeholder?: string;
@@ -31,7 +32,7 @@ export function TeacherCombobox({ teachers, value, onValueChange, placeholder = 
     return teachers.find((teacher) => teacher.id === value) || null;
   }, [teachers, value]);
 
-  const handleSelect = (teacher: any) => {
+  const handleSelect = (teacher: UserDataTypes) => {
     onValueChange(teacher.id);
     setOpen(false);
     setSearchTerm("");
@@ -48,14 +49,12 @@ export function TeacherCombobox({ teachers, value, onValueChange, placeholder = 
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className={cn("w-full justify-between h-auto min-h-10 px-3 py-2", !selectedTeacher && "text-muted-foreground", className)} disabled={disabled}>
           <div className="flex flex-1 items-center gap-2 overflow-hidden">
-            {selectedTeacher ? (
+            {selectedTeacher ?
               <div className="flex flex-col items-start flex-1 min-w-0">
                 <span className="font-medium truncate w-full">{selectedTeacher.name}</span>
                 <span className="text-xs text-muted-foreground truncate w-full">{selectedTeacher.position}</span>
               </div>
-            ) : (
-              <span className="truncate">{placeholder}</span>
-            )}
+            : <span className="truncate">{placeholder}</span>}
           </div>
           <div className="flex items-center gap-1 ml-2">
             {selectedTeacher && !disabled && <X className="h-4 w-4 opacity-50 hover:opacity-100 cursor-pointer" onClick={handleClear} />}
@@ -74,10 +73,9 @@ export function TeacherCombobox({ teachers, value, onValueChange, placeholder = 
           {/* Teacher List */}
           <ScrollArea className="h-[300px]">
             <div className="p-2">
-              {filteredTeachers.length === 0 ? (
+              {filteredTeachers.length === 0 ?
                 <div className="py-6 text-center text-sm text-muted-foreground">{searchTerm ? "Tidak ada guru yang ditemukan" : "Tidak ada data guru"}</div>
-              ) : (
-                filteredTeachers.map((teacher) => (
+              : filteredTeachers.map((teacher) => (
                   <div key={teacher.id} onClick={() => handleSelect(teacher)} className={cn("flex items-center justify-between w-full gap-2 px-2 py-3 rounded-md cursor-pointer hover:bg-accent", value === teacher.id && "bg-accent")}>
                     <div className="flex flex-col flex-1 min-w-0">
                       <span className="font-medium truncate">{teacher.name}</span>
@@ -86,7 +84,7 @@ export function TeacherCombobox({ teachers, value, onValueChange, placeholder = 
                     <Check className={cn("h-4 w-4 shrink-0", value === teacher.id ? "opacity-100" : "opacity-0")} />
                   </div>
                 ))
-              )}
+              }
             </div>
           </ScrollArea>
         </div>

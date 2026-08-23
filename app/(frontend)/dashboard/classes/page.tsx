@@ -1,36 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, X } from "lucide-react";
-
+import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
+import { useCreateClass, useDeleteClass, useGetClasses, useUpdateClass } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { AcademicYearDataTypes } from "@/app/(types)/types/academicyear-types";
+import { ClassDataTypes, ClassFormValues, classSchemaForm } from "@/app/(types)/types/class-types";
+import { MajorDataTypes } from "@/app/(types)/types/majors-types";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Pencil, Plus, Trash2, X } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 // Import hooks
-import { useGetClasses, useCreateClass, useUpdateClass, useDeleteClass } from "@/app/(hooks)/hooks/Classes/useClass";
-import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
-import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { ClassDataTypes, ClassFormValues, classSchemaForm } from "@/app/(types)/types/class-types";
-import { z } from "zod";
-import { MajorDataTypes } from "@/app/(types)/types/majors-types";
-import { AcademicYearDataTypes } from "@/app/(types)/types/academicyear-types";
-
 // Create/Edit Dialog Component
 function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: ClassDataTypes | null; onSuccess: () => void }) {
   const createClass = useCreateClass();
@@ -115,7 +113,7 @@ function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
                 <SelectValue placeholder="Pilih Jurusan" />
               </SelectTrigger>
               <SelectContent>
-                {majors?.map((major: MajorDataTypes) => (
+                {majors?.map((major) => (
                   <SelectItem key={major.id} value={major.id}>
                     {major.name}
                   </SelectItem>
@@ -153,11 +151,7 @@ function ClassFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
               Batal
             </Button>
             <Button type="submit" disabled={createClass.isPending || updateClass.isPending}>
-              {createClass.isPending || updateClass.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createClass.isPending || updateClass.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -461,7 +455,7 @@ function ClassDataTable() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ?
+                {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
@@ -469,12 +463,13 @@ function ClassDataTable() {
                       ))}
                     </TableRow>
                   ))
-                : <TableRow>
+                ) : (
+                  <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       Tidak ada data kelas.
                     </TableCell>
                   </TableRow>
-                }
+                )}
               </TableBody>
             </Table>
           </div>

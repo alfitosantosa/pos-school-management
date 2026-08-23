@@ -18,6 +18,15 @@ export const ClassSchema = z.object({
   _count: z.object({
     students: z.number().min(1, "students not be null"),
   }),
+  students: z
+    .array(
+      z.object({
+        id: z.string().min(1, "id not be null"),
+        name: z.string().min(1, "name not be null"),
+        nisn: z.string().min(1, "nisn not be null"),
+      }),
+    )
+    .nullable(),
 });
 
 export type ClassDataTypes = z.infer<typeof ClassSchema>;

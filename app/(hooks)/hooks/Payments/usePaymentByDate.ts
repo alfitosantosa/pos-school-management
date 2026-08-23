@@ -1,5 +1,6 @@
+import { PaymentData } from "@/app/(types)";
+import { apiGet } from "@/lib/apiClients";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api-client";
 
 export const usePaymentsByDate = ({ fromdate, todate, majorId }: { fromdate?: Date; todate?: Date; majorId?: string }) => {
   // Format tanggal ke YYYY-MM-DD menggunakan timezone lokal
@@ -42,7 +43,7 @@ export const usePaymentsByDate = ({ fromdate, todate, majorId }: { fromdate?: Da
         params.majorId = majorId;
       }
 
-      const response = await apiGet("/api/payment/filterdate", { params });
+      const response = await apiGet<PaymentData[]>("/api/payment/filterdate", { params });
       return response.data;
     },
     // ✅ FIX: Enable query when dates are available

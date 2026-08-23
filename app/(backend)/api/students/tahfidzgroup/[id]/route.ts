@@ -1,6 +1,7 @@
 "use server";
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -15,7 +16,6 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     });
     return NextResponse.json(student);
   } catch (error) {
-    console.error("Error fetching student:", error);
-    return NextResponse.json({ error: "Failed to fetch student" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

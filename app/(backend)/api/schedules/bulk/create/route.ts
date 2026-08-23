@@ -18,8 +18,9 @@
 //   @@map("schedules")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
       created: result.count,
       total: schedules.length,
     });
-  } catch (error: unknown) {
-    console.error("Error creating schedules:", error);
+  } catch (error) {
+    return handlePrismaError(error);
   }
 }

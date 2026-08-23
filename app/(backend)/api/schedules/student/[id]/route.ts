@@ -18,8 +18,9 @@
 //   @@map("schedules")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -31,8 +32,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     });
     return NextResponse.json(schedules);
   } catch (error) {
-    console.error("Error fetching schedules by class:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }
 
@@ -53,8 +53,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(schedule);
   } catch (error) {
-    console.error("Error creating schedule:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }
 
@@ -76,8 +75,7 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json(schedule);
   } catch (error) {
-    console.error("Error updating schedule:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }
 
@@ -89,7 +87,6 @@ export async function DELETE(request: NextRequest) {
     });
     return NextResponse.json({ message: "Schedule deleted successfully" });
   } catch (error) {
-    console.error("Error deleting schedule:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }

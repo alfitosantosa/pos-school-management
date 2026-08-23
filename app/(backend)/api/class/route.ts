@@ -15,9 +15,9 @@
 //   @@map("classes")
 // }
 
-"use server";
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -44,10 +44,10 @@ export async function GET() {
     });
     return NextResponse.json(classes);
   } catch (error) {
-    console.error("Error fetching classes:", error);
-    return NextResponse.json({ error: "Failed to fetch classes" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
+
 export async function POST(request: NextRequest) {
   try {
     const { name, grade, majorId, academicYearId, capacity } = await request.json();
@@ -71,8 +71,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newClass, { status: 201 });
   } catch (error) {
-    console.error("Error creating class:", error);
-    return NextResponse.json({ error: "Failed to create class" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -100,8 +99,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(updatedClass);
   } catch (error) {
-    console.error("Error updating class:", error);
-    return NextResponse.json({ error: "Failed to update class" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -118,8 +116,8 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json(deletedClass, { status: 200 });
   } catch (error) {
-    console.error("Error deleting class:", error);
-    return NextResponse.json({ error: "Failed to delete class" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
+
 // app/api/class/route.ts

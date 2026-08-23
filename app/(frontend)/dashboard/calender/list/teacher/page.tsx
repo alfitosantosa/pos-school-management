@@ -1,58 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { CalendarBody, CalendarDate, CalendarDatePagination, CalendarDatePicker, CalendarHeader, CalendarItem, CalendarMonthPicker, CalendarProvider, CalendarYearPicker } from "@/components/ui/kibo-ui/calendar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGetSchedulesByTeacher } from "@/app/(hooks)/hooks/Schedules/useSchedules";
+import { useGetSpecialSchedules } from "@/app/(hooks)/hooks/SpecialSchedules/useSpecialSchedule";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CalendarBody, CalendarDate, CalendarDatePagination, CalendarDatePicker, CalendarHeader, CalendarItem, CalendarMonthPicker, CalendarProvider, CalendarYearPicker } from "@/components/ui/kibo-ui/calendar";
+import { useSession } from "@/lib/authClients";
 import { format, isSameDay } from "date-fns";
 import { id } from "date-fns/locale";
 import { Calendar, Clock, MapPin, User } from "lucide-react";
-
-import { useGetSpecialSchedules } from "@/app/(hooks)/hooks/SpecialSchedules/useSpecialSchedule";
-import { useGetSchedulesByTeacher } from "@/app/(hooks)/hooks/Schedules/useSchedules";
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import Loading from "@/components/loading";
-
-// Type definitions berdasarkan JSON
-type Schedule = {
-  id: string;
-  classId: string;
-  subjectId: string;
-  teacherId: string;
-  academicYearId: string;
-  dayOfWeek: number; // 1 = Monday, 7 = Sunday
-  startTime: string;
-  endTime: string;
-  room: string;
-  class: {
-    id: string;
-    name: string;
-    grade: number;
-  };
-  subject: {
-    id: string;
-    code: string;
-    name: string;
-    credits: number;
-  };
-  teacher: {
-    id: string;
-    name: string;
-  };
-};
-
-type SpecialSchedule = {
-  id: string;
-  title: string;
-  description: string | null;
-  eventDate: string;
-  eventType: "HOLIDAY" | "EXAM" | "EVENT";
-  isPublished: boolean;
-  academicYearId: string;
-  createdAt: string;
-  updatedAt: string;
-};
+import { useMemo, useState } from "react";
 
 type CalendarFeature = {
   id: string;
@@ -70,7 +29,7 @@ type CalendarFeature = {
 
 export default function CalendarPage() {
   // Get session from Better Auth
-  const { data: session, isPending } = useSession();
+  const { data: session } = useSession();
   const { data: userData } = useGetUserByIdBetterAuth(session?.user?.id ?? "");
 
   // State for selected date
@@ -97,7 +56,7 @@ export default function CalendarPage() {
 
     const features: CalendarFeature[] = [];
 
-    schedules.forEach((schedule: Schedule) => {
+    schedules.forEach((schedule) => {
       // Generate recurring events untuk setiap minggu dalam tahun
       const currentWeekStart = new Date(startOfYear);
 
@@ -119,11 +78,11 @@ export default function CalendarPage() {
 
         features.push({
           id: `${schedule.id}-${currentWeekStart.getTime()}`,
-          name: `${schedule.subject.name} - ${schedule.class.name}`,
+          name: `${schedule?.subject?.name} - ${schedule?.class?.name}`,
           startAt,
           endAt,
           status: statuses.regularClass,
-          description: `Guru: ${schedule.teacher.name}\nRuang: ${schedule.room}\nWaktu: ${schedule.startTime} - ${schedule.endTime}`,
+          description: `Guru: ${schedule?.teacher?.name}\nRuang: ${schedule.room}\nWaktu: ${schedule.startTime} - ${schedule.endTime}`,
           type: "schedule",
         });
 
@@ -140,8 +99,8 @@ export default function CalendarPage() {
     if (!specialSchedules || specialSchedules.length === 0) return [];
 
     return specialSchedules
-      .filter((schedule: SpecialSchedule) => schedule.isPublished)
-      .map((schedule: SpecialSchedule) => {
+      .filter((schedule) => schedule.isPublished)
+      .map((schedule) => {
         const eventDate = new Date(schedule.eventDate);
 
         // Set waktu untuk event khusus (full day event)
@@ -198,9 +157,6 @@ export default function CalendarPage() {
   }, [selectedDate, allFeatures]);
 
   // Check if a date has schedules
-  const hasSchedulesOnDate = (date: Date) => {
-    return allFeatures.some((feature) => isSameDay(feature.startAt, date) || isSameDay(feature.endAt, date));
-  };
 
   // Loading state
   if (schedulesLoading || specialSchedulesLoading) {
@@ -245,7 +201,7 @@ export default function CalendarPage() {
             </div>
             <div className="p-4 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800">
               <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Event Khusus</p>
-              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300 mt-1">{specialSchedules.filter((s: SpecialSchedule) => s.isPublished).length}</p>
+              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300 mt-1">{specialSchedules.filter((s) => s.isPublished).length}</p>
             </div>
             <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
               <p className="text-sm text-green-600 dark:text-green-400 font-medium">Total Event</p>
@@ -279,7 +235,7 @@ export default function CalendarPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {selectedDateSchedules.length > 0 ? (
+              {selectedDateSchedules.length > 0 ?
                 <div className="space-y-4">
                   {selectedDateSchedules.map((schedule) => (
                     <div key={schedule.id} className="border rounded-lg p-4 space-y-3 hover:bg-muted/50 transition-colors">
@@ -326,15 +282,14 @@ export default function CalendarPage() {
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-8">
+              : <div className="text-center py-8">
                   <div className="text-muted-foreground">
                     <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p className="text-lg font-medium mb-2">Tidak ada jadwal</p>
                     <p className="text-sm">Tidak ada jadwal atau event pada tanggal ini</p>
                   </div>
                 </div>
-              )}
+              }
             </CardContent>
           </Card>
         )}

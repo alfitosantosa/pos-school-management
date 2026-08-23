@@ -1,5 +1,5 @@
+import { apiPost, apiPut } from "@/lib/apiClients";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiPost, apiPut } from "@/lib/api-client";
 
 export const useCreateAttendanceBulk = () => {
   const queryClient = useQueryClient();

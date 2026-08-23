@@ -1,47 +1,29 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Building2, CreditCard, Landmark, Users } from "lucide-react";
-
+import { useCreateAccountBank, useDeleteAccountBank, useGetAccountBank, useUpdateAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { AccountBankTypes } from "@/app/(types)/types/accountbank-types";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useForm } from "react-hook-form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-
-// Import hooks
-import { useGetAccountBank, useCreateAccountBank, useUpdateAccountBank, useDeleteAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, Building2, ChevronDown, CreditCard, Landmark, MoreHorizontal, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-
-// You may need to create or import a hook for majors
-import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
-
-// Type definitions
-export type AccountBankData = {
-  id: string;
-  accountName: string;
-  accountBank: string;
-  accountNumber: string;
-  majorId: string;
-  createdAt: Date | string;
-  majors?: {
-    id: string;
-    name: string;
-  };
-};
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // Form schema
 const accountBankSchema = z.object({
@@ -57,7 +39,7 @@ type AccountBankFormValues = z.infer<typeof accountBankSchema>;
 const indonesianBanks = ["BCA", "BRI", "BNI", "Mandiri", "BTN", "CIMB Niaga", "Danamon", "Permata", "Maybank", "Muamalat", "OCBC NISP", "Panin Bank", "Bank Syariah Indonesia (BSI)", "Bank Mega", "Bank Bukopin", "Bank Sinarmas", "Lainnya"];
 
 // Statistics Card Component
-function StatisticsCards({ accounts }: { accounts: AccountBankData[] }) {
+function StatisticsCards({ accounts }: { accounts: AccountBankTypes[] }) {
   const totalAccounts = accounts.length;
 
   // Unique banks
@@ -105,7 +87,7 @@ function StatisticsCards({ accounts }: { accounts: AccountBankData[] }) {
 }
 
 // Create/Edit Dialog Component
-function AccountBankFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: AccountBankData | null; onSuccess: () => void }) {
+function AccountBankFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: AccountBankTypes | null; onSuccess: () => void }) {
   const createAccountBank = useCreateAccountBank();
   const updateAccountBank = useUpdateAccountBank();
 
@@ -160,8 +142,9 @@ function AccountBankFormDialog({ open, onOpenChange, editData, onSuccess }: { op
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal menyimpan rekening";
+      toast.error(errorMessage);
     }
   };
 
@@ -209,7 +192,7 @@ function AccountBankFormDialog({ open, onOpenChange, editData, onSuccess }: { op
                 <SelectValue placeholder="Pilih Branch" />
               </SelectTrigger>
               <SelectContent>
-                {majors.map((major: any) => (
+                {majors.map((major) => (
                   <SelectItem key={major.id} value={major.id}>
                     {major.name}
                   </SelectItem>
@@ -238,7 +221,7 @@ function AccountBankFormDialog({ open, onOpenChange, editData, onSuccess }: { op
 }
 
 // Delete Confirmation Dialog
-function DeleteAccountBankDialog({ open, onOpenChange, accountData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; accountData: AccountBankData | null; onSuccess: () => void }) {
+function DeleteAccountBankDialog({ open, onOpenChange, accountData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; accountData: AccountBankTypes | null; onSuccess: () => void }) {
   const deleteAccountBank = useDeleteAccountBank();
 
   const handleDelete = async () => {
@@ -249,8 +232,9 @@ function DeleteAccountBankDialog({ open, onOpenChange, accountData, onSuccess }:
       toast.success("Rekening berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus rekening");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal menghapus rekening";
+      toast.error(errorMessage);
     }
   };
 
@@ -285,7 +269,7 @@ function AccountBankDashboard() {
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [selectedAccount, setSelectedAccount] = React.useState<AccountBankData | null>(null);
+  const [selectedAccount, setSelectedAccount] = React.useState<AccountBankTypes | null>(null);
 
   const { data: accounts = [], isLoading, refetch } = useGetAccountBank();
 
@@ -293,7 +277,7 @@ function AccountBankDashboard() {
     refetch();
   };
 
-  const columns: ColumnDef<AccountBankData>[] = [
+  const columns: ColumnDef<AccountBankTypes>[] = [
     {
       id: "select",
       header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
@@ -332,11 +316,11 @@ function AccountBankDashboard() {
       cell: ({ row }) => <div className="font-mono">{row.getValue("accountNumber")}</div>,
     },
     {
-      accessorKey: "majors",
+      id: "majorName",
       header: "Branch",
+      accessorFn: (row) => row.majors?.name,
       cell: ({ row }) => {
-        const majors = row.getValue("majors") as AccountBankData["majors"];
-        return <div>{majors?.name || row.original.majors?.name || "-"}</div>;
+        return <div>{row.original.majors?.name || "-"}</div>;
       },
     },
     {

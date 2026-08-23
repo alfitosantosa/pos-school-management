@@ -1,22 +1,21 @@
 "use client";
 
-import * as React from "react";
-import { unauthorized } from "next/navigation";
-import Loading from "@/components/loading";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useSession } from "@/lib/auth-client";
-import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
 import { useGetPaymentByStudentId, usePaymentItemsByStudentId } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
-import { StudentCombobox } from "@/components/ui/student-combobox";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { User, Phone, MapPin, GraduationCap, Calendar, CreditCard, MessageCircle, CheckCircle2, Clock, XCircle, Receipt, Building2, BookOpen, Hash, AlertCircle, TrendingUp } from "lucide-react";
+import { StudentCombobox } from "@/components/ui/student-combobox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSession } from "@/lib/authClients";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
+import { AlertCircle, BookOpen, Building2, Calendar, CheckCircle2, Clock, CreditCard, GraduationCap, Hash, MapPin, MessageCircle, Phone, Receipt, TrendingUp, User, XCircle } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type PaymentItem = {
@@ -170,13 +169,7 @@ function StudentProfileCard({ student }: { student: Student }) {
               <User className="h-3 w-3" />
               Jenis Kelamin
             </p>
-            <p className="font-medium">
-              {student.gender === "L" ?
-                "Laki-laki"
-              : student.gender === "P" ?
-                "Perempuan"
-              : "-"}
-            </p>
+            <p className="font-medium">{student.gender === "L" ? "Laki-laki" : student.gender === "P" ? "Perempuan" : "-"}</p>
           </div>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -344,27 +337,29 @@ function BillingTab({ billingItems, student }: { billingItems: PaymentItem[]; st
           {/* WA Reminder Buttons */}
           {unpaidItems.length > 0 && (
             <div className="flex gap-2">
-              {student.parentPhone ?
+              {student.parentPhone ? (
                 <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700 text-white gap-1.5 text-xs h-8" onClick={handleWAReminder}>
                   <MessageCircle className="h-3.5 w-3.5" />
                   Reminder WA
                   <span className="opacity-80 text-xs">({student.parentPhone})</span>
                 </Button>
-              : <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 gap-1.5 text-xs h-8" onClick={handleWAReminderManual}>
+              ) : (
+                <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 gap-1.5 text-xs h-8" onClick={handleWAReminderManual}>
                   <MessageCircle className="h-3.5 w-3.5" />
                   Salin Pesan WA
                 </Button>
-              }
+              )}
             </div>
           )}
         </div>
 
-        {unpaidItems.length === 0 ?
+        {unpaidItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 border rounded-lg bg-green-50 dark:bg-green-950/20">
             <CheckCircle2 className="h-10 w-10 text-green-600 mb-2" />
             <p className="text-sm font-medium text-green-800 dark:text-green-200">Semua tagihan sudah lunas!</p>
           </div>
-        : <div className="space-y-3">
+        ) : (
+          <div className="space-y-3">
             {/* Total unpaid summary */}
             <div className="flex items-center justify-between rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 px-4 py-2.5">
               <span className="text-sm text-red-700 dark:text-red-300 font-medium">Total Tagihan Belum Lunas</span>
@@ -399,7 +394,7 @@ function BillingTab({ billingItems, student }: { billingItems: PaymentItem[]; st
               </div>
             ))}
           </div>
-        }
+        )}
       </div>
 
       {/* Paid Section */}
@@ -518,8 +513,35 @@ function StudentInformation() {
   const { data: rawBilling = [], isLoading: isLoadingBilling } = usePaymentItemsByStudentId(selectedStudentId);
   const { data: rawPayments = [], isLoading: isLoadingPayments } = useGetPaymentByStudentId(selectedStudentId);
 
-  const billingItems: PaymentItem[] = Array.isArray(rawBilling) ? rawBilling : [];
-  const payments: Payment[] = Array.isArray(rawPayments) ? rawPayments : [];
+  const billingItems: PaymentItem[] = Array.isArray(rawBilling)
+    ? rawBilling.map((item) => ({
+        ...item,
+        createdAt: item.createdAt == null ? "" : String(item.createdAt),
+        paymentId: item.paymentId ?? null,
+        quantity: String(item.quantity),
+        amount: String(item.amount),
+        subtotal: String(item.subtotal),
+      }))
+    : [];
+  const payments: Payment[] = Array.isArray(rawPayments)
+    ? rawPayments.map((payment) => ({
+        ...payment,
+        id: String(payment.id),
+        studentId: String(payment.studentId ?? selectedStudentId),
+        amount: String(payment.amount ?? "0"),
+        status: String(payment.status ?? "pending"),
+        notes: payment.notes ?? undefined,
+        student: payment.student ? { ...payment.student, nisn: payment.student.nisn ?? undefined } : undefined,
+        createdAt: String(payment.createdAt ?? payment.paymentDate ?? ""),
+        paymentDate: String(payment.paymentDate ?? payment.createdAt ?? ""),
+        receiptNumber: String(payment.receiptNumber ?? "-"),
+        accountBankId: String(payment.accountBankId ?? ""),
+        majorId: String(payment.majorId ?? ""),
+        month: String(payment.month ?? "-"),
+        bendaharaId: String(payment.bendaharaId ?? ""),
+        bankRef: String(payment.bankRef ?? ""),
+      }))
+    : [];
 
   const selectedStudent: Student | undefined = React.useMemo(() => (allStudents as Student[]).find((s) => s.id === selectedStudentId), [allStudents, selectedStudentId]);
 
@@ -541,23 +563,26 @@ function StudentInformation() {
       <Card>
         <CardContent className="pt-4 pb-4">
           <Label className="text-sm font-medium mb-2 block">Cari & Pilih Siswa</Label>
-          {isLoadingStudents ?
+          {isLoadingStudents ? (
             <div className="h-10 bg-muted animate-pulse rounded-md" />
-          : <StudentCombobox students={allStudents as any[]} value={selectedStudentId} onValueChange={(val) => setSelectedStudentId(val)} placeholder="Cari berdasarkan nama, NISN, atau kelas..." />}
+          ) : (
+            <StudentCombobox students={allStudents as any[]} value={selectedStudentId} onValueChange={(val) => setSelectedStudentId(val)} placeholder="Cari berdasarkan nama, NISN, atau kelas..." />
+          )}
         </CardContent>
       </Card>
 
       {/* ── Content ── */}
-      {!selectedStudentId ?
+      {!selectedStudentId ? (
         <EmptyState />
-      : isLoadingDetail ?
+      ) : isLoadingDetail ? (
         <div className="flex items-center justify-center py-16">
           <div className="text-center space-y-2">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
             <p className="text-sm text-muted-foreground">Memuat data siswa...</p>
           </div>
         </div>
-      : <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ── Left: Profile Card ── */}
           <div className="lg:col-span-1">{selectedStudent && <StudentProfileCard student={selectedStudent} />}</div>
 
@@ -598,7 +623,7 @@ function StudentInformation() {
             </Tabs>
           </div>
         </div>
-      }
+      )}
     </div>
   );
 }

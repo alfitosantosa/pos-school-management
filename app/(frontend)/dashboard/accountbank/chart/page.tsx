@@ -1,28 +1,27 @@
 "use client";
 
-import * as React from "react";
-import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { format, subMonths } from "date-fns";
-import { id as localeId } from "date-fns/locale";
-import type { DateRange } from "react-day-picker";
-import { Wallet, Landmark, ArrowDownToLine, Activity, Building2, CalendarDays, RefreshCw, BarChart2, PieChart as PieIcon, ListChecks, ChevronRight, CreditCard } from "lucide-react";
-
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { DatePickerWithRange } from "@/components/date/datePicker";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
-
 import { useAccountBankDashboard } from "@/app/(hooks)/hooks/AccountBank/useAccountBankDashboard";
 import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
-import { useSession } from "@/lib/auth-client";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { UserDataTypes } from "@/app/(types)";
+import { DatePickerWithRange } from "@/components/date/datePicker";
 import Loading from "@/components/loading";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSession } from "@/lib/authClients";
+import { format, subMonths } from "date-fns";
+import { id as localeId } from "date-fns/locale";
+import { Activity, ArrowDownToLine, BarChart2, Building2, CalendarDays, ChevronRight, CreditCard, Landmark, ListChecks, PieChart as PieIcon, RefreshCw, Wallet } from "lucide-react";
 import { unauthorized } from "next/navigation";
+import * as React from "react";
+import type { DateRange } from "react-day-picker";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 // ─── Types (matches API response) ──────────────────────────────────────────
 type Summary = {
@@ -109,12 +108,20 @@ const fmtNum = (v: number) => new Intl.NumberFormat("id-ID").format(v);
 const PALETTE = ["#2563EB", "#059669", "#D97706", "#7C3AED", "#DB2777", "#0891B2", "#DC2626", "#65A30D", "#CA8A04", "#EA580C"];
 
 // ─── Custom Tooltip ─────────────────────────────────────────────────────────
-function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) {
+interface TooltipPayloadItem {
+  name?: string;
+  value?: number | string;
+  color?: string;
+  dataKey?: string;
+  payload?: unknown;
+}
+
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload: TooltipPayloadItem[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border bg-background/95 backdrop-blur shadow-xl p-3 min-w-[180px]">
       <p className="text-xs font-semibold text-muted-foreground mb-2">{label}</p>
-      {payload.map((p, i) => (
+      {payload.map((p: TooltipPayloadItem, i: number) => (
         <div key={i} className="flex items-center justify-between gap-4 text-xs">
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: p.color }} />
@@ -189,10 +196,13 @@ function AccountBankBalanceDashboard({
   userDataMajor,
   isAdmin,
 }: {
-  userDataMajor: {
-    id?: string;
-    name?: string;
-  };
+  userDataMajor:
+    | {
+        id: string;
+        name: string;
+      }
+    | null
+    | undefined;
   isAdmin: boolean;
 }) {
   // ✅ Memoize initial date to prevent re-creation
@@ -318,7 +328,7 @@ function AccountBankBalanceDashboard({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Semua Branch</SelectItem>
-                    {(majors as any[]).map((m) => (
+                    {majors.map((m) => (
                       <SelectItem key={m.id} value={m.id}>
                         {m.name}
                       </SelectItem>
@@ -411,7 +421,7 @@ function AccountBankBalanceDashboard({
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="period" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                       <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={(v) => fmt(v).replace("Rp", "").trim()} width={52} />
-                      <Tooltip content={<CustomTooltip />} />
+                      <Tooltip content={<CustomTooltip payload={[]} />} />
                       <Legend wrapperStyle={{ fontSize: 10 }} />
                       <Area type="monotone" dataKey="Saldo Masuk" stroke="#059669" strokeWidth={2.5} fill="url(#gradRevenue)" dot={{ r: 3, fill: "#059669" }} activeDot={{ r: 5 }} />
                     </AreaChart>
@@ -435,7 +445,7 @@ function AccountBankBalanceDashboard({
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                       <XAxis dataKey="period" tick={{ fontSize: 9 }} tickLine={false} axisLine={false} />
                       <YAxis tick={{ fontSize: 9 }} tickLine={false} axisLine={false} width={28} />
-                      <Tooltip content={<CustomTooltip />} />
+                      <Tooltip content={<CustomTooltip payload={[]} />} />
                       <Bar dataKey="Jumlah Transaksi" fill="#2563EB" radius={[4, 4, 0, 0]}>
                         {revenueChartData.map((_, i) => (
                           <Cell key={i} fill={`hsl(${210 + i * 4}, 70%, ${45 + (i % 3) * 5}%)`} />
@@ -534,7 +544,7 @@ function AccountBankBalanceDashboard({
                             <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value: any) => (value ? [fmtFull(Number(value)), "Saldo Masuk"] : ["", ""])} labelFormatter={(name) => name} />
+                        <Tooltip formatter={(value) => (value ? [fmtFull(Number(value)), "Saldo Masuk"] : ["", ""])} labelFormatter={(name) => name} />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 w-full mt-2">
@@ -567,6 +577,7 @@ function AccountBankBalanceDashboard({
                       <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f0f0f0" />
                       <XAxis type="number" tick={{ fontSize: 9 }} tickLine={false} axisLine={false} tickFormatter={(v) => fmt(v).replace("Rp", "").trim()} />
                       <YAxis dataKey="bankName" type="category" tick={{ fontSize: 9 }} tickLine={false} axisLine={false} width={80} />
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       <Tooltip formatter={(v: any) => (v ? [fmtFull(Number(v)), "Saldo Masuk"] : ["", ""])} />
                       <Bar dataKey="totalRevenue" name="Saldo Masuk" radius={[0, 4, 4, 0]}>
                         {byBankGroup.map((_, i) => (
@@ -726,12 +737,8 @@ export default function AccountBankChartPage() {
   const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
-  const userRole = userData?.role?.name;
-
-  // ✅ FIX #2: Memoize userDataMajor object untuk stabilize reference
-  const userDataMajor = React.useMemo(() => {
-    return userData?.major ? { id: userData.major.id, name: userData.major.name } : { id: undefined, name: undefined };
-  }, [userData?.major?.id, userData?.major?.name]);
+  const userRole = (userData as UserDataTypes)?.role?.name;
+  const userDataMajor = (userData as UserDataTypes)?.major;
 
   if (isPending || isLoadingUserData) {
     return <Loading />;

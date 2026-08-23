@@ -1,6 +1,6 @@
 "use client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { apiPost } from "@/lib/apiClients";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useUpdatePaymentTransaction = () => {
   const queryClient = useQueryClient();

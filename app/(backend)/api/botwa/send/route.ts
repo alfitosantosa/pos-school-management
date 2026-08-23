@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
 function formatPhoneNumber(phone: string): string {
   // Remove all non-numeric characters

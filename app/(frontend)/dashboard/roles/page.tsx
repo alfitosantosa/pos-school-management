@@ -1,32 +1,30 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Shield, Users } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-
-// Import hooks (Anda perlu membuat hooks ini sesuai dengan API backend)
-import { useGetRoles, useCreateRole, useUpdateRole, useDeleteRole } from "@/app/(hooks)/hooks/Roles/useRoles";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
+import { useCreateRole, useDeleteRole, useGetRoles, useUpdateRole } from "@/app/(hooks)/hooks/Roles/useRoles";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { RoleDataTypes } from "@/app/(types)";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Pencil, Plus, Shield, Trash2, Users } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
+// Import hooks (Anda perlu membuat hooks ini sesuai dengan API backend)
 // Type definitions
 export type RoleData = {
   id: string;
@@ -225,10 +223,19 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
     };
 
     if (editData) {
-      await updateRole.mutateAsync({ id: editData.id, ...submitData });
+      await updateRole.mutateAsync({
+        ...submitData,
+        createdAt: editData.createdAt,
+        updatedAt: editData.updatedAt,
+      });
       toast.success("Role berhasil diperbarui!");
     } else {
-      await createRole.mutateAsync(submitData);
+      const now = new Date().toISOString();
+      await createRole.mutateAsync({
+        ...submitData,
+        createdAt: now,
+        updatedAt: now,
+      });
       toast.success("Role berhasil dibuat!");
     }
     reset();
@@ -281,11 +288,7 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
               Batal
             </Button>
             <Button type="submit" disabled={createRole.isPending || updateRole.isPending}>
-              {createRole.isPending || updateRole.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createRole.isPending || updateRole.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -395,13 +398,15 @@ function RoleDataTable() {
         const permissions = (row.getValue("permissions") as string[]) || [];
         return (
           <div className="flex flex-wrap gap-1">
-            {permissions.length > 0 ?
+            {permissions.length > 0 ? (
               permissions.slice(0, 3).map((permission) => (
                 <Badge key={permission} variant="outline" className="text-xs">
                   {availablePermissions.find((p) => p.id === permission)?.label || permission}
                 </Badge>
               ))
-            : <span className="text-muted-foreground text-sm">Tidak ada</span>}
+            ) : (
+              <span className="text-muted-foreground text-sm">Tidak ada</span>
+            )}
             {permissions.length > 3 && (
               <Badge variant="outline" className="text-xs">
                 +{permissions.length - 3} lainnya
@@ -549,7 +554,7 @@ function RoleDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ?
+              {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -557,12 +562,13 @@ function RoleDataTable() {
                     ))}
                   </TableRow>
                 ))
-              : <TableRow>
+              ) : (
+                <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     Tidak ada data role.
                   </TableCell>
                 </TableRow>
-              }
+              )}
             </TableBody>
           </Table>
         </div>

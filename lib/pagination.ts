@@ -43,12 +43,7 @@ export function extractPaginationParams(searchParams: URLSearchParams): Paginati
  * @param limit - Items per page
  * @returns Formatted pagination response
  */
-export function createPaginationResponse<T>(
-  data: T[],
-  total: number,
-  page: number,
-  limit: number
-): PaginationResponse<T> {
+export function createPaginationResponse<T>(data: T[], total: number, page: number, limit: number): PaginationResponse<T> {
   const pages = Math.ceil(total / limit);
 
   return {

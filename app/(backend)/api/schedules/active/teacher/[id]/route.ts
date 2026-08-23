@@ -18,8 +18,9 @@
 //   @@map("schedules")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 //use params for get id
 
@@ -37,7 +38,6 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     });
     return NextResponse.json(schedules);
   } catch (error) {
-    console.error("Error fetching schedules by teacher:", error);
-    return NextResponse.json({ error: "Failed to fetch schedules" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

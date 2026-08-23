@@ -1,13 +1,14 @@
 "use client";
+import { userDataMajorTypes, UserDataTypes } from "@/app/(types)";
+import { apiGet } from "@/lib/apiClients";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api-client";
 
 export const useGetStudentById = (id: string) => {
   return useQuery({
     queryKey: ["students", id],
     queryFn: async () => {
       try {
-        const res = await apiGet(`/api/students/${id}`);
+        const res = await apiGet<UserDataTypes>(`/api/students/${id}`);
         return res.data;
       } catch (error) {
         console.error(error);
@@ -22,7 +23,7 @@ export const useGetStudentByIdMajor = (id: string) => {
     queryKey: ["students", id],
     queryFn: async () => {
       try {
-        const res = await apiGet(`/api/students/major/${id}`);
+        const res = await apiGet<UserDataTypes[]>(`/api/students/major/${id}`);
         return res.data;
       } catch (error) {
         console.error(error);
@@ -37,7 +38,7 @@ export const useGetStudentByIdMajorActive = (id: string) => {
     queryKey: ["students", id, "active"],
     queryFn: async () => {
       try {
-        const res = await apiGet(`/api/students/major/${id}/active`);
+        const res = await apiGet<userDataMajorTypes[]>(`/api/students/major/${id}/active`);
         return res.data;
       } catch (error) {
         console.error(error);

@@ -1,28 +1,25 @@
 "use client";
 
-import * as React from "react";
-import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { usePaymentsItemsDashboardByDate } from "@/app/(hooks)/hooks/Payments/usePaymentItemsByDate";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import Loading from "@/components/loading";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSession } from "@/lib/authClients";
 import { format, subMonths } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import type { DateRange } from "react-day-picker";
-import { AlertTriangle, CheckCircle2, Users, Building2, CalendarDays, RefreshCw, BarChart2, PieChart as PieIcon, Activity, ListChecks, Clock, ChevronRight } from "lucide-react";
-
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { DatePickerWithRange } from "@/components/date/datePicker";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
-
-import { usePaymentsItemsDashboardByDate } from "@/app/(hooks)/hooks/Payments/usePaymentItemsByDate";
-import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import Loading from "@/components/loading";
+import { Activity, AlertTriangle, BarChart2, Building2, CalendarDays, CheckCircle2, ChevronRight, Clock, ListChecks, PieChart as PieIcon, RefreshCw, Users } from "lucide-react";
 import { unauthorized } from "next/navigation";
+import * as React from "react";
+import type { DateRange } from "react-day-picker";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 // ─── Types (matches API response) ──────────────────────────────────────────
 type SummaryResult = {
