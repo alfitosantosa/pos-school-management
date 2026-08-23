@@ -1,13 +1,14 @@
 "use client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { SubjectTypes, SubjectInput } from "@/app/(types)/types/subject-types";
 import { CACHE_STRATEGIES } from "@/app/client/providers";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetSubjects = () => {
-  return useQuery({
+  return useQuery<SubjectTypes[]>({
     queryKey: ["subjects"],
-    queryFn: async () => {
-      const response = await apiGet("/api/subjects");
+    queryFn: async (): Promise<SubjectTypes[]> => {
+      const response = await apiGet<SubjectTypes[]>("/api/subjects");
       return response.data;
     },
     // ✅ Subjects are static - cache for 1 hour
@@ -18,7 +19,7 @@ export const useGetSubjects = () => {
 export const useCreateSubject = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (data: SubjectInput) => {
       const response = await apiPost("/api/subjects", data);
       return response.data;
     },
@@ -34,7 +35,7 @@ export const useCreateSubject = () => {
 export const useUpdateSubject = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (data: SubjectInput & { id: string }) => {
       const response = await apiPut(`/api/subjects/`, data);
       return response.data;
     },
@@ -50,7 +51,7 @@ export const useUpdateSubject = () => {
 export const useDeleteSubject = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id) => {
+    mutationFn: async (id: string) => {
       const response = await apiDelete(`/api/subjects`, {
         body: JSON.stringify({ id }),
         headers: {

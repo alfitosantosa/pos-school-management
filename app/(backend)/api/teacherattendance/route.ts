@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
@@ -7,7 +8,7 @@ export async function GET(req: NextRequest) {
     const date = searchParams.get("date");
     const teacherId = searchParams.get("teacherId");
 
-    const whereClause: any = {};
+    const whereClause: Record<string, unknown> = {};
 
     if (date) {
       const targetDate = new Date(date);
@@ -52,8 +53,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(attendances);
   } catch (error) {
-    console.error("Error fetching teacher attendance:", error);
-    return NextResponse.json({ error: "Failed to fetch attendance" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -116,8 +116,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(attendance, { status: 201 });
   } catch (error) {
-    console.error("Error creating teacher attendance:", error);
-    return NextResponse.json({ error: "Failed to create attendance" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -160,8 +159,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(attendance);
   } catch (error) {
-    console.error("Error updating teacher attendance:", error);
-    return NextResponse.json({ error: "Failed to update attendance" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -180,7 +178,6 @@ export async function DELETE(request: NextRequest) {
     });
     return NextResponse.json(attendance);
   } catch (error) {
-    console.error("Error deleting attendance:", error);
-    return NextResponse.json({ error: "Failed to delete attendance" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

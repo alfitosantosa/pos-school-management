@@ -1,8 +1,8 @@
 // hooks/AccountBank/useAccountBankDashboard.ts
 "use client";
 
+import { apiGet } from "@/lib/apiClients";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api-client";
 
 type AccountBankDashboardParams = {
   fromdate?: Date;

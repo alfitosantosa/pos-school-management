@@ -1,31 +1,30 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
-
+import { useCreatePaymentType, useDeletePaymentType, useGetPaymentTypeByIdMajor, useUpdatePaymentType } from "@/app/(hooks)/hooks/Payments/usePaymentType";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
+import { errorHandlerFrontend } from "@/lib/errorHandlerFrontend";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-
-import { useGetPaymentTypes, useCreatePaymentType, useUpdatePaymentType, useDeletePaymentType, useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // ============================================================================
 // Type Definitions
@@ -122,8 +121,8 @@ const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
-const parseToFloat = (value: string | number): number => {
-  return parseFloat(value as any) || 0;
+const parseToFloat = (value: number | string) => {
+  return typeof value === "string" ? Number.parseFloat(value) || 0 : value || 0;
 };
 
 const getColumnLabel = (columnId: string): string => {
@@ -144,7 +143,7 @@ const FixedBadge = ({ isFixed }: { isFixed: boolean }) => <Badge className={`tex
 // Form Dialog Component
 // ============================================================================
 
-function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: { id: String; open: boolean; onOpenChange: (open: boolean) => void; editData?: PaymentTypeData | null; onSuccess: () => void }) {
+function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: { id: string; open: boolean; onOpenChange: (open: boolean) => void; editData?: PaymentTypeData | null; onSuccess: () => void }) {
   const createPaymentType = useCreatePaymentType();
   const updatePaymentType = useUpdatePaymentType();
 
@@ -200,18 +199,18 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
       };
 
       if (editData) {
-        await updatePaymentType.mutateAsync({ id: editData.id, ...payload } as any);
+        await updatePaymentType.mutateAsync(payload);
         toast.success("Jenis Transaksi berhasil diperbarui!");
       } else {
-        await createPaymentType.mutateAsync(payload as any);
+        await createPaymentType.mutateAsync(payload);
         toast.success("Jenis Transaksi berhasil dibuat!");
       }
 
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error) {
+      errorHandlerFrontend(error);
     }
   };
 
@@ -337,11 +336,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
               Batal
             </Button>
             <Button type="submit" disabled={createPaymentType.isPending || updatePaymentType.isPending}>
-              {createPaymentType.isPending || updatePaymentType.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createPaymentType.isPending || updatePaymentType.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -366,8 +361,8 @@ function DeletePaymentTypeDialog({ open, onOpenChange, paymentTypeData, onSucces
       toast.success("Jenis pembayaran berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus jenis pembayaran");
+    } catch (error) {
+      errorHandlerFrontend(error);
     }
   };
 
@@ -564,7 +559,7 @@ function PaymentTypeDataTable({ userMajorData }: { userMajorData: { id: string; 
   const columns = React.useMemo(() => createColumns(handleEdit, handleDelete), [handleEdit, handleDelete]);
 
   const table = useReactTable({
-    data: filteredPaymentTypes,
+    data: filteredPaymentTypes as PaymentTypeData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -635,7 +630,7 @@ function PaymentTypeDataTable({ userMajorData }: { userMajorData: { id: string; 
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -643,12 +638,13 @@ function PaymentTypeDataTable({ userMajorData }: { userMajorData: { id: string; 
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data jenis pembayaran.
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>
@@ -702,15 +698,13 @@ export default function PaymentTypeTable() {
   }
 
   // Check if bendahara has a major assigned
-  if (!userMajorData.id) {
+
+  if (!userMajorData) {
     return (
-      <div className="">
-        <div className="text-center text-red-600">
-          <p>Bendahara belum memiliki branch yang ditugaskan.</p>
-        </div>
+      <div className="text-center">
+        <p className="text-red-600">User tidak memiliki data jurusan.</p>
       </div>
     );
   }
-
   return <PaymentTypeDataTable userMajorData={userMajorData} />;
 }

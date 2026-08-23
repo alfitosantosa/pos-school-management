@@ -1,16 +1,20 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Check database connectivity with timeout
-    const dbCheck = await Promise.race([prisma.$queryRaw`SELECT 1`, new Promise((_, reject) => setTimeout(() => reject(new Error("Database timeout")), 5000))]);
+    const getPrismaStatus = await prisma.$transaction(async () => {
+      await prisma.user.findFirstOrThrow;
+      return true;
+    });
+    console.log(getPrismaStatus);
 
     return NextResponse.json(
       {
         status: "healthy",
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
+        prisma: getPrismaStatus ? "connected" : "not connected",
         environment: process.env.NODE_ENV,
         database: "connected",
       },

@@ -1,10 +1,11 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldAlert, ArrowLeft, Home, AlertTriangle, Info } from "lucide-react";
-import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle, ArrowLeft, Home, Info, ShieldAlert } from 'lucide-react';
+import Link from 'next/link';
+import React from 'react';
 
 export default function Unauthorized() {
   return (

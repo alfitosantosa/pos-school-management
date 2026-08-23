@@ -1,6 +1,27 @@
 "use client";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+
+// Type definitions
+type TahfidzRecordCreate = {
+  studentId: string;
+  teacherId: string | null;
+  surahQuranId: string;
+  startVerse: number;
+  endVerse: number;
+  grade: string | null;
+  notes: string | null;
+  date: string;
+};
+
+type TahfidzRecordUpdate = TahfidzRecordCreate & {
+  id: string;
+};
+
+type TahfidzRecordDelete = {
+  id: string;
+  studentId?: string;
+};
 
 export const useGetTahfidzRecords = (studentId: string) => {
   return useQuery({
@@ -15,12 +36,12 @@ export const useGetTahfidzRecords = (studentId: string) => {
 export const useCreateTahfidzRecord = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (data: TahfidzRecordCreate) => {
       const response = await apiPost("/api/tahfidzrecord", data);
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["tahfidzRecords", data.studentId] });
+      queryClient.invalidateQueries({ queryKey: ["tahfidzRecords"] });
     },
     onError: (error) => {
       console.error(error);
@@ -31,12 +52,12 @@ export const useCreateTahfidzRecord = () => {
 export const useUpdateTahfidzRecord = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (data: TahfidzRecordUpdate) => {
       const response = await apiPut(`/api/tahfidzrecord/`, data);
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["tahfidzRecords", data.studentId] });
+      queryClient.invalidateQueries({ queryKey: ["tahfidzRecords"] });
     },
     onError: (error) => {
       console.error(error);
@@ -47,7 +68,7 @@ export const useUpdateTahfidzRecord = () => {
 export const useDeleteTahfidzRecord = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (data: TahfidzRecordDelete) => {
       const response = await apiDelete(`/api/tahfidzrecord`, {
         body: JSON.stringify(data),
         headers: {
@@ -57,7 +78,7 @@ export const useDeleteTahfidzRecord = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["tahfidzRecords", data.studentId] });
+      queryClient.invalidateQueries({ queryKey: ["tahfidzRecords"] });
     },
     onError: (error) => {
       console.error(error);
@@ -75,7 +96,7 @@ export const useGetTahfidzRecordByStudentId = (studentId: string) => {
   });
 };
 
-export const useGetTahfidzRecordByIdTeacher = (teacherId:string) => {
+export const useGetTahfidzRecordByIdTeacher = (teacherId: string) => {
   return useQuery({
     queryKey: ["tahfidzRecordByTeacher", teacherId],
     queryFn: async () => {
@@ -83,6 +104,4 @@ export const useGetTahfidzRecordByIdTeacher = (teacherId:string) => {
       return response.data;
     },
   });
-}
-
-
+};

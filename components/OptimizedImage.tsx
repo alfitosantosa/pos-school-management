@@ -1,8 +1,8 @@
 "use client";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import Image, { ImageProps } from "next/image";
 import { useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface OptimizedImageProps extends Omit<ImageProps, "onLoadingComplete"> {
   fallback?: string;

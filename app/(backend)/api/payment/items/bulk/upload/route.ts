@@ -11,7 +11,7 @@
 //   name            String
 //   year            String
 //   skuType         String
-//   payment         Payment?    @relation(fields: [paymentId], references: [id], onDelete: SetNull) 
+//   payment         Payment?    @relation(fields: [paymentId], references: [id], onDelete: SetNull)
 //   PaymentType     PaymentType @relation(fields: [paymentTypeId], references: [id])
 //   student         UserData    @relation(fields: [studentId], references: [id])
 //   createdAt       DateTime             @default(now())
@@ -20,6 +20,7 @@
 //   @@map("payment_items")
 // }
 
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -42,24 +43,11 @@ export async function POST(request: NextRequest) {
 
     // Validate input is array and not empty
     if (!Array.isArray(body) || body.length === 0) {
-      return NextResponse.json(
-        { error: "Body harus berupa array dan tidak boleh kosong" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Body harus berupa array dan tidak boleh kosong" }, { status: 400 });
     }
 
     // Validate required fields per item
-    const requiredFields = [
-      "studentId",
-      "paymentTypeId",
-      "quantity",
-      "amount",
-      "subtotal",
-      "month",
-      "year",
-      "name",
-      "skuType",
-    ] as const;
+    const requiredFields = ["studentId", "paymentTypeId", "quantity", "amount", "subtotal", "month", "year", "name", "skuType"] as const;
 
     const validationErrors: Array<{ index: number; message: string }> = [];
 
@@ -112,10 +100,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (validationErrors.length > 0) {
-      return NextResponse.json(
-        { error: "Validation errors", details: validationErrors },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Validation errors", details: validationErrors }, { status: 400 });
     }
 
     // Get all unique studentIds and paymentTypeIds for batch validation
@@ -131,10 +116,7 @@ export async function POST(request: NextRequest) {
 
     const missingStudents = studentIds.filter((id) => !existingStudentIds.has(id));
     if (missingStudents.length > 0) {
-      return NextResponse.json(
-        { error: `Student tidak ditemukan: ${missingStudents.join(", ")}` },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: `Student tidak ditemukan: ${missingStudents.join(", ")}` }, { status: 400 });
     }
 
     // Validate all payment types exist
@@ -144,19 +126,15 @@ export async function POST(request: NextRequest) {
     });
     const existingPaymentTypeIds = new Set(existingPaymentTypes.map((pt) => pt.id));
 
-    const missingPaymentTypes = paymentTypeIds.filter(
-      (id) => !existingPaymentTypeIds.has(id)
-    );
+    const missingPaymentTypes = paymentTypeIds.filter((id) => !existingPaymentTypeIds.has(id));
     if (missingPaymentTypes.length > 0) {
       return NextResponse.json(
         {
           error: `PaymentType tidak ditemukan: ${missingPaymentTypes.join(", ")}`,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
-
-
 
     // Create payment items
     const result = await prisma.paymentItems.createMany({
@@ -182,33 +160,10 @@ export async function POST(request: NextRequest) {
         skipped: body.length - result.count,
         total: body.length,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
-    console.error("Error creating payment items:", error);
-
-    // Handle Prisma-specific errors
-    if (error instanceof Error) {
-      if (error.message.includes("Unique constraint failed")) {
-        return NextResponse.json(
-          {
-            error: "Duplikasi data terdeteksi",
-            message: error.message,
-          },
-          { status: 409 }
-        );
-      }
-
-      return NextResponse.json(
-        { error: "Gagal membuat payment items", message: error.message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: "Gagal membuat payment items", message: "Unknown error occurred" },
-      { status: 500 }
-    );
+    return handlePrismaError(error);
   }
 }
 
@@ -222,7 +177,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") ?? "100");
     const offset = parseInt(searchParams.get("offset") ?? "0");
 
-    const where: any = {};
+    const where: Record<string, string> = {};
 
     if (studentId) where.studentId = studentId;
     if (month) where.month = month;
@@ -253,13 +208,9 @@ export async function GET(request: NextRequest) {
           hasMore: offset + limit < total,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching payment items:", error);
-    return NextResponse.json(
-      { error: "Gagal mengambil payment items" },
-      { status: 500 }
-    );
+    return handlePrismaError(error);
   }
 }

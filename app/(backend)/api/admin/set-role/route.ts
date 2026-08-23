@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -47,7 +48,6 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error setting role:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

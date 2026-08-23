@@ -1,32 +1,30 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
-
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { useCreatePaymentType, useDeletePaymentType, useGetPaymentTypes, useUpdatePaymentType } from "@/app/(hooks)/hooks/Payments/usePaymentType";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-
-import { useGetPaymentTypes, useCreatePaymentType, useUpdatePaymentType, useDeletePaymentType } from "@/app/(hooks)/hooks/Payments/usePaymentType";
-import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // ============================================================================
 // Type Definitions
@@ -220,16 +218,17 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
                 <SelectValue placeholder="Pilih branch" />
               </SelectTrigger>
               <SelectContent>
-                {majorsLoading ?
+                {majorsLoading ? (
                   <SelectItem value="" disabled>
                     Loading...
                   </SelectItem>
-                : majors.map((major: any) => (
+                ) : (
+                  majors.map((major: any) => (
                     <SelectItem key={major.id} value={major.id}>
                       {major.name}
                     </SelectItem>
                   ))
-                }
+                )}
               </SelectContent>
             </Select>
             {errors.majorId && <p className="text-sm text-red-500">{errors.majorId.message}</p>}
@@ -328,11 +327,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess }: { op
               Batal
             </Button>
             <Button type="submit" disabled={createPaymentType.isPending || updatePaymentType.isPending}>
-              {createPaymentType.isPending || updatePaymentType.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createPaymentType.isPending || updatePaymentType.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -538,7 +533,7 @@ function PaymentTypeDataTable() {
   // Filter payment types by selected major
   const filteredPaymentTypes = React.useMemo(() => {
     if (!majorSelection) return paymentTypes;
-    return paymentTypes.filter((pt: PaymentTypeData) => pt.majorId === majorSelection);
+    return paymentTypes.filter((pt) => pt.majorId === majorSelection);
   }, [paymentTypes, majorSelection]);
 
   const handleSuccess = () => {
@@ -557,8 +552,8 @@ function PaymentTypeDataTable() {
 
   const columns = React.useMemo(() => createColumns(handleEdit, handleDelete), [handleEdit, handleDelete]);
 
-  const table = useReactTable({
-    data: filteredPaymentTypes,
+  const table = useReactTable<PaymentTypeData>({
+    data: filteredPaymentTypes as PaymentTypeData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -650,7 +645,7 @@ function PaymentTypeDataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -658,12 +653,13 @@ function PaymentTypeDataTable() {
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data jenis pembayaran.
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>

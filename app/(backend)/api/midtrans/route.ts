@@ -1,4 +1,4 @@
-import midtransClient from "midtrans-client";
+import midtransClient from 'midtrans-client';
 
 export async function POST(request: Request) {
   try {

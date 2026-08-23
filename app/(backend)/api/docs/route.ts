@@ -1,6 +1,6 @@
+import { swaggerPaths } from '@/lib/swaggerPath';
 import { NextResponse } from 'next/server';
 import swaggerJsdoc from 'swagger-jsdoc';
-import { swaggerPaths } from '@/lib/swagger-paths';
 
 /**
  * API endpoint untuk menghasilkan OpenAPI specification

@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
 
 interface LazyImageProps {
   src: string;
@@ -13,7 +13,6 @@ interface LazyImageProps {
 export function LazyImage({ src, alt, width = 40, height = 40, className = "", fallback = "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png" }: LazyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
-  const [imgSrc, setImgSrc] = useState(fallback);
   const imgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,7 +26,7 @@ export function LazyImage({ src, alt, width = 40, height = 40, className = "", f
       {
         threshold: 0.1,
         rootMargin: "50px",
-      }
+      },
     );
 
     if (imgRef.current) {
@@ -43,7 +42,6 @@ export function LazyImage({ src, alt, width = 40, height = 40, className = "", f
 
   const handleImageError = () => {
     console.warn(`Failed to load image: ${src}, using fallback`);
-    setImgSrc(fallback);
     setIsLoaded(true);
   };
 

@@ -10,6 +10,7 @@
 
 //   @@map("account_bank")
 // }
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -40,7 +41,7 @@ export async function POST(Request: NextRequest) {
     });
     return NextResponse.json(createAccountBank);
   } catch (error) {
-    return NextResponse.json(error, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -59,7 +60,7 @@ export async function PUT(Request: NextRequest) {
     });
     return NextResponse.json(createAccountBank);
   } catch (error) {
-    return NextResponse.json(error, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -72,7 +73,6 @@ export async function DELETE(request: NextRequest) {
     });
     return NextResponse.json(accountBank);
   } catch (error) {
-    console.error("Error deleting accountBank:", error);
-    return NextResponse.json({ error: "Failed to delete accountBank" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

@@ -1,18 +1,19 @@
 // app/page.tsx
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import { useSession } from "@/lib/auth-client";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Shield, User, Mail, Phone, MapPin, Calendar, GraduationCap, Building2, Award, CheckCircle, Key, Users, BookOpen, School } from "lucide-react";
+import { useSession } from "@/lib/authClients";
 
-const NoUserDataComponent = ({ authUser }: { authUser: any }) => {
+import { Award, BookOpen, Building2, Calendar, CheckCircle, GraduationCap, Key, Mail, MapPin, Phone, School, Shield, User, Users } from "lucide-react";
+import Image from "next/image";
+import React from "react";
+
+const NoUserDataComponent = ({ session }: { session?: { id: string; name: string; email: string; image?: string | null } }) => {
+  console.log(session);
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-2xl mx-auto">
@@ -22,19 +23,21 @@ const NoUserDataComponent = ({ authUser }: { authUser: any }) => {
             <CardDescription>Akun Better Auth Anda belum terhubung dengan sistem sekolah</CardDescription>
           </CardHeader>
           <CardContent>
-            {authUser && (
+            {session && (
               <Alert>
                 <Shield className="h-5 w-5" />
                 <AlertTitle>Informasi Akun</AlertTitle>
                 <AlertDescription>
+                  {session.image && (
+                    <div className="mb-4">
+                      <Image src={session.image} alt={session.name} width={64} height={64} className="rounded-full" />
+                    </div>
+                  )}
                   <p>
-                    <strong>Nama:</strong> {authUser.name}
+                    <strong>Nama:</strong> {session.name}
                   </p>
                   <p>
-                    <strong>Email:</strong> {authUser.email}
-                  </p>
-                  <p>
-                    <strong>ID:</strong> <code className="bg-muted px-2 py-1 rounded text-xs">{authUser.id}</code>
+                    <strong>Email:</strong> {session.email}
                   </p>
                 </AlertDescription>
               </Alert>
@@ -73,20 +76,7 @@ const UserProfileSkeleton = () => (
   </div>
 );
 
-const ErrorComponent = ({ error }: { error: any }) => (
-  <div className="min-h-screen py-20 px-4">
-    <div className="max-w-md mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle>Error Loading Profile</CardTitle>
-          <CardDescription>{error?.message || "Failed to load user data"}</CardDescription>
-        </CardHeader>
-      </Card>
-    </div>
-  </div>
-);
-
-const StatCard = ({ icon: Icon, label, value, variant = "default" }: { icon: any; label: string; value: string | React.ReactNode; variant?: "default" | "success" | "warning" | "destructive" }) => {
+const StatCard = ({ icon: Icon, label, value, variant = "default" }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | React.ReactNode; variant?: "default" | "success" | "warning" | "destructive" }) => {
   if (!value || value === "N/A") return null;
 
   const variantStyles = {
@@ -113,7 +103,7 @@ const StatCard = ({ icon: Icon, label, value, variant = "default" }: { icon: any
   );
 };
 
-const InfoItem = ({ icon: Icon, label, value }: { icon: any; label: string; value: React.ReactNode }) => {
+const InfoItem = ({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: React.ReactNode }) => {
   if (value === null || value === undefined || value === "N/A" || (typeof value === "string" && value.trim() === "")) return null;
 
   return (
@@ -127,86 +117,15 @@ const InfoItem = ({ icon: Icon, label, value }: { icon: any; label: string; valu
   );
 };
 
-const DataRow = ({ label, value }: { label: string; value: any }) => {
-  if (value === null || value === undefined) return null;
-
-  const formatValue = (val: any): React.ReactNode => {
-    if (typeof val === "boolean") return <Badge variant={val ? "default" : "secondary"}>{val ? "Yes" : "No"}</Badge>;
-    if (val instanceof Date || (typeof val === "string" && !isNaN(Date.parse(val)) && val.includes("T"))) {
-      const date = val instanceof Date ? val : new Date(val);
-      return date.toLocaleString("id-ID", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
-    if (Array.isArray(val)) {
-      if (val.length === 0) return <span className="text-muted-foreground text-sm">Empty array</span>;
-      return (
-        <div className="flex flex-wrap gap-1">
-          {val.map((item, idx) => (
-            <Badge key={idx} variant="outline" className="text-xs">
-              {String(item)}
-            </Badge>
-          ))}
-        </div>
-      );
-    }
-    if (typeof val === "object") {
-      return <pre className="text-xs bg-muted p-2 rounded overflow-x-auto max-w-md">{JSON.stringify(val, null, 2)}</pre>;
-    }
-    return <span className="font-mono text-sm">{String(val)}</span>;
-  };
-
-  return (
-    <TableRow>
-      <TableHead className="w-50 font-medium">{label}</TableHead>
-      <TableCell>{formatValue(value)}</TableCell>
-    </TableRow>
-  );
-};
-
-const ObjectSection = ({ title, data, description, icon: Icon }: { title: string; data: any; description?: string; icon?: any }) => {
-  if (!data) return null;
-
-  const entries = Object.entries(data).filter(([_, value]) => value !== null && value !== undefined);
-
-  if (entries.length === 0) return null;
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          {Icon && <Icon className="h-5 w-5" />}
-          {title}
-        </CardTitle>
-        {description && <CardDescription>{description}</CardDescription>}
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableBody>
-            {entries.map(([key, value]) => (
-              <DataRow key={key} label={key} value={value} />
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
-};
-
 export default function Home() {
   const { data: session } = useSession();
-  const { data: user, isPending: userLoading } = useGetUserByIdBetterAuth(session?.user?.id ?? "");
+  const { data: userData, isPending: userLoading } = useGetUserByIdBetterAuth(session?.user?.id ?? "");
 
   if (userLoading) return <UserProfileSkeleton />;
-  if (!user || !user.id) return <NoUserDataComponent authUser={session?.user} />;
-  if (user?.error) return <ErrorComponent error={user?.error} />;
+  if (!userData) return <NoUserDataComponent session={session?.user} />;
 
   // Extract nested objects
-  const { class: classData, major, academicYear, role, user: userData, ...mainData } = user;
+  const { class: classData, major, academicYear, role, user, ...mainData } = userData;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-background to-muted/20 py-8 px-4">
@@ -215,12 +134,12 @@ export default function Home() {
         <Card className="border-2 shadow-lg">
           <CardHeader className="pb-4">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-              {user?.avatarUrl && (
+              {(user?.image || mainData.avatarUrl) && (
                 <div className="relative">
                   <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-background shadow-xl ring-4 ring-primary/20">
-                    <Image src={user.avatarUrl} alt={user?.name || "User Avatar"} width={128} height={128} className="w-full h-full object-cover" priority />
+                    <Image src={user?.image || mainData.avatarUrl || ""} alt={user?.name || mainData.name || "User Avatar"} width={128} height={128} className="w-full h-full object-cover" priority />
                   </div>
-                  {user?.isActive && (
+                  {mainData.isActive && (
                     <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-background flex items-center justify-center">
                       <CheckCircle className="h-4 w-4 text-white" />
                     </div>
@@ -228,23 +147,18 @@ export default function Home() {
                 </div>
               )}
               <div className="flex-1 text-center md:text-left">
-                <CardTitle className="text-3xl md:text-4xl mb-2">{user?.name || "User"}</CardTitle>
-                <CardDescription className="text-lg mb-4">{user?.email}</CardDescription>
+                <CardTitle className="text-3xl md:text-4xl mb-2">{user?.name || mainData.name}</CardTitle>
+                <CardDescription className="text-lg mb-4">{user?.email || mainData.email}</CardDescription>
                 <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                  {user?.role?.name && (
+                  {role?.name && (
                     <Badge variant="default" className="text-sm px-3 py-1">
                       <Shield className="h-3 w-3 mr-1" />
-                      {user.role.name}
+                      {role.name}
                     </Badge>
                   )}
-                  {/* {user?.status && (
-                    <Badge variant={user.status === "active" ? "default" : "secondary"} className="text-sm px-3 py-1">
-                      {user.status}
-                    </Badge>
-                  )} */}
-                  {user?.isActive !== undefined && (
-                    <Badge variant={user.isActive ? "default" : "destructive"} className="text-sm px-3 py-1">
-                      {user.isActive ? "Active" : "Inactive"}
+                  {mainData.isActive !== undefined && (
+                    <Badge variant={mainData.isActive ? "default" : "destructive"} className="text-sm px-3 py-1">
+                      {mainData.isActive ? "Active" : "Inactive"}
                     </Badge>
                   )}
                 </div>
@@ -322,42 +236,6 @@ export default function Home() {
             </CardContent>
           </Card>
         )}
-
-        {/* System Information */}
-        {/* <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              System Information
-            </CardTitle>
-            <CardDescription>System IDs and metadata</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableBody>
-                <DataRow label="ID" value={mainData.id} />
-                <DataRow label="User ID" value={mainData.userId} />
-                <DataRow label="Academic Year ID" value={mainData.academicYearId} />
-                <DataRow label="Class ID" value={mainData.classId} />
-                <DataRow label="Major ID" value={mainData.majorId} />
-                <DataRow label="Role ID" value={mainData.roleId} />
-                <DataRow label="Avatar URL" value={mainData.avatarUrl} />
-                <DataRow label="Student IDs" value={mainData.studentIds} />
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card> */}
-
-        {/* Detailed Sections */}
-        {/* <div className="grid md:grid-cols-2 gap-6">
-          <ObjectSection title="Class Details" data={classData} description="Complete class information" icon={School} />
-          <ObjectSection title="Major Details" data={major} description="Complete major information" icon={BookOpen} />
-          <ObjectSection title="Academic Year Details" data={academicYear} description="Academic year information" icon={Calendar} />
-          <ObjectSection title="Role & Permissions" data={role} description="Role details and permissions" icon={Shield} />
-        </div> */}
-
-        {/* Better Auth User */}
-        {/* <ObjectSection title="Better Auth User" data={userData} description="Better Auth user information" icon={User} /> */}
       </div>
     </div>
   );

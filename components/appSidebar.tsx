@@ -1,11 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { Home, LayoutDashboard, Users, GraduationCap, Calendar, ClipboardCheck, AlertTriangle, CreditCard, Upload, MessageSquare, BarChart3, Building2, FileText, Settings, ChevronRight, LogOut, User as UserIcon } from "lucide-react";
-import { useRouter, usePathname } from "next/navigation";
-import Image from "next/image";
-import Logo from "@/public/Logo.svg";
-
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import {
   Sidebar,
   SidebarContent,
@@ -21,9 +16,14 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { signOut, useSession } from "@/lib/authClients";
+import Logo from "@/public/Logo.svg";
+import { AlertTriangle, BarChart3, Building2, Calendar, ChevronRight, ClipboardCheck, CreditCard, FileText, GraduationCap, Home, LayoutDashboard, LogOut, MessageSquare, Settings, Upload, User as UserIcon, Users } from "lucide-react";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import * as React from "react";
+
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { useSession, signOut } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 

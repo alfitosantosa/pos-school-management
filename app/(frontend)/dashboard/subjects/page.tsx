@@ -1,35 +1,32 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, BookOpen, GraduationCap, Search, X, Hash, FileText } from "lucide-react";
-
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { useCreateSubject, useDeleteSubject, useGetSubjects, useUpdateSubject } from "@/app/(hooks)/hooks/Subjects/useSubjects";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Switch } from "@/components/ui/switch";
-import { useForm } from "react-hook-form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, BookOpen, ChevronDown, FileText, GraduationCap, Hash, MoreHorizontal, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
 
 // Import hooks
-import { useGetSubjects, useCreateSubject, useUpdateSubject, useDeleteSubject } from "@/app/(hooks)/hooks/Subjects/useSubjects";
-import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-
-import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-
 // Type definitions
 export type SubjectData = {
   id: string;
@@ -181,7 +178,11 @@ function SubjectFormDialog({ open, onOpenChange, editData, onSuccess }: { open: 
               Batal
             </Button>
             <Button type="submit" disabled={createSubject.isPending || updateSubject.isPending}>
-              {createSubject.isPending || updateSubject.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createSubject.isPending || updateSubject.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -322,7 +323,13 @@ function SubjectDataTable() {
       },
       cell: ({ row }) => {
         const major = row.original.major;
-        return <div>{major ? <Badge variant="outline">{major.name}</Badge> : <Badge variant="secondary">Semua Jurusan</Badge>}</div>;
+        return (
+          <div>
+            {major ?
+              <Badge variant="outline">{major.name}</Badge>
+            : <Badge variant="secondary">Semua Jurusan</Badge>}
+          </div>
+        );
       },
       filterFn: (row, id, value) => {
         if (value === "all") return true;
@@ -421,8 +428,8 @@ function SubjectDataTable() {
     },
   ];
 
-  const table = useReactTable({
-    data: subjects,
+  const table = useReactTable<SubjectData>({
+    data: subjects as SubjectData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -615,7 +622,7 @@ function SubjectDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {table.getRowModel().rows?.length ?
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -623,8 +630,7 @@ function SubjectDataTable() {
                     ))}
                   </TableRow>
                 ))
-              ) : (
-                <TableRow>
+              : <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <FileText className="h-8 w-8 text-muted-foreground" />
@@ -646,7 +652,7 @@ function SubjectDataTable() {
                     </div>
                   </TableCell>
                 </TableRow>
-              )}
+              }
             </TableBody>
           </Table>
         </div>

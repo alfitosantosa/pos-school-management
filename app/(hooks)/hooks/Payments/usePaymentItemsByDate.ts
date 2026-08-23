@@ -1,5 +1,6 @@
+import { apiGet } from "@/lib/apiClients";
+import { PaymentItemsTypes } from "@/app/(types)";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api-client";
 
 export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPaid, skuType }: { fromdate?: Date; todate?: Date; majorId?: string; status?: string; isPaid?: boolean; skuType?: string }) => {
   // Format tanggal ke YYYY-MM-DD menggunakan timezone lokal
@@ -49,7 +50,7 @@ export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPa
         params.isPaid = String(isPaid);
       }
 
-      const response = await apiGet("/api/payment/items/filterdate", { params });
+      const response = await apiGet<PaymentItemsTypes[]>("/api/payment/items/filterdate", { params });
       return response.data;
     },
     // Selalu enabled

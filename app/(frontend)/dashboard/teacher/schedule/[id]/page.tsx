@@ -1,35 +1,35 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Calendar, Clock, Users, Search, X, CheckCircle, XCircle, AlertCircle, Download } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-
-// Import hooks
-import { useCreateAttendance, useUpdateAttendance, useDeleteAttendance } from "@/app/(hooks)/hooks/Attendances/useAttendance";
+import { useCreateAttendance, useDeleteAttendance, useUpdateAttendance } from "@/app/(hooks)/hooks/Attendances/useAttendance";
+import { useGetAttendanceByIdSchedule } from "@/app/(hooks)/hooks/Attendances/useAttendanceByIdShcedule";
 import { useGetSchedules } from "@/app/(hooks)/hooks/Schedules/useSchedules";
 import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
-import { useGetAttendanceByIdSchedule } from "@/app/(hooks)/hooks/Attendances/useAttendanceByIdShcedule";
-import { unauthorized, useParams } from "next/navigation";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { UserDataTypes } from "@/app/(types)";
+import { attendanceTypes } from "@/app/(types)/types/attendance-types";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { AlertCircle, ArrowUpDown, Calendar, CheckCircle, ChevronDown, Clock, Download, MoreHorizontal, Pencil, Search, Trash2, Users, X, XCircle } from "lucide-react";
+import { unauthorized, useParams } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
+// Import hooks
 // Type definitions
 export type AttendanceData = {
   id: string;
@@ -101,7 +101,7 @@ const DAYS_MAP = {
 };
 
 // Create/Edit Dialog Component
-function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: AttendanceData | null; onSuccess: () => void }) {
+function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: attendanceTypes | null; onSuccess: () => void }) {
   const createAttendance = useCreateAttendance();
   const updateAttendance = useUpdateAttendance();
 
@@ -181,7 +181,7 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
                   <SelectValue placeholder="Pilih Siswa" />
                 </SelectTrigger>
                 <SelectContent>
-                  {students.map((student: any) => (
+                  {students.map((student) => (
                     <SelectItem key={student.id} value={student.id}>
                       {student.name}
                     </SelectItem>
@@ -247,7 +247,11 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
               Batal
             </Button>
             <Button type="submit" disabled={createAttendance.isPending || updateAttendance.isPending}>
-              {createAttendance.isPending || updateAttendance.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createAttendance.isPending || updateAttendance.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -257,7 +261,7 @@ function AttendanceFormDialog({ open, onOpenChange, editData, onSuccess }: { ope
 }
 
 // Delete Confirmation Dialog
-function DeleteAttendanceDialog({ open, onOpenChange, attendanceData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; attendanceData: AttendanceData | null; onSuccess: () => void }) {
+function DeleteAttendanceDialog({ open, onOpenChange, attendanceData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; attendanceData: attendanceTypes | null; onSuccess: () => void }) {
   const deleteAttendance = useDeleteAttendance();
 
   const handleDelete = async () => {
@@ -305,7 +309,7 @@ function AttendanceDataTable() {
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [selectedAttendance, setSelectedAttendance] = React.useState<AttendanceData | null>(null);
+  const [selectedAttendance, setSelectedAttendance] = React.useState<attendanceTypes | null>(null);
 
   // Filter states
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
@@ -463,7 +467,7 @@ function AttendanceDataTable() {
     [schedules],
   );
 
-  const columns: ColumnDef<AttendanceData>[] = [
+  const columns: ColumnDef<attendanceTypes>[] = [
     {
       id: "select",
       header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
@@ -583,13 +587,11 @@ function AttendanceDataTable() {
         const notes = row.getValue("notes") as string;
         return (
           <div className="max-w-[200px]">
-            {notes ? (
+            {notes ?
               <div className="text-sm truncate" title={notes}>
                 {notes}
               </div>
-            ) : (
-              <span className="text-muted-foreground">-</span>
-            )}
+            : <span className="text-muted-foreground">-</span>}
           </div>
         );
       },
@@ -882,7 +884,7 @@ function AttendanceDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {table.getRowModel().rows?.length ?
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -890,8 +892,7 @@ function AttendanceDataTable() {
                     ))}
                   </TableRow>
                 ))
-              ) : (
-                <TableRow>
+              : <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <CheckCircle className="h-8 w-8 text-muted-foreground" />
@@ -916,7 +917,7 @@ function AttendanceDataTable() {
                     </div>
                   </TableCell>
                 </TableRow>
-              )}
+              }
             </TableBody>
           </Table>
         </div>

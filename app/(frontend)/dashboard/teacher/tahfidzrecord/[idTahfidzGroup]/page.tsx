@@ -1,33 +1,32 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, BookOpen, User, Star, CalendarDays } from "lucide-react";
+import { useGetQuranSurah } from "@/app/(hooks)/hooks/TahfidzRecord/useQuranSurah";
+import { useCreateTahfidzRecord, useDeleteTahfidzRecord, useGetTahfidzRecordByIdTeacher, useUpdateTahfidzRecord } from "@/app/(hooks)/hooks/TahfidzRecord/useTahfidzRecord";
+import { useGetStudentByIdTahfidzGroup } from "@/app/(hooks)/hooks/Users/useStudents";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-
-import { useCreateTahfidzRecord, useUpdateTahfidzRecord, useDeleteTahfidzRecord, useGetTahfidzRecordByIdTeacher } from "@/app/(hooks)/hooks/TahfidzRecord/useTahfidzRecord";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
+import { ArrowUpDown, BookOpen, CalendarDays, ChevronDown, FileText, MoreHorizontal, Pencil, Plus, Search, Star, Trash2, User, X } from "lucide-react";
 import { unauthorized, useParams } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetStudentByIdTahfidzGroup } from "@/app/(hooks)/hooks/Users/useStudents";
-import { useGetQuranSurah } from "@/app/(hooks)/hooks/TahfidzRecord/useQuranSurah";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type SurahQuranData = {
@@ -122,6 +121,7 @@ function TahfidzFormDialog({
     formState: { errors },
     reset,
   } = useForm<TahfidzFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(tahfidzSchema as any),
     defaultValues: {
       date: new Date().toISOString().split("T")[0],
@@ -178,17 +178,18 @@ function TahfidzFormDialog({
       };
 
       if (editData) {
-        await updateRecord.mutateAsync({ id: editData.id, ...submitData } as any);
+        await updateRecord.mutateAsync({ id: editData.id, ...submitData });
         toast.success("Rekaman tahfidz berhasil diperbarui!");
       } else {
-        await createRecord.mutateAsync(submitData as any);
+        await createRecord.mutateAsync(submitData);
         toast.success("Rekaman tahfidz berhasil dibuat!");
       }
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan";
+      toast.error(errorMessage);
     }
   };
 
@@ -199,7 +200,7 @@ function TahfidzFormDialog({
           <DialogTitle>{editData ? "Edit Rekaman Tahfidz" : "Tambah Rekaman Tahfidz Baru"}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Student & Teacher */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -334,12 +335,13 @@ function DeleteTahfidzDialog({ open, onOpenChange, recordData, onSuccess }: { op
   const handleDelete = async () => {
     if (!recordData) return;
     try {
-      await deleteRecord.mutateAsync({ id: recordData.id, studentId: recordData.studentId } as any);
+      await deleteRecord.mutateAsync({ id: recordData.id, studentId: recordData.studentId });
       toast.success("Rekaman tahfidz berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus rekaman tahfidz");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal menghapus rekaman tahfidz";
+      toast.error(errorMessage);
     }
   };
 
@@ -379,7 +381,7 @@ function TahfidzRecordDataTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedRecord, setSelectedRecord] = React.useState<TahfidzRecordData | null>(null);
 
-  const { data: session, isPending } = useSession();
+  const { data: session } = useSession();
   const { data: userData } = useGetUserByIdBetterAuth(session?.user?.id ?? "");
 
   const { data: records = [], isLoading, refetch } = useGetTahfidzRecordByIdTeacher(userData?.id as string);
@@ -393,7 +395,7 @@ function TahfidzRecordDataTable() {
 
   const handleSuccess = () => refetch();
 
-  const globalFilterFn = React.useCallback((row: any, _columnId: string, filterValue: string) => {
+  const globalFilterFn = React.useCallback((row: { original: TahfidzRecordData }, _columnId: string, filterValue: string) => {
     if (!filterValue) return true;
     const r = row.original as TahfidzRecordData;
     const text = [r.surah?.name, r.surah?.nameLatin, r.student?.name, r.teacher?.name, r.grade, r.notes, r.startVerse?.toString(), r.endVerse?.toString()].filter(Boolean).join(" ").toLowerCase();
@@ -584,7 +586,7 @@ function TahfidzRecordDataTable() {
   if (isLoading) return <Loading />;
 
   const filteredRows = table.getFilteredRowModel().rows;
-  const totalRecords = (records as any[]).length;
+  const totalRecords = (records as TahfidzRecordData[]).length;
 
   const columnLabels: Record<string, string> = {
     student: "Siswa",

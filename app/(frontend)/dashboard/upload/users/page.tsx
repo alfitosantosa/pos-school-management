@@ -4,20 +4,20 @@ import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcadem
 import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
 import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
 import { useGetRoles } from "@/app/(hooks)/hooks/Roles/useRoles";
+import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
+import { useBulkCreateUserData } from "@/app/(hooks)/hooks/Users/useBulkUsersData";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { FileText, X, Upload, Download, AlertCircle } from "lucide-react";
-import { useState } from "react";
-import { useBulkCreateUserData } from "@/app/(hooks)/hooks/Users/useBulkUsersData";
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/authClients";
+import { AlertCircle, Download, FileText, Upload, X } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import Loading from "@/components/loading";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export type typeData = {
   id: string;
@@ -155,7 +155,7 @@ function UploadUsers() {
       }
       const readXlsxFile = (await import("read-excel-file")).default;
 
-      let allUsers: any[] = [];
+      const allUsers: any[] = [];
 
       for (const file of files) {
         const rows = await readXlsxFile(file);
@@ -483,7 +483,7 @@ function UploadUsers() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rolesData.map((data: typeData) => (
+              {rolesData.map((data) => (
                 <TableRow key={data.id}>
                   <TableCell>{data.name}</TableCell>
                   <TableCell className="font-mono text-xs">{data.id}</TableCell>
@@ -508,7 +508,7 @@ function UploadUsers() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {academicYearData.map((data: typeData) => (
+              {academicYearData.map((data) => (
                 <TableRow key={data.id}>
                   <TableCell>{data.year}</TableCell>
                   <TableCell className="font-mono text-xs">{data.id}</TableCell>
@@ -533,7 +533,7 @@ function UploadUsers() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {majorsData.map((data: typeData) => (
+              {majorsData.map((data) => (
                 <TableRow key={data.id}>
                   <TableCell>{data.name}</TableCell>
                   <TableCell className="font-mono text-xs">{data.id}</TableCell>
@@ -558,7 +558,7 @@ function UploadUsers() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {classData.map((data: typeData) => (
+              {classData.map((data) => (
                 <TableRow key={data.id}>
                   <TableCell>{data.name}</TableCell>
                   <TableCell className="font-mono text-xs">{data.id}</TableCell>
@@ -582,7 +582,7 @@ function UploadUsers() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tahfidzGroupData.map((data: typeData) => (
+              {tahfidzGroupData.map((data) => (
                 <TableRow key={data.id}>
                   <TableCell>{data.name}</TableCell>
                   <TableCell className="font-mono text-xs">{data.id}</TableCell>

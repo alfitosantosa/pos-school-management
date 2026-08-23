@@ -13,9 +13,9 @@
 //   @@map("attendances")
 // }
 
-"use server";
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -49,8 +49,7 @@ export async function GET() {
     });
     return NextResponse.json(attendances);
   } catch (error) {
-    console.error("Error fetching attendances:", error);
-    return NextResponse.json({ error: "Failed to fetch attendances" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -69,8 +68,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(attendance);
   } catch (error) {
-    console.error("Error creating attendance:", error);
-    return NextResponse.json({ error: "Failed to create attendance" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 

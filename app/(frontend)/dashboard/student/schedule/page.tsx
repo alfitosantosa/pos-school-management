@@ -1,24 +1,21 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Calendar, Clock, Users, Search, X, MapPin, GraduationCap, BookOpen } from "lucide-react";
-
+import { useClassByIdUser } from "@/app/(hooks)/hooks/Classes/useClassByIdUser";
+import { useGetSchedulesByIdClass } from "@/app/(hooks)/hooks/Schedules/useScheduleByIdClass";
+import { useGetStudentById } from "@/app/(hooks)/hooks/Users/useGetStudentById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { ScheduleTypes } from "@/app/(types)/types/schedule-types";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, BookOpen, Calendar, ChevronDown, Clock, GraduationCap, MapPin, MoreHorizontal, Search, Users, X } from "lucide-react";
+import * as React from "react";
 import * as z from "zod";
-
-import { useGetSchedulesByIdClass } from "@/app/(hooks)/hooks/Schedules/useScheduleByIdClass";
-import { useClassByIdUser } from "@/app/(hooks)/hooks/Classes/useClassByIdUser";
-import { useGetStudentById } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 
 // Type definitions
 export type ScheduleData = {
@@ -111,16 +108,16 @@ export default function ScheduleDataTable() {
 
   const studentId = userData?.id;
 
-  const { data: classData, isLoading } = useClassByIdUser(studentId);
+  const { data: classData, isLoading } = useClassByIdUser(studentId as string);
 
-  const { data: studentData } = useGetStudentById(studentId);
+  const { data: studentData } = useGetStudentById(studentId as string);
 
   // Get the class id from classData
-  const classId = classData?.id;
+  const classId = classData?.id as string;
 
   // Fetch schedules by class id if available
 
-  const { data: schedules = [], isLoading: isLoadingSchedules } = useGetSchedulesByIdClass(classId ?? "");
+  const { data: schedules = [], isLoading: isLoadingSchedules } = useGetSchedulesByIdClass((classId as string) ?? "");
 
   const globalFilterFn = React.useCallback((row: any, filterValue: string) => {
     if (!filterValue) return true;
@@ -272,8 +269,8 @@ export default function ScheduleDataTable() {
     },
   ];
 
-  const table = useReactTable({
-    data: schedules,
+  const table = useReactTable<ScheduleData>({
+    data: schedules as ScheduleData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

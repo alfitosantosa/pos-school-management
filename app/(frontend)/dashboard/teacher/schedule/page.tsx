@@ -1,25 +1,24 @@
 "use client";
 
-import { useGetScheduleByIdAcademicYearActive } from "@/app/(hooks)/hooks/Schedules/useGetScheduleById";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarDays, Clock, MapPin, BookOpen, Users, GraduationCap, Eye, Plus } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { useGetAttendance } from "@/app/(hooks)/hooks/Attendances/useAttendance";
-
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { unauthorized } from "next/navigation";
-import Loading from "@/components/loading";
 import { useAttendanceIsSubmitted } from "@/app/(hooks)/hooks/Attendances/useAttendanceIsSubmitted";
+import { useGetScheduleByIdAcademicYearActive } from "@/app/(hooks)/hooks/Schedules/useGetScheduleById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { ScheduleTypes } from "@/app/(types)";
+import Loading from "@/components/loading";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSession } from "@/lib/authClients";
+import { BookOpen, CalendarDays, Clock, Eye, GraduationCap, MapPin, Plus, Users } from "lucide-react";
+import Link from "next/link";
+import { unauthorized } from "next/navigation";
+import React, { useState } from "react";
 
-const ScheduleCard = ({ schedule }: { schedule: any }) => {
+const ScheduleCard = ({ schedule }: { schedule: ScheduleTypes }) => {
   const getDayName = (dayOfWeek: number) => {
     const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
     return days[dayOfWeek];
@@ -50,15 +49,18 @@ const ScheduleCard = ({ schedule }: { schedule: any }) => {
 
   const isButtonDisabled = isSubmitted === true || !isTodaySchedule(schedule.dayOfWeek);
 
-  const getButtonText = isSubmitted ? "Sudah Diabsen" : !isTodaySchedule(schedule.dayOfWeek) ? "Bukan Hari Ini" : "Buat Absensi";
+  const getButtonText =
+    isSubmitted ? "Sudah Diabsen"
+    : !isTodaySchedule(schedule.dayOfWeek) ? "Bukan Hari Ini"
+    : "Buat Absensi";
 
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-2">
-            <CardTitle className="text-xl text-slate-900">{schedule.subject.name}</CardTitle>
-            <CardDescription className="text-base">Kode: {schedule.subject.code}</CardDescription>
+            <CardTitle className="text-xl text-slate-900">{schedule?.subject?.name}</CardTitle>
+            <CardDescription className="text-base">Kode: {schedule?.subject?.code}</CardDescription>
           </div>
           <Badge className={`${getDayColor(schedule.dayOfWeek)} border-0`} variant="secondary">
             {getDayName(schedule.dayOfWeek)}
@@ -72,7 +74,7 @@ const ScheduleCard = ({ schedule }: { schedule: any }) => {
             <div className="flex items-center gap-3">
               <Users className="h-4 w-4 text-slate-500" />
               <span className="text-slate-700">
-                <span className="font-medium">Kelas:</span> {schedule.tahfidzGroup?.name ? schedule.tahfidzGroup.name : schedule.class.name}
+                <span className="font-medium">Kelas:</span> {schedule?.tahfidzGroup?.name ? schedule?.tahfidzGroup?.name : schedule?.class?.name}
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -94,7 +96,7 @@ const ScheduleCard = ({ schedule }: { schedule: any }) => {
             <div className="flex items-center gap-3">
               <BookOpen className="h-4 w-4 text-slate-500" />
               <span className="text-slate-700">
-                <span className="font-medium">SKS:</span> {schedule.subject.credits}
+                <span className="font-medium">SKS:</span> {schedule?.subject?.credits}
               </span>
             </div>
           </div>
@@ -103,7 +105,7 @@ const ScheduleCard = ({ schedule }: { schedule: any }) => {
         <Separator className="my-4" />
 
         <div className="text-sm text-slate-600">
-          <span className="font-medium">Tahun Akademik:</span> {schedule.academicYear.year}
+          <span className="font-medium">Tahun Akademik:</span> {schedule?.academicYear?.year}
         </div>
       </CardContent>
 
@@ -167,7 +169,7 @@ function TeacherAttendancePage() {
     { value: "6", label: "Sabtu" },
   ];
   //filtered base on hour entry student at start time
-  const filteredScheduleData = selectedDay === "all" ? scheduleData : scheduleData.filter((schedule: any) => schedule.dayOfWeek.toString() === selectedDay && schedule.startTime === schedule.startTime);
+  const filteredScheduleData = selectedDay === "all" ? scheduleData : scheduleData.filter((schedule: ScheduleTypes) => schedule.dayOfWeek.toString() === selectedDay && schedule.startTime === schedule.startTime);
 
   const ScheduleCardSkeleton = () => (
     <Card>
@@ -231,19 +233,18 @@ function TeacherAttendancePage() {
           </Card>
 
           {/* Content Section */}
-          {isLoadingSchedule ? (
+          {isLoadingSchedule ?
             <div className="space-y-6">
               {[1, 2, 3].map((i) => (
                 <ScheduleCardSkeleton key={i} />
               ))}
             </div>
-          ) : scheduleError ? (
+          : scheduleError ?
             <Alert variant="destructive">
               <AlertDescription>Terjadi kesalahan saat memuat jadwal: {(scheduleError as Error).message}</AlertDescription>
             </Alert>
-          ) : (
-            <div className="space-y-6">
-              {filteredScheduleData.length === 0 ? (
+          : <div className="space-y-6">
+              {filteredScheduleData.length === 0 ?
                 <Card className="text-center py-12">
                   <CardContent>
                     <CalendarDays className="mx-auto h-12 w-12 text-slate-400 mb-4" />
@@ -251,8 +252,7 @@ function TeacherAttendancePage() {
                     <p className="text-slate-600">Tidak ada jadwal untuk hari yang dipilih.</p>
                   </CardContent>
                 </Card>
-              ) : (
-                <>
+              : <>
                   {/* Summary Badge */}
                   <div className="flex items-center gap-2 mb-4">
                     <Badge variant="secondary" className="px-3 py-1">
@@ -261,13 +261,13 @@ function TeacherAttendancePage() {
                   </div>
 
                   {/* Schedule Cards */}
-                  {filteredScheduleData.map((schedule: any) => (
+                  {filteredScheduleData.map((schedule: ScheduleTypes) => (
                     <ScheduleCard key={schedule.id} schedule={schedule} />
                   ))}
                 </>
-              )}
+              }
             </div>
-          )}
+          }
         </div>
       </div>
     </>

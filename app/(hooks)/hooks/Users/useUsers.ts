@@ -2,15 +2,16 @@
 
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { UserDataTypes } from "@/app/(types)";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetUsers = () => {
   return useQuery({
     queryKey: ["users"],
     queryFn: async () => {
       try {
-        const res = await apiGet("/api/userdata");
+        const res = await apiGet<UserDataTypes[]>("/api/userdata");
         return res.data;
       } catch (error) {
         console.error(error);
@@ -77,7 +78,7 @@ export const useGetUserById = (id: string) => {
     queryKey: ["users", id],
     queryFn: async () => {
       try {
-        const res = await apiGet(`/api/userdata/id/${id}`);
+        const res = await apiGet<UserDataTypes[]>(`/api/userdata/id/${id}`);
         return res.data;
       } catch (error) {
         console.error(error);

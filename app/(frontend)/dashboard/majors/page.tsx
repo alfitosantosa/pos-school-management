@@ -1,32 +1,31 @@
 "use client";
 
-import * as React from "react";
-import Image from "next/image";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Eye, Search, Upload, X, PenLine } from "lucide-react";
-
+import { useCreateMajor, useDeleteMajor, useGetMajors, useUpdateMajor } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { getErrorMessage, majorTypes } from "@/app/(types)";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-
-import { useGetMajors, useCreateMajor, useUpdateMajor, useDeleteMajor } from "@/app/(hooks)/hooks/Majors/useMajors";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, Eye, MoreHorizontal, Pencil, PenLine, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import Image from "next/image";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type MajorData = {
@@ -128,8 +127,8 @@ function SignatureUpload({ currentSignatureUrl, onUploadSuccess, disabled = fals
       setPreviewUrl(data.fileUrl);
       onUploadSuccess(data.fileUrl);
       toast.success("Tanda tangan berhasil diunggah!");
-    } catch (error: any) {
-      toast.error(error.message || "Gagal mengunggah tanda tangan");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     } finally {
       setIsUploading(false);
     }
@@ -260,7 +259,10 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
   const onSubmit = async (data: MajorFormValues) => {
     try {
       if (editData) {
-        await updateMajor.mutateAsync({ id: editData.id, ...data });
+        await updateMajor.mutateAsync({
+          ...data,
+          id: editData.id,
+        });
         toast.success("Branch berhasil diperbarui!");
       } else {
         await createMajor.mutateAsync(data);
@@ -269,8 +271,8 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -476,8 +478,8 @@ function DeleteMajorDialog({ open, onOpenChange, majorData, onSuccess }: { open:
       toast.success("Branch berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus Branch");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     }
   };
 

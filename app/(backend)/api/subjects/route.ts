@@ -12,8 +12,9 @@
 //   @@map("subjects")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -23,8 +24,7 @@ export async function GET() {
     });
     return NextResponse.json(subjects);
   } catch (error) {
-    console.error("Error fetching subjects:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }
 
@@ -42,11 +42,9 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(subject);
   } catch (error) {
-    console.error("Error creating subject:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }
-
 export async function PUT(request: NextRequest) {
   try {
     const { id, code, name, description, majorId, credits } = await request.json();
@@ -62,8 +60,7 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json(subject);
   } catch (error) {
-    console.error("Error updating subject:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }
 
@@ -75,7 +72,6 @@ export async function DELETE(request: NextRequest) {
     });
     return NextResponse.json({ message: "Subject deleted successfully" });
   } catch (error) {
-    console.error("Error deleting subject:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }

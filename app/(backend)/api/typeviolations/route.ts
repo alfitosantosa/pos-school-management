@@ -11,16 +11,16 @@
 //   @@map("violation_types")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
     const violationTypes = await prisma.violationType.findMany();
     return NextResponse.json(violationTypes);
   } catch (error) {
-    console.error("Error fetching violation types:", error);
-    return NextResponse.json({ error: "Failed to fetch violation types" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -39,8 +39,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(violationType);
   } catch (error) {
-    console.error("Error creating violation type:", error);
-    return NextResponse.json({ error: "Failed to create violation type" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -60,8 +59,7 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json(violationType);
   } catch (error) {
-    console.error("Error updating violation type:", error);
-    return NextResponse.json({ error: "Failed to update violation type" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -74,7 +72,6 @@ export async function DELETE(request: NextRequest) {
     });
     return NextResponse.json(violationType);
   } catch (error) {
-    console.error("Error deleting violation type:", error);
-    return NextResponse.json({ error: "Failed to delete violation type" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

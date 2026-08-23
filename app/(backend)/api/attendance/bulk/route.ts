@@ -15,9 +15,9 @@
 //   @@map("attendances")
 // }
 
-"use server";
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const { attendances } = await request.json();
@@ -28,29 +28,26 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(createdAttendances);
   } catch (error) {
-    console.error("Error creating bulk attendance:", error);
-    return NextResponse.json({ error: "Failed to create bulk attendance" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
-
 // put many attendance
 
 export async function PUT(request: NextRequest) {
   const { attendances } = await request.json();
 
   try {
-    const updatePromises = attendances.map((attendance: any) =>
+    const updatePromises = attendances.map((attendance: { id: string; [key: string]: unknown }) =>
       prisma.attendance.update({
         where: {
           id: attendance.id,
         },
         data: attendance,
-      })
+      }),
     );
     const updatedAttendances = await Promise.all(updatePromises);
     return NextResponse.json(updatedAttendances);
   } catch (error) {
-    console.error("Error updating bulk attendance:", error);
-    return NextResponse.json({ error: "Failed to update bulk attendance" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

@@ -1,31 +1,29 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, DollarSign, CheckCircle, Clock, XCircle } from "lucide-react";
-import Script from "next/script";
-
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useBulkSendWhatsApp } from "@/app/(hooks)/hooks/BotWA/useBotWA";
+import { useCreateSnapMidtransTransaction, useMidtransCheckStatusOderId, useUpdateMidtransSuccessTransaction } from "@/app/(hooks)/hooks/Midtrans/useMidtrans";
+import { useGetPaymentByStudentId } from "@/app/(hooks)/hooks/Payments/usePayment";
+import { useUpdatePaymentTransaction } from "@/app/(hooks)/hooks/Payments/usePaymentTransaction";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import Loading from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import * as z from "zod";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, CheckCircle, Clock, DollarSign, MoreHorizontal, XCircle } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import Script from "next/script";
+import * as React from "react";
 import { toast } from "sonner";
+import * as z from "zod";
 
 // Import hooks
-import { useGetPaymentByStudentId } from "@/app/(hooks)/hooks/Payments/usePayment";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useCreateSnapMidtransTransaction, useMidtransCheckStatusOderId, useUpdateMidtransSuccessTransaction } from "@/app/(hooks)/hooks/Midtrans/useMidtrans";
-import { useUpdatePaymentTransaction } from "@/app/(hooks)/hooks/Payments/usePaymentTransaction";
-import { useBulkSendWhatsApp } from "@/app/(hooks)/hooks/BotWA/useBotWA";
-
 // Declare Snap type for TypeScript
 declare global {
   interface Window {
@@ -44,7 +42,7 @@ declare global {
 }
 
 // Type definitions
-export type PaymentData = {
+export type StudentPaymentData = {
   id: string;
   studentId: string;
   paymentTypeId: string;
@@ -103,7 +101,7 @@ const paymentStatuses = [
 ];
 
 // Statistics Card Component
-function StatisticsCards({ payments }: { payments: PaymentData[] }) {
+function StatisticsCards({ payments }: { payments: Array<Pick<StudentPaymentData, "status"> & { amount: number | string }> }) {
   const totalPayments = payments.length;
   const paidPayments = payments.filter((p) => p.status === "paid").length;
   const pendingPayments = payments.filter((p) => p.status === "pending").length;
@@ -177,7 +175,7 @@ function MidtransPaymentDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  paymentData?: PaymentData | null;
+  paymentData?: StudentPaymentData | null;
   onSuccess: () => void;
   setMidtransDialogOpen?: (open: boolean) => void;
 }) {
@@ -241,7 +239,7 @@ function MidtransPaymentDialog({
     };
 
     mutationSnapMidtrans.mutate(transactionData, {
-      onSuccess: (response) => {
+      onSuccess: (response: unknown) => {
         // Check if snap is loaded
         if (typeof window.snap === "undefined") {
           toast.error("Midtrans belum siap. Silakan coba lagi.");
@@ -252,7 +250,7 @@ function MidtransPaymentDialog({
         console.log(response);
 
         // Open Snap payment popup
-        window.snap.pay(response.token, {
+        window.snap.pay((response as { token: string }).token, {
           onSuccess: function (result) {
             mutationPaymentSuccess.mutate({
               id: paymentData.id,
@@ -393,7 +391,7 @@ function PaymentDashboard({ userId }: { userId: string }) {
 
   // Dialog states
   const [midtransDialogOpen, setMidtransDialogOpen] = React.useState(false);
-  const [selectedPayment, setSelectedPayment] = React.useState<PaymentData | null>(null);
+  const [selectedPayment, setSelectedPayment] = React.useState<StudentPaymentData | null>(null);
 
   const { data: payments = [], isLoading, refetch } = useGetPaymentByStudentId(userId);
 
@@ -437,7 +435,7 @@ function PaymentDashboard({ userId }: { userId: string }) {
     return found ? found.label : status;
   };
 
-  const columns: ColumnDef<PaymentData>[] = [
+  const columns: ColumnDef<StudentPaymentData>[] = [
     {
       id: "select",
       header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
@@ -461,7 +459,7 @@ function PaymentDashboard({ userId }: { userId: string }) {
         );
       },
       cell: ({ row }) => {
-        const student = row.getValue("student") as PaymentData["student"];
+        const student = row.getValue("student") as StudentPaymentData["student"];
         return <div className="font-medium">{student?.name || "-"}</div>;
       },
     },
@@ -469,7 +467,7 @@ function PaymentDashboard({ userId }: { userId: string }) {
       accessorKey: "paymentType",
       header: "Jenis Pembayaran",
       cell: ({ row }) => {
-        const paymentType = row.getValue("paymentType") as PaymentData["paymentType"];
+        const paymentType = row.getValue("paymentType") as StudentPaymentData["paymentType"];
         return <div>{paymentType?.name || "-"}</div>;
       },
     },
@@ -569,8 +567,8 @@ function PaymentDashboard({ userId }: { userId: string }) {
     },
   ];
 
-  const table = useReactTable({
-    data: payments,
+  const table = useReactTable<StudentPaymentData>({
+    data: payments as unknown as StudentPaymentData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

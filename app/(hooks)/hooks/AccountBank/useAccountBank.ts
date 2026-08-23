@@ -1,17 +1,14 @@
 "use client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { AccountBankInput, AccountBankTypes } from "@/app/(types)";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetAccountBank = () => {
   return useQuery({
     queryKey: ["accountbank"],
     queryFn: async () => {
-      try {
-        const res = await apiGet("/api/accountbank");
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment types");
-      }
+      const res = await apiGet<AccountBankTypes[]>("/api/accountbank");
+      return res.data;
     },
   });
 };
@@ -19,7 +16,7 @@ export const useGetAccountBank = () => {
 export const useCreateAccountBank = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: AccountBankInput) => {
       const res = await apiPost("/api/accountbank", data);
       return res.data;
     },
@@ -32,7 +29,7 @@ export const useCreateAccountBank = () => {
 export const useUpdateAccountBank = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: AccountBankInput) => {
       const res = await apiPut("/api/accountbank", data);
       return res.data;
     },
@@ -58,23 +55,15 @@ export const useDeleteAccountBank = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accountbank"] });
     },
-    onError: (error: any) => {
-      console.error("Error deleting payment type:", error);
-      throw new Error(error?.response?.data?.message || "Failed to delete payment type");
-    },
   });
 };
 
 export const useGetAccountBankByIdMajor = (majorId: string) => {
   return useQuery({
-    queryKey: ["accountbank-by-id-major"],
+    queryKey: ["accountbank-by-id-major", majorId],
     queryFn: async () => {
-      try {
-        const res = await apiGet(`/api/accountbank/major/${majorId}`);
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
-      }
+      const res = await apiGet<AccountBankTypes[]>(`/api/accountbank/major/${majorId}`);
+      return res.data;
     },
   });
 };

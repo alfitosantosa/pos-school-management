@@ -1,3 +1,4 @@
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,9 +22,7 @@ export async function GET() {
 
     return NextResponse.json(getAllPaymentItems);
   } catch (error) {
-    console.error("Error fetching payment items:", error);
-
-    return NextResponse.json({ error: "Failed to fetch payment items" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -53,9 +52,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(createPaymentItems);
   } catch (error) {
-    console.error("Error creating payment item:", error);
-
-    return NextResponse.json({ error: "Failed to create payment item" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -84,9 +81,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(updatedPaymentItems);
   } catch (error) {
-    console.error("Error processing payment:", error);
-
-    return NextResponse.json({ error: "Failed to process payment" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -102,8 +97,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json(deletedPaymentItems);
   } catch (error) {
-    console.error("Error deleting payment items:", error);
-
-    return NextResponse.json({ error: "Failed to delete payment items" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
-import { NextResponse, NextRequest } from "next/server";
+import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ studentId: string }> }) {
   const { studentId } = await params;

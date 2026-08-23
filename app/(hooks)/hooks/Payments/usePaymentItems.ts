@@ -1,17 +1,14 @@
 "use client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { PaymentData, PaymentItemData, PaymentItemsInput, SetPaidInput } from "@/app/(types)";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetPaymentsItems = () => {
   return useQuery({
     queryKey: ["paymentItems"],
     queryFn: async () => {
-      try {
-        const res = await apiGet("/api/payment/items");
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payments");
-      }
+      const res = await apiGet<PaymentItemData[]>("/api/payment/items");
+      return res.data;
     },
   });
 };
@@ -19,18 +16,13 @@ export const useGetPaymentsItems = () => {
 export const useCreatePaymentItems = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
-      const res = await apiPost("/api/payment/items", data);
-      console.log(data);
+    mutationFn: async (data: PaymentItemsInput) => {
+      const res = await apiPost<PaymentItemData>("/api/payment/items", data);
       return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paymentItems"] });
       queryClient.invalidateQueries({ queryKey: ["unpaid-students"] });
-    },
-    onError: (error: any) => {
-      console.error("Update error:", error);
-      throw new Error(error?.response?.data?.error || "Failed to update payment items");
     },
   });
 };
@@ -38,9 +30,8 @@ export const useCreatePaymentItems = () => {
 export const useUpdatePaymentItems = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: PaymentItemsInput) => {
       const res = await apiPut("/api/payment/items", data);
-      console.log(data);
       return res.data;
     },
     onSuccess: () => {
@@ -52,21 +43,15 @@ export const useUpdatePaymentItems = () => {
 export const useDeletePaymentItems = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: any) => {
+    mutationFn: async (id: string) => {
       const response = await apiDelete(`/api/payment/items`, {
         body: JSON.stringify({ id }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paymentItems"] });
-    },
-    onError: (error: any) => {
-      console.error("Error deleting payment:", error);
-      throw new Error(error?.response?.data?.message || "Failed to delete payment");
     },
   });
 };
@@ -74,7 +59,7 @@ export const useDeletePaymentItems = () => {
 export const useCreatePaymentItemsBulk = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: PaymentItemsInput[]) => {
       const res = await apiPost("/api/payment/items/student/bulk", data);
       return res.data;
     },
@@ -89,12 +74,8 @@ export const useGetPaymentItemsById = (id: string) => {
   return useQuery({
     queryKey: ["paymentItems", id],
     queryFn: async () => {
-      try {
-        const res = await apiGet(`/api/payment/items/${id}`);
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
-      }
+      const res = await apiGet<PaymentItemData>(`/api/payment/items/${id}`);
+      return res.data;
     },
   });
 };
@@ -103,46 +84,21 @@ export const useGetPaymentByStudentId = (studentId: string) => {
   return useQuery({
     queryKey: ["payment-by-id", studentId],
     queryFn: async () => {
-      try {
-        const res = await apiGet(`/api/payment/student/${studentId}`);
-        // localhost:3000/api/payment/student/cmpthwv86000201mvsv7fy3s6
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
-      }
-    },
-    enabled: !!studentId, // Prevent request when studentId is empty
-  });
-};
-
-export const usePaymentTransactionSuccess = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (data: any) => {
-      const res = await apiPost("/api/payment/success", data);
+      const res = await apiGet<PaymentData[]>(`/api/payment/student/${studentId}`);
       return res.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payment-by-id"] });
-    },
-    onError: (error) => {
-      console.error(error);
-    },
+    enabled: !!studentId,
   });
 };
 
 export const usePaymentItemsUnpaidStudent = (studentId: string) => {
   return useQuery({
-    queryKey: ["unpaid-students", studentId], // ← tambahkan studentId di sini
+    queryKey: ["unpaid-students", studentId],
     queryFn: async () => {
-      try {
-        const res = await apiGet(`/api/payment/items/unpaid/student/${studentId}`);
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
-      }
+      const res = await apiGet<PaymentItemData[]>(`/api/payment/items/unpaid/student/${studentId}`);
+      return res.data ?? [];
     },
-    enabled: !!studentId, // ← query HANYA jalan jika studentId truthy
+    enabled: !!studentId,
   });
 };
 
@@ -150,26 +106,24 @@ export const usePaymentItemsByMajorId = (majorId: string) => {
   return useQuery({
     queryKey: ["payment-by-id-major", majorId],
     queryFn: async () => {
-      try {
-        const res = await apiGet(`/api/payment/items/major/${majorId}`);
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
-      }
+      const res = await apiGet<PaymentItemData[]>(`/api/payment/items/major/${majorId}`);
+      return res.data;
     },
-    enabled: !!majorId, // Prevent request when majorId is empty
+    enabled: !!majorId,
   });
 };
 
+/** Mark selected payment items as paid and link them to a payment record. */
 export const usePaymentItemsSetPaid = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: SetPaidInput) => {
       const res = await apiPost("/api/payment/items/setpaid", data);
       return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["payments-by-date"] });
       queryClient.invalidateQueries({ queryKey: ["unpaid-students"] });
       queryClient.invalidateQueries({ queryKey: ["payment-by-id-major"] });
     },
@@ -179,7 +133,7 @@ export const usePaymentItemsSetPaid = () => {
 export const BulkUploadPaymentItems = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: PaymentItemsInput[]) => {
       const res = await apiPost("/api/payment/items/bulk/upload", data);
       return res.data;
     },
@@ -194,14 +148,10 @@ export const usePaymentItemsByStudentId = (id: string) => {
   return useQuery({
     queryKey: ["payment-by-id-student", id],
     queryFn: async () => {
-      try {
-        const res = await apiGet(`/api/payment/items/student/${id}`);
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
-      }
+      const res = await apiGet<PaymentItemData[]>(`/api/payment/items/student/${id}`);
+      return res.data;
     },
-    enabled: !!id, // Prevent request when id is empty
+    enabled: !!id,
   });
 };
 
@@ -209,12 +159,8 @@ export const usePaymentItemsByFilterDate = (startDate: string, endDate: string) 
   return useQuery({
     queryKey: ["payment-items-filter-date", startDate, endDate],
     queryFn: async () => {
-      try {
-        const res = await apiGet(`/api/payment/items/filter/date?start_date=${startDate}&end_date=${endDate}`);
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch payment");
-      }
+      const res = await apiGet<PaymentItemData[]>(`/api/payment/items/filter/date?start_date=${startDate}&end_date=${endDate}`);
+      return res.data;
     },
   });
 };

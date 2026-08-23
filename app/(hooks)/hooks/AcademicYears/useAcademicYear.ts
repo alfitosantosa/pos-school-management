@@ -1,14 +1,15 @@
 "use client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { AcademicYearDataTypes } from "@/app/(types)";
 import { CACHE_STRATEGIES } from "@/app/client/providers";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetAcademicYears = () => {
   return useQuery({
     queryKey: ["academicYears"],
     queryFn: async () => {
       try {
-        const res = await apiGet("/api/academicyear");
+        const res = await apiGet<AcademicYearDataTypes[]>("/api/academicyear");
         return res.data;
       } catch (error) {
         console.error(error);

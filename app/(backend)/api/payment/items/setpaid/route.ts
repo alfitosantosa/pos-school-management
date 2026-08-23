@@ -19,6 +19,7 @@
 //   PaymentType     PaymentType @relation(fields: [paymentTypeId], references: [id])
 //   student         UserData    @relation(fields: [studentId], references: [id])
 
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -71,7 +72,6 @@ export async function POST(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error updating payment items:", error);
-    return NextResponse.json({ error: "Failed to update payment items" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

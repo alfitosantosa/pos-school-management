@@ -1,8 +1,8 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useGetConnectionBotWa } from "@/app/(hooks)/hooks/BotWA/useBotWA";
-import { Wifi, WifiOff } from "lucide-react";
+import { useGetConnectionBotWa } from '@/app/(hooks)/hooks/BotWA/useBotWA';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Wifi, WifiOff } from 'lucide-react';
 
 export default function WaPage() {
   const { data: connection, isLoading, isError } = useGetConnectionBotWa();

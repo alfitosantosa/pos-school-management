@@ -1,9 +1,10 @@
+import { attendanceTypes } from "@/app/(types)/types/attendance-types";
+import { apiGet } from "@/lib/apiClients";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api-client";
 
 export const useAttendanceByDate = ({ fromdate, todate }: { fromdate?: Date; todate?: Date }) => {
   return useQuery({
-    queryKey: ["attendances-by-date"],
+    queryKey: ["attendances-by-date", fromdate, todate],
     queryFn: async () => {
       if (!fromdate || !todate) return [];
 
@@ -15,7 +16,7 @@ export const useAttendanceByDate = ({ fromdate, todate }: { fromdate?: Date; tod
         return `${year}-${month}-${day}`;
       };
 
-      const response = await apiGet("/api/attendance/filterdate", {
+      const response = await apiGet<attendanceTypes[]>("/api/attendance/filterdate", {
         params: {
           fromdate: formatLocalDate(fromdate),
           todate: formatLocalDate(todate),

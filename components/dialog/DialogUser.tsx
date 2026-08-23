@@ -1,35 +1,35 @@
 "use client";
 
-import * as React from "react";
-import { Search, User, X, Upload, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
+import { useGetRoles } from "@/app/(hooks)/hooks/Roles/useRoles";
+import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetBetterAuthWithoutUserData } from "@/app/(hooks)/hooks/Users/useBetterAuthWithoutUserData";
+import { useBulkDeleteUserData } from "@/app/(hooks)/hooks/Users/useBulkUsersData";
+import { useCreateUser, useDeleteUser, useGetUsers, useUpdateUser } from "@/app/(hooks)/hooks/Users/useUsers";
+import { getErrorMessage, SelectOption, tahfidzGroupTypes } from "@/app/(types)";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useForm } from "react-hook-form";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { Eye, Search, Upload, User, X } from "lucide-react";
+import Image from "next/image";
+import * as React from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
 
 // Import hooks
-import { useGetUsers, useCreateUser, useUpdateUser, useDeleteUser } from "@/app/(hooks)/hooks/Users/useUsers";
-import { useGetRoles } from "@/app/(hooks)/hooks/Roles/useRoles";
-import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
-import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
-import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
-import { useGetBetterAuthWithoutUserData } from "@/app/(hooks)/hooks/Users/useBetterAuthWithoutUserData";
-import Image from "next/image";
-import { useBulkDeleteUserData } from "@/app/(hooks)/hooks/Users/useBulkUsersData";
-import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
-
 // Type definitions
 export type UserData = {
-  tahfidzGroup: any;
+  tahfidzGroup: tahfidzGroupTypes;
   id: string;
   userId?: string;
   roleId: string;
@@ -207,9 +207,10 @@ function StudentSelector({ students, selectedStudentIds = [], onSelectionChange,
 
             {/* Student List */}
             <div className="max-h-96 overflow-y-auto space-y-2 border rounded-md p-2">
-              {filteredStudents.length === 0 ?
+              {filteredStudents.length === 0 ? (
                 <div className="text-center p-8 text-muted-foreground">{searchTerm ? "Tidak ada siswa yang cocok dengan pencarian" : "Tidak ada siswa tersedia"}</div>
-              : filteredStudents.map((student) => (
+              ) : (
+                filteredStudents.map((student) => (
                   <div key={student.id} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted cursor-pointer" onClick={() => toggleStudent(student.id)}>
                     <Checkbox checked={selectedStudentIds.includes(student.id)} onCheckedChange={() => toggleStudent(student.id)} />
                     <div className="flex-1 min-w-0">
@@ -230,7 +231,7 @@ function StudentSelector({ students, selectedStudentIds = [], onSelectionChange,
                     </div>
                   </div>
                 ))
-              }
+              )}
             </div>
 
             {/* Footer with count */}
@@ -335,9 +336,9 @@ function AvatarUpload({ currentAvatarUrl, onUploadSuccess, disabled = false }: {
       setPreviewUrl(data.fileUrl);
       onUploadSuccess(data.fileUrl);
       toast.success("Avatar berhasil diunggah!");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Upload error:", error);
-      toast.error(error.message || "Gagal mengunggah avatar");
+      toast.error(getErrorMessage(error));
     } finally {
       setIsUploading(false);
     }
@@ -350,7 +351,7 @@ function AvatarUpload({ currentAvatarUrl, onUploadSuccess, disabled = false }: {
       <div className="flex gap-4 items-start">
         {/* Preview */}
         <div className="relative">
-          {previewUrl ?
+          {previewUrl ? (
             <div className="relative group">
               <Image src={previewUrl} alt="Avatar preview" width={20} height={20} className="w-24 h-24 rounded-full object-cover border-2" />
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
@@ -359,10 +360,11 @@ function AvatarUpload({ currentAvatarUrl, onUploadSuccess, disabled = false }: {
                 </Button>
               </div>
             </div>
-          : <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center border-2 border-dashed">
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center border-2 border-dashed">
               <User className="h-10 w-10 text-muted-foreground" />
             </div>
-          }
+          )}
         </div>
 
         {/* Upload Controls */}
@@ -407,7 +409,8 @@ function AvatarUpload({ currentAvatarUrl, onUploadSuccess, disabled = false }: {
 function BetterAuthSelector({ onSelect, selecteduserId, disabled = false }: { onSelect: (betterAuth: BetterAuthUser | null) => void; selecteduserId?: string; disabled?: boolean }) {
   const [open, setOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
-  const { data: betterAuths = [], isLoading: betterAuthsLoading } = useGetBetterAuthWithoutUserData();
+  const { data: betterAuthsData, isLoading: betterAuthsLoading } = useGetBetterAuthWithoutUserData();
+  const betterAuths = (betterAuthsData ?? []) as BetterAuthUser[];
 
   const filteredbetterAuths = React.useMemo(() => {
     if (!searchTerm) return betterAuths;
@@ -440,11 +443,7 @@ function BetterAuthSelector({ onSelect, selecteduserId, disabled = false }: { on
       <Label>Betterauth User (Opsional)</Label>
       <div className="flex gap-2">
         <Button type="button" variant="outline" onClick={() => setOpen(true)} disabled={disabled || betterAuthsLoading} className="flex-1 justify-start">
-          {betterAuthsLoading ?
-            "Loading..."
-          : selectedUser ?
-            `${selectedUser.name} (${selectedUser.email})`
-          : "Pilih Betterauth User"}
+          {betterAuthsLoading ? "Loading..." : selectedUser ? `${selectedUser.name} (${selectedUser.email})` : "Pilih Betterauth User"}
         </Button>
         {selectedUser && (
           <Button type="button" variant="outline" size="sm" onClick={handleClear} disabled={disabled}>
@@ -466,21 +465,23 @@ function BetterAuthSelector({ onSelect, selecteduserId, disabled = false }: { on
             </div>
 
             <div className="max-h-96 overflow-y-auto space-y-2">
-              {betterAuthsLoading ?
+              {betterAuthsLoading ? (
                 <div className="flex items-center justify-center p-8">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                 </div>
-              : filteredbetterAuths.length === 0 ?
+              ) : filteredbetterAuths.length === 0 ? (
                 <div className="text-center p-8 text-muted-foreground">{searchTerm ? "Tidak ada user yang cocok dengan pencarian" : "Tidak ada Betterauth user tersedia"}</div>
-              : filteredbetterAuths.map((user: BetterAuthUser) => (
+              ) : (
+                filteredbetterAuths.map((user: BetterAuthUser) => (
                   <div key={user.id} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted cursor-pointer" onClick={() => handleSelect(user)}>
                     <div className="flex">
-                      {user.image ?
+                      {user.image ? (
                         <Image src={user.image} alt={`${user.name}`} width={20} height={20} className="h-10 w-10 rounded-full" />
-                      : <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
                           <User className="h-5 w-5" />
                         </div>
-                      }
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{user.name}</p>
@@ -493,7 +494,7 @@ function BetterAuthSelector({ onSelect, selecteduserId, disabled = false }: { on
                     )}
                   </div>
                 ))
-              }
+              )}
             </div>
           </div>
         </DialogContent>
@@ -516,7 +517,7 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
   const { data: majors = [], isLoading: majorsLoading } = useGetMajors();
 
   const students = React.useMemo(() => {
-    return users.filter((user: any) => user.role?.name.trim() === "Student");
+    return users.filter((user) => user.role?.name.trim() === "Student");
   }, [users]);
 
   const {
@@ -537,7 +538,7 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
   const selectedRoleId = watch("roleId");
   const selecteduserId = watch("userId");
   const selectedStudentIds = watch("studentIds") || [];
-  const selectedRole = roles.find((role: any) => role.id === selectedRoleId);
+  const selectedRole = roles.find((role) => role.id === selectedRoleId);
 
   React.useEffect(() => {
     if (editData) {
@@ -588,7 +589,7 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
   const onSubmit = async (data: UserFormValues) => {
     try {
       // Prepare base data - HANYA field yang ada di UserData schema
-      const submitData: any = {
+      const submitData: Record<string, unknown> = {
         name: data.name,
         email: data.email || null,
         roleId: data.roleId || null,
@@ -649,9 +650,9 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error details:", error);
-      toast.error(error.message || "Terjadi kesalahan");
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -703,16 +704,17 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">— Tidak ada —</SelectItem>
-                    {classesLoading ?
+                    {classesLoading ? (
                       <SelectItem value="" disabled>
                         Loading...
                       </SelectItem>
-                    : classes.map((cls: any) => (
+                    ) : (
+                      classes.map((cls: SelectOption) => (
                         <SelectItem key={cls.id} value={cls.id}>
                           {cls.name}
                         </SelectItem>
                       ))
-                    }
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -724,16 +726,17 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">— Tidak ada —</SelectItem>
-                    {tahfidzGroupsLoading ?
+                    {tahfidzGroupsLoading ? (
                       <SelectItem value="" disabled>
                         Loading...
                       </SelectItem>
-                    : tahfidzGroups.map((tahfidzGroup: any) => (
+                    ) : (
+                      tahfidzGroups.map((tahfidzGroup) => (
                         <SelectItem key={tahfidzGroup.id} value={tahfidzGroup.id}>
                           {tahfidzGroup.name}
                         </SelectItem>
                       ))
-                    }
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -746,16 +749,17 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
                     <SelectValue placeholder="Pilih Branch" />
                   </SelectTrigger>
                   <SelectContent>
-                    {majorsLoading ?
+                    {majorsLoading ? (
                       <SelectItem value="" disabled>
                         Loading...
                       </SelectItem>
-                    : majors.map((major: any) => (
+                    ) : (
+                      majors.map((major) => (
                         <SelectItem key={major.id} value={major.id}>
                           {major.name}
                         </SelectItem>
                       ))
-                    }
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -766,16 +770,17 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
                     <SelectValue placeholder="Pilih tahun akademik" />
                   </SelectTrigger>
                   <SelectContent>
-                    {academicYearsLoading ?
+                    {academicYearsLoading ? (
                       <SelectItem value="" disabled>
                         Loading...
                       </SelectItem>
-                    : academicYears.map((year: any) => (
+                    ) : (
+                      academicYears.map((year: any) => (
                         <SelectItem key={year.id} value={year.id}>
                           {year.year}
                         </SelectItem>
                       ))
-                    }
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -833,11 +838,13 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
         return (
           <>
             {/* Student Selection for Parent */}
-            {userLoading ?
+            {userLoading ? (
               <div className="flex items-center justify-center h-20 border rounded-md">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
               </div>
-            : <StudentSelector students={students} selectedStudentIds={selectedStudentIds} onSelectionChange={(studentIds) => setValue("studentIds", studentIds)} disabled={createUser.isPending || updateUser.isPending} />}
+            ) : (
+              <StudentSelector students={students as UserData[]} selectedStudentIds={selectedStudentIds} onSelectionChange={(studentIds) => setValue("studentIds", studentIds)} disabled={createUser.isPending || updateUser.isPending} />
+            )}
 
             <div className="space-y-2">
               <Label>Hubungan *</Label>
@@ -914,16 +921,17 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
                     <SelectValue placeholder="Pilih Branch" />
                   </SelectTrigger>
                   <SelectContent>
-                    {majorsLoading ?
+                    {majorsLoading ? (
                       <SelectItem value="" disabled>
                         Loading...
                       </SelectItem>
-                    : majors.map((major: any) => (
+                    ) : (
+                      majors.map((major) => (
                         <SelectItem key={major.id} value={major.id}>
                           {major.name}
                         </SelectItem>
                       ))
-                    }
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -1047,11 +1055,7 @@ export function UserFormDialog({ open, onOpenChange, editData, onSuccess }: { op
               Batal
             </Button>
             <Button type="submit" disabled={createUser.isPending || updateUser.isPending}>
-              {createUser.isPending || updateUser.isPending ?
-                "Loading..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createUser.isPending || updateUser.isPending ? "Loading..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -1130,12 +1134,13 @@ export function DeleteUserBulkDialog({ open, onOpenChange, userDatas, onSuccess 
                 <div className="max-h-60 overflow-y-auto space-y-2 rounded-md border p-3 bg-muted/30">
                   {userDatas.map((data) => (
                     <div key={data.id} className="flex items-center gap-3 p-2 rounded-md bg-background border">
-                      {data.avatarUrl ?
+                      {data.avatarUrl ? (
                         <Image src={data.avatarUrl} alt={data.name} width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
-                      : <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                           <User className="h-4 w-4 text-muted-foreground" />
                         </div>
-                      }
+                      )}
 
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{data.name}</p>

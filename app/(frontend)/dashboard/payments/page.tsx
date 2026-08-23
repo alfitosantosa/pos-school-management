@@ -1,108 +1,43 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, Receipt, Building2, BadgeCheck, Clock, XCircle, Package, FileDown } from "lucide-react";
+import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoice";
+import { useGetAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
+import { useCreatePayment, useDeletePayment, useUpdatePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
+import { usePaymentsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
+import { usePaymentItemsSetPaid, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { AccountBankTypes, PaymentData, PaymentItemData, UserDataTypes } from "@/app/(types)";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import { DatePickerTime } from "@/components/date/datePickerTime";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { StudentCombobox } from "@/components/ui/student-combobox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
+import { errorHandlerFrontend } from "@/lib/errorHandlerFrontend";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-
-import { useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
-import { usePaymentItemsSetPaid, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
-import { useGetAccountBank } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
-import Loading from "@/components/loading";
-import { StudentCombobox } from "@/components/ui/student-combobox";
-import { useSession } from "@/lib/auth-client";
+import { ArrowUpDown, BadgeCheck, Building2, CalendarDays, ChevronDown, Clock, CreditCard, FileDown, FileText, MoreHorizontal, Package, Pencil, Plus, Receipt, Search, Trash2, User, X, XCircle } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { v4 as uuidv4 } from "uuid";
-import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoice";
-import { DatePickerWithRange } from "@/components/date/datePicker";
+import * as React from "react";
 import { DateRange } from "react-day-picker";
-import { usePaymentsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
-import { DatePickerTime } from "@/components/date/datePickerTime";
-import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-export type PaymentTypeData = {
-  id: string;
-  name: string;
-  description: string;
-  amount: string;
-  isMonthly: boolean;
-  isActive: boolean;
-  isFixedAmount: boolean;
-  isFixedQuantity: boolean;
-  quantity: string;
-  subtotal: string;
-  owner: string;
-  majorId: string;
-};
-
-export type PaymentItemData = {
-  id: string;
-  paymentId: string | null;
-  studentId: string;
-  paymentTypeId: string;
-  month: string;
-  year: string;
-  isPaid: boolean;
-  isMonthly: boolean;
-  isActive: boolean;
-  isFixedAmount: boolean;
-  isFixedQuantity: boolean;
-  quantity: number;
-  amount: number;
-  subtotal: number;
-  name: string;
-  skuType: string;
-  paymentType?: PaymentTypeData;
-};
-
-export type PaymentData = {
-  id: string;
-  studentId: string;
-  bendaharaId: string;
-  amount: number | string;
-  dueDate?: string;
-  status: string;
-  notes?: string;
-  createdAt: string;
-  paymentDate: string;
-  transferDate: string;
-  receiptNumber: string;
-  bankRef: string;
-  accountBankId: string;
-  majorId: string;
-  month: string;
-  student?: {
-    id: string;
-    name: string;
-    parentPhone: string;
-    class: {
-      name: string;
-    };
-  };
-  major?: { id: string; name: string; adminName: string; signatureUrl: string };
-  accountBank?: { id: string; accountName: string; accountBank?: string; accountNumber: string };
-  paymentItems?: PaymentItemData[];
-};
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
+import * as z from "zod";
 
 // ─── Status Config ────────────────────────────────────────────────────────────
 const statusConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
@@ -251,7 +186,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
     ];
 
     // ── 8. Freeze pane: bekukan 3 baris header + 2 kolom kiri ─────────────
-    ws2["!freeze"] = { xSplit: 2, ySplit: 3 } as any;
+    ws2["!freeze"] = { xSplit: 2, ySplit: 3 };
 
     // ── 9. Simpan ke file ─────────────────────────────────────────────────
     const wb = XLSX.utils.book_new();
@@ -259,9 +194,10 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
     XLSX.writeFile(wb, filename);
 
     toast.success(`${data.length} data pembayaran berhasil diexport!`);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Export error:", error);
-    toast.error("Gagal mengexport data: " + (error?.message ?? "Unknown error"));
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    toast.error("Gagal mengexport data: " + msg);
   }
 }
 
@@ -355,14 +291,8 @@ function PaymentFormDialog({
   onOpenChange: (open: boolean) => void;
   editData?: PaymentData | null;
   onSuccess: () => void;
-  allStudents: any[];
-  allAccountBanks: {
-    id: string;
-    accountName: string;
-    accountBank?: string;
-    accountNumber: string;
-    major: { name: string };
-  }[];
+  allStudents: UserDataTypes[];
+  allAccountBanks: AccountBankTypes[];
   userDataId?: string;
   userDataMajorId?: string;
 }) {
@@ -395,6 +325,7 @@ function PaymentFormDialog({
     formState: { errors },
     reset,
   } = useForm<PaymentFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(paymentSchema as any),
     defaultValues: {
       status: "pending",
@@ -607,8 +538,9 @@ function PaymentFormDialog({
       setTotalTransfer("");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Terjadi kesalahan";
+      toast.error(msg);
     }
   };
 
@@ -787,7 +719,7 @@ function PaymentFormDialog({
               </Label>
             </div>
 
-            {errors.items && typeof errors.items === "object" && "message" in errors.items && <p className="text-sm text-red-500">{(errors.items as any).message}</p>}
+            {errors.items && typeof errors.items === "object" && "message" in errors.items && <p className="text-sm text-red-500">{(errors.items as { message?: string }).message}</p>}
 
             {!selectedStudentId && (
               <div className="text-center p-8 border rounded-lg bg-muted/20">
@@ -984,8 +916,8 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
       toast.success("Pembayaran berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus pembayaran");
+    } catch (error) {
+      errorHandlerFrontend(error);
     }
   };
 
@@ -1072,9 +1004,9 @@ function PaymentDataTable({
   const { data: allAccountBanks = [] } = useGetAccountBank();
 
   // Callback hooks
-  const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
+  const globalFilterFn = React.useCallback((row: import("@tanstack/react-table").Row<PaymentData>, _: string, filterValue: string) => {
     if (!filterValue) return true;
-    const p = row.original as PaymentData;
+    const p = row.original;
     const text = [p.student?.name, p.major?.name, p.accountBank?.accountName, p.accountBank?.accountBank, p.receiptNumber, p.month, p.status, p.notes].filter(Boolean).join(" ").toLowerCase();
     return text.includes(filterValue.toLowerCase());
   }, []);
@@ -1266,7 +1198,7 @@ function PaymentDataTable({
                 <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.id)}>Copy ID Pembayaran</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.receiptNumber)}>Copy No. Kwitansi</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => createPDFKwitansi(p as any)}>
+                <DropdownMenuItem onClick={() => createPDFKwitansi(p as unknown as Parameters<typeof createPDFKwitansi>[0])}>
                   <FileDown className="mr-2 h-4 w-4" />
                   Invoice PDF
                 </DropdownMenuItem>
@@ -1300,7 +1232,7 @@ function PaymentDataTable({
   );
 
   const table = useReactTable({
-    data: payments as PaymentData[],
+    data: payments,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -1326,7 +1258,7 @@ function PaymentDataTable({
   if (isLoading) return <Loading />;
 
   const filteredRows = table.getFilteredRowModel().rows;
-  const totalPayments = (payments as any[]).length;
+  const totalPayments = payments.length;
   const totalPaid = filteredRows.filter((r) => r.original.status === "paid").reduce((sum, r) => sum + parseFloat(String(r.original.amount)), 0);
 
   const columnLabels: Record<string, string> = {
@@ -1422,7 +1354,7 @@ function PaymentDataTable({
           <Button
             onClick={async () => {
               setIsExporting(true);
-              await exportToExcel(payments as PaymentData[]);
+              await exportToExcel(payments);
               setIsExporting(false);
             }}
             disabled={isExporting}

@@ -1,10 +1,9 @@
-import { betterAuth } from "better-auth";
-import { nextCookies } from "better-auth/next-js";
-import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@/prisma/generated/client";
-import { admin } from "better-auth/plugins";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { openAPI } from "better-auth/plugins";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
+import { admin, openAPI } from "better-auth/plugins";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,

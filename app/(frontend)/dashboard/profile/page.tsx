@@ -1,12 +1,10 @@
 // app/page.tsx
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import { useSession } from "@/lib/auth-client";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -203,7 +201,6 @@ export default function Home() {
 
   if (userLoading) return <UserProfileSkeleton />;
   if (!user || !user.id) return <NoUserDataComponent authUser={session?.user} />;
-  if (user?.error) return <ErrorComponent error={user?.error} />;
 
   // Extract nested objects
   const { class: classData, major, academicYear, role, user: userData, ...mainData } = user;

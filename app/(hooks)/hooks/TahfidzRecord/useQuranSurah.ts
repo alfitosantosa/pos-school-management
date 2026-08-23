@@ -1,6 +1,6 @@
 "use client";
+import { apiGet } from "@/lib/apiClients";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api-client";
 
 export type SurahQuranData = {
   id: string;

@@ -1,17 +1,25 @@
 "use client";
+import { ClassDataTypes } from "@/app/(types)";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+
+// Add explicit return type to the hook
+// export const useGetItems = () => {
+//   return useQuery<ItemType[]>({  // ← Generic type here
+//     queryKey: ["items"],
+//     queryFn: async (): Promise<ItemType[]> => {  // ← Return type here
+//       const res = await apiGet<ItemType[]>("/api/items");  // ← Generic here too
+//       return res.data;
+//     },
+//   });
+// };
 
 export const useGetClasses = () => {
-  return useQuery({
+  return useQuery<ClassDataTypes[]>({
     queryKey: ["classes"],
     queryFn: async () => {
-      try {
-        const res = await apiGet("/api/class");
-        return res.data;
-      } catch (error: any) {
-        throw new Error(error?.response?.data?.message || "Failed to fetch classes");
-      }
+      const res = await apiGet<ClassDataTypes[]>("/api/class");
+      return res.data;
     },
   });
 };

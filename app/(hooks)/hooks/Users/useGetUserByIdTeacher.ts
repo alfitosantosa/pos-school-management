@@ -2,8 +2,8 @@
 
 // app/api/users/teacher/[id]
 
+import { apiGet } from "@/lib/apiClients";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api-client";
 
 export const useGetUserByIdTeacher = (id: string) => {
   return useQuery({

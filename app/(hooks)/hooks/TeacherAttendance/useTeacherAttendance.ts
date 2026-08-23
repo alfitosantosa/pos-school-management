@@ -1,8 +1,8 @@
 "use client";
 
+import type { BulkTeacherAttendanceInput, CreateTeacherAttendanceInput, TeacherAttendanceRecord, TeacherAttendanceReport, UpdateTeacherAttendanceInput } from "@/app/(types)/types/teacher-attendance-types";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/api-client";
-import type { CreateTeacherAttendanceInput, UpdateTeacherAttendanceInput, BulkTeacherAttendanceInput, TeacherAttendanceRecord, TeacherAttendanceReport } from "@/app/types/teacher-attendance";
 
 export const useGetTeacherAttendance = (date?: string, teacherId?: string) => {
   const params = new URLSearchParams();

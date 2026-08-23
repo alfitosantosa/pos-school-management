@@ -1,9 +1,10 @@
 // app/api/payment/items/dashboard/route.ts
 "use server";
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/prisma/generated/client";
+import { NextRequest, NextResponse } from "next/server";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -135,12 +136,6 @@ export async function GET(request: NextRequest) {
   const todate = searchParams.get("todate");
   const majorId = searchParams.get("majorId") ?? undefined;
   const skuType = searchParams.get("skuType") ?? undefined;
-  // Default focus: unpaid (isPaid=false). Bisa di-override via query param.
-  const isPaidRaw = searchParams.get("isPaid");
-  const isPaid =
-    isPaidRaw === null ?
-      false // ← default ke false (unpaid dashboard)
-    : isPaidRaw === "true"; //   atau sesuai param yang dikirim
 
   // ── 1. Validate dates ───────────────────────────────────────────────────
   const dateResult = parseAndValidateDate(fromdate, todate);
@@ -341,16 +336,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("[payment/items/dashboard] Error:", error);
-
-    // Jangan expose detail error ke client di production
-    const message =
-      process.env.NODE_ENV === "development" ?
-        error instanceof Error ?
-          error.message
-        : String(error)
-      : "Terjadi kesalahan pada server";
-
-    return NextResponse.json({ error: "Failed to fetch payment items dashboard", detail: message }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

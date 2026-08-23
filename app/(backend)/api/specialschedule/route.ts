@@ -13,8 +13,9 @@
 //   @@map("calendar_events")
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -38,8 +39,7 @@ export async function GET() {
     });
     return NextResponse.json(specialSchedules);
   } catch (error) {
-    console.error("Error fetching special schedules:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }
 
@@ -51,8 +51,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(specialSchedule);
   } catch (error) {
-    console.error("Error creating special schedule:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }
 
@@ -65,8 +64,7 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json(specialSchedule);
   } catch (error) {
-    console.error("Error updating special schedule:", error);
-    return NextResponse.error();
+    return handlePrismaError(error);
   }
 }
 

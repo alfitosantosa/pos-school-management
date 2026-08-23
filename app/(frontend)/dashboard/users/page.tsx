@@ -1,30 +1,26 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, BookOpen, GraduationCap, User, Mail, Shield, Image as ImageIcon } from "lucide-react";
-
+import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
+import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
+import { useGetBetterAuth } from "@/app/(hooks)/hooks/Users/useBetterAuth";
+import { useGetUsers } from "@/app/(hooks)/hooks/Users/useUsers";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { BetterAuthUser, DeleteUserBulkDialog, DeleteUserDialog, UserData, UserFormDialog } from "@/components/dialog/DialogUser";
+import Loading from "@/components/loading";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { useSession } from "@/lib/authClients";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, BookOpen, ChevronDown, GraduationCap, Image as ImageIcon, Mail, MoreHorizontal, Pencil, Plus, Shield, Trash2, User } from "lucide-react";
+import Image from "next/image";
+import * as React from "react";
 
 // Import hooks
-import { useGetUsers } from "@/app/(hooks)/hooks/Users/useUsers";
-import { useGetBetterAuth } from "@/app/(hooks)/hooks/Users/useBetterAuth";
-
 // Import dialog components
-import { UserFormDialog, DeleteUserDialog, UserData, BetterAuthUser, DeleteUserBulkDialog } from "@/components/dialog/DialogUser";
-import Image from "next/image";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { unauthorized } from "next/navigation";
-import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
-import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzGroup";
-
 // Dashboard Component - Only rendered after role verification
 function UserDashboard() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -59,11 +55,11 @@ function UserDashboard() {
 
   // Get unique values for filters
   const uniqueRoles = React.useMemo(() => {
-    return Array.from(new Set(usersData.map((user: UserData) => user.role?.name).filter(Boolean)));
+    return Array.from(new Set(usersData.map((user) => user.role?.name).filter(Boolean)));
   }, [usersData]);
 
   const uniqueClasses = React.useMemo(() => {
-    return Array.from(new Set(usersData.map((user: UserData) => user.class?.name).filter(Boolean)));
+    return Array.from(new Set(usersData.map((user) => user.class?.name).filter(Boolean)));
   }, [usersData]);
 
   const { data: classesData, isLoading: isLoadingClasses } = useGetClasses();
@@ -71,7 +67,7 @@ function UserDashboard() {
   const { data: tahfidzGroupsData, isLoading: isLoadingTahfidzGroups } = useGetTahfidzGroup();
 
   const uniqueMajors = React.useMemo(() => {
-    return Array.from(new Set(usersData.map((user: UserData) => user.major?.name).filter(Boolean)));
+    return Array.from(new Set(usersData.map((user) => user.major?.name).filter(Boolean)));
   }, [usersData]);
 
   // Define columns with useMemo to prevent recreation
@@ -371,7 +367,7 @@ function UserDashboard() {
   // Initialize table
   const table = useReactTable({
     data: usersData,
-    columns,
+    columns: columns as unknown as ColumnDef<(typeof usersData)[number]>[],
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -673,7 +669,12 @@ function UserDashboard() {
       <UserFormDialog open={createDialogOpen} onOpenChange={handleCloseCreateDialog} onSuccess={handleSuccess} />
       <UserFormDialog open={editDialogOpen} onOpenChange={handleCloseEditDialog} editData={selectedUser} onSuccess={handleSuccess} />
       <DeleteUserDialog open={deleteDialogOpen} onOpenChange={handleCloseDeleteDialog} userData={selectedUser} onSuccess={handleSuccess} />
-      <DeleteUserBulkDialog open={deleteBulkDialogOpen} onOpenChange={handleCloseBulkDeleteDialog} userDatas={table.getSelectedRowModel().rows.map((row) => row.original)} onSuccess={handleSuccess} />
+      <DeleteUserBulkDialog
+        open={deleteBulkDialogOpen}
+        onOpenChange={handleCloseBulkDeleteDialog}
+        userDatas={table.getSelectedRowModel().rows.map((row) => row.original) as UserData[]}
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }

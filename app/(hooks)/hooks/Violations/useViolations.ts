@@ -1,12 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api-client";
+import { ViolationInput, ViolationTypes } from "@/app/(types)";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetViolations = () => {
   return useQuery({
     queryKey: ["violations"],
     queryFn: async () => {
       try {
-        const response = await apiGet("/api/violations");
+        const response = await apiGet<ViolationTypes[]>("/api/violations");
         return response.data;
       } catch (error) {
         console.error(error);
@@ -18,7 +19,7 @@ export const useGetViolations = () => {
 export const useCreateViolation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: ViolationInput) => {
       const response = await apiPost("/api/violations", data);
       return response.data;
     },
@@ -34,7 +35,7 @@ export const useCreateViolation = () => {
 export const useUpdateViolation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: ViolationInput) => {
       const response = await apiPut("/api/violations", data);
       return response.data;
     },

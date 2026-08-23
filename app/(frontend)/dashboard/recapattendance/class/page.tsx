@@ -1,23 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, AlertCircle, XCircle, Calendar, Users, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import { useGetAttendanceByClass } from "@/app/(hooks)/hooks/Attendances/useAttendanceByClass";
 import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
 import { useGetStudents } from "@/app/(hooks)/hooks/Users/useStudents";
-import { useGetAttendanceByClass } from "@/app/(hooks)/hooks/Attendances/useAttendanceByClass";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { attendanceTypes } from "@/app/(types)/types/attendance-types";
+import { ClassDataTypes } from "@/app/(types)/types/class-types";
+import { UserDataTypes } from "@/app/(types)/types/userData";
+import Loading from "@/components/loading";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSession } from "@/lib/authClients";
+import { exportClassAttendanceDailyToExcel } from "@/lib/export/exportClassAttendance";
+import { DEFAULT_AVATAR } from "@/lib/imageLoader";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import Loading from "@/components/loading";
-import { ImageWithFallback } from "@/components/ui/image-with-fallback";
-import { DEFAULT_AVATAR } from "@/lib/image-loader";
-import { exportClassAttendanceDailyToExcel } from "@/lib/export/exportClassAttendance";
-import { useSession } from "@/lib/auth-client";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { AlertCircle, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Clock, Download, Users, XCircle } from "lucide-react";
 import { unauthorized } from "next/navigation";
+import { useState } from "react";
 
 const STATUS_CONFIG = {
   present: { label: "Hadir", bg: "bg-green-100", text: "text-green-800", icon: CheckCircle2 },
@@ -40,7 +43,7 @@ function getDefaultEndDate() {
 function RecapAttendanceByClass() {
   const { data: classes = [], isLoading: isLoadingClasses } = useGetClasses();
   const { data: students = [], isLoading: isLoadingStudents } = useGetStudents();
-  const [selectedClass, setSelectedClass] = useState<any>(null);
+  const [selectedClass, setSelectedClass] = useState<ClassDataTypes | null>(null);
   const [startDate, setStartDate] = useState(getDefaultStartDate());
   const [endDate, setEndDate] = useState(getDefaultEndDate());
   const [currentPage, setCurrentPage] = useState(0);
@@ -49,12 +52,12 @@ function RecapAttendanceByClass() {
   const { data: attendanceResponse, isLoading } = useGetAttendanceByClass(selectedClass?.id, startDate, endDate);
 
   // Extract data from response
-  const rawAttendanceData = attendanceResponse?.attendance || [];
-  const classStudents = attendanceResponse?.students || [];
+  const rawAttendanceData = attendanceResponse?.data?.attendances || [];
+  const classStudents = attendanceResponse?.data?.students || [];
 
   // Deduplicate attendance: one record per student per day
   const uniqueAttendanceMap = new Map();
-  rawAttendanceData.forEach((attendance: any) => {
+  rawAttendanceData.forEach((attendance: attendanceTypes) => {
     if (!attendance.date || !attendance.studentId) return;
     const dateStr = format(new Date(attendance.date), "yyyy-MM-dd");
     const key = `${attendance.studentId}-${dateStr}`;
@@ -63,11 +66,14 @@ function RecapAttendanceByClass() {
   const attendanceData = Array.from(uniqueAttendanceMap.values());
 
   // Use students from attendance response if available, otherwise filter from all students
-  const filteredStudents = classStudents.length > 0 ? classStudents : selectedClass ? students.filter((student: any) => student.classId === selectedClass.id) : [];
+  const filteredStudents =
+    classStudents.length > 0 ? classStudents
+    : selectedClass ? students.filter((student: UserDataTypes) => student.classId === selectedClass.id)
+    : [];
 
   // Group attendance by date
-  const attendanceByDate: Record<string, any[]> = {};
-  attendanceData.forEach((attendance: any) => {
+  const attendanceByDate: Record<string, attendanceTypes[]> = {};
+  attendanceData.forEach((attendance: attendanceTypes) => {
     if (!attendance.date) return;
     const date = format(new Date(attendance.date), "yyyy-MM-dd");
     if (!attendanceByDate[date]) {
@@ -83,11 +89,11 @@ function RecapAttendanceByClass() {
   // Calculate statistics
   const stats = {
     total: attendanceData.length,
-    present: attendanceData.filter((a: any) => a.status === "present").length,
-    late: attendanceData.filter((a: any) => a.status === "late").length,
-    sick: attendanceData.filter((a: any) => a.status === "sick").length,
-    excused: attendanceData.filter((a: any) => a.status === "excused").length,
-    absent: attendanceData.filter((a: any) => a.status === "absent").length,
+    present: attendanceData.filter((a) => a.status === "present").length,
+    late: attendanceData.filter((a) => a.status === "late").length,
+    sick: attendanceData.filter((a) => a.status === "sick").length,
+    excused: attendanceData.filter((a) => a.status === "excused").length,
+    absent: attendanceData.filter((a) => a.status === "absent").length,
   };
 
   const handleExportDaily = async () => {
@@ -129,10 +135,10 @@ function RecapAttendanceByClass() {
                   value={selectedClass?.id || ""}
                   onValueChange={(value) => {
                     if (value === "all") {
-                      setSelectedClass({ id: "all", name: "Semua Kelas" });
+                      setSelectedClass({ id: "all", name: "Semua Kelas" } as ClassDataTypes);
                     } else {
-                      const classData = classes.find((c: any) => c.id === value);
-                      setSelectedClass(classData);
+                      const classData = classes.find((c: ClassDataTypes) => c.id === value);
+                      setSelectedClass(classData || null);
                     }
                     setCurrentPage(0);
                   }}
@@ -147,7 +153,7 @@ function RecapAttendanceByClass() {
                         <span>Semua Kelas</span>
                       </div>
                     </SelectItem>
-                    {classes.map((classItem: any) => (
+                    {classes.map((classItem: ClassDataTypes) => (
                       <SelectItem key={classItem.id} value={classItem.id}>
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4" />
@@ -239,20 +245,19 @@ function RecapAttendanceByClass() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
-                {isLoading ? (
+                {isLoading ?
                   <div className="space-y-4">
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
-                ) : paginatedDates.length === 0 ? (
+                : paginatedDates.length === 0 ?
                   <div className="py-12 text-center">
                     <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                     <p className="text-gray-500 font-medium">Tidak ada data absensi</p>
                     <p className="text-sm text-gray-400 mt-1">Silakan pilih periode lain</p>
                   </div>
-                ) : (
-                  <div className="space-y-4">
+                : <div className="space-y-4">
                     {paginatedDates.map((date) => {
                       const dailyAttendances = attendanceByDate[date] || [];
 
@@ -263,7 +268,7 @@ function RecapAttendanceByClass() {
                               <h3 className="font-semibold text-gray-900">{format(new Date(date), "EEEE, dd MMMM yyyy", { locale: id })}</h3>
                               <div className="flex flex-wrap gap-2">
                                 {Object.entries(STATUS_CONFIG).map(([key, config]) => {
-                                  const count = dailyAttendances.filter((a: any) => a.status === key).length;
+                                  const count = dailyAttendances.filter((a: attendanceTypes) => a.status === key).length;
                                   if (count === 0) return null;
                                   const Icon = config.icon;
                                   return (
@@ -278,12 +283,11 @@ function RecapAttendanceByClass() {
                           </div>
 
                           <div className="p-4 bg-white">
-                            {dailyAttendances.length === 0 ? (
+                            {dailyAttendances.length === 0 ?
                               <p className="text-sm text-gray-500 text-center py-4">Tidak ada data kehadiran</p>
-                            ) : (
-                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {dailyAttendances.map((attendance: any) => {
-                                  const student = filteredStudents.find((s: any) => s.id === attendance.studentId);
+                            : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {dailyAttendances.map((attendance: attendanceTypes) => {
+                                  const student = filteredStudents.find((s: UserDataTypes) => s.id === attendance.studentId);
                                   const config = STATUS_CONFIG[attendance.status as keyof typeof STATUS_CONFIG];
 
                                   if (!config) return null;
@@ -305,13 +309,13 @@ function RecapAttendanceByClass() {
                                   );
                                 })}
                               </div>
-                            )}
+                            }
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                )}
+                }
 
                 {/* Pagination */}
                 {totalPages > 1 && (
@@ -320,11 +324,11 @@ function RecapAttendanceByClass() {
                       Halaman {currentPage + 1} dari {totalPages}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setCurrentPage((p: number) => Math.max(0, p - 1))} disabled={currentPage === 0}>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentPage((p) => Math.max(0, p - 1))} disabled={currentPage === 0}>
                         <ChevronLeft className="h-4 w-4 mr-1" />
                         Sebelumnya
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => setCurrentPage((p: number) => Math.min(totalPages - 1, p + 1))} disabled={currentPage >= totalPages - 1}>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))} disabled={currentPage >= totalPages - 1}>
                         Selanjutnya
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>

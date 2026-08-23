@@ -1,31 +1,30 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Shield, Users } from "lucide-react";
-
+import { useCreateRole, useDeleteRole, useGetRoles, useUpdateRole } from "@/app/(hooks)/hooks/Roles/useRoles";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { RoleDataTypes } from "@/app/(types)";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Pencil, Plus, Shield, Trash2, Users } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
 
 // Import hooks (Anda perlu membuat hooks ini sesuai dengan API backend)
-import { useGetRoles, useCreateRole, useUpdateRole, useDeleteRole } from "@/app/(hooks)/hooks/Roles/useRoles";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-
 // Type definitions
 export type RoleData = {
   id: string;
@@ -172,7 +171,7 @@ const availablePermissions = [
 ];
 
 // Create/Edit Dialog Component
-function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: RoleData | null; onSuccess: () => void }) {
+function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: RoleDataTypes | null; onSuccess: () => void }) {
   const createRole = useCreateRole();
   const updateRole = useUpdateRole();
   const [selectedPermissions, setSelectedPermissions] = React.useState<string[]>([]);
@@ -218,26 +217,31 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
   };
 
   const onSubmit = async (data: RoleFormValues) => {
-    try {
-      const submitData = {
-        ...data,
-        permissions: selectedPermissions,
-      };
+    const submitData = {
+      ...data,
+      permissions: selectedPermissions,
+    };
 
-      if (editData) {
-        await updateRole.mutateAsync({ id: editData.id, ...submitData });
-        toast.success("Role berhasil diperbarui!");
-      } else {
-        await createRole.mutateAsync(submitData);
-        toast.success("Role berhasil dibuat!");
-      }
-      reset();
-      setSelectedPermissions([]);
-      onOpenChange(false);
-      onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    if (editData) {
+      await updateRole.mutateAsync({
+        ...submitData,
+        createdAt: editData.createdAt,
+        updatedAt: editData.updatedAt,
+      });
+      toast.success("Role berhasil diperbarui!");
+    } else {
+      const now = new Date().toISOString();
+      await createRole.mutateAsync({
+        ...submitData,
+        createdAt: now,
+        updatedAt: now,
+      });
+      toast.success("Role berhasil dibuat!");
     }
+    reset();
+    setSelectedPermissions([]);
+    onOpenChange(false);
+    onSuccess();
   };
 
   return (
@@ -284,11 +288,7 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
               Batal
             </Button>
             <Button type="submit" disabled={createRole.isPending || updateRole.isPending}>
-              {createRole.isPending || updateRole.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+              {createRole.isPending || updateRole.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
             </Button>
           </div>
         </form>
@@ -303,15 +303,10 @@ function DeleteRoleDialog({ open, onOpenChange, roleData, onSuccess }: { open: b
 
   const handleDelete = async () => {
     if (!roleData) return;
-
-    try {
-      await deleteRole.mutateAsync(roleData.id);
-      toast.success("Role berhasil dihapus!");
-      onOpenChange(false);
-      onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus role");
-    }
+    await deleteRole.mutateAsync(roleData.id);
+    toast.success("Role berhasil dihapus!");
+    onOpenChange(false);
+    onSuccess();
   };
 
   return (
@@ -403,13 +398,15 @@ function RoleDataTable() {
         const permissions = (row.getValue("permissions") as string[]) || [];
         return (
           <div className="flex flex-wrap gap-1">
-            {permissions.length > 0 ?
+            {permissions.length > 0 ? (
               permissions.slice(0, 3).map((permission) => (
                 <Badge key={permission} variant="outline" className="text-xs">
                   {availablePermissions.find((p) => p.id === permission)?.label || permission}
                 </Badge>
               ))
-            : <span className="text-muted-foreground text-sm">Tidak ada</span>}
+            ) : (
+              <span className="text-muted-foreground text-sm">Tidak ada</span>
+            )}
             {permissions.length > 3 && (
               <Badge variant="outline" className="text-xs">
                 +{permissions.length - 3} lainnya
@@ -557,7 +554,7 @@ function RoleDataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ?
+              {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
@@ -565,12 +562,13 @@ function RoleDataTable() {
                     ))}
                   </TableRow>
                 ))
-              : <TableRow>
+              ) : (
+                <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     Tidak ada data role.
                   </TableCell>
                 </TableRow>
-              }
+              )}
             </TableBody>
           </Table>
         </div>
@@ -613,10 +611,10 @@ export default function UserDataTable() {
   }
 
   // Check if user is Admin
-  // if (userRole !== "Admin") {
-  //   unauthorized();
-  //   return null;
-  // }
+  if (userRole !== "Admin") {
+    unauthorized();
+    return null;
+  }
 
   // Render dashboard only after authorization is confirmed
   return <RoleDataTable />;

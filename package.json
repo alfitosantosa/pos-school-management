@@ -10,7 +10,7 @@
     "prebuild": "rm -rf node_modules/.cache && rm -rf .next",
     "build": "NODE_NO_WARNINGS=1 next build",
     "start": "NODE_ENV=production next start",
-    "lint": "next lint",
+    "lint": "eslint",
     "prepare": "husky"
   },
   "dependencies": {
@@ -68,6 +68,7 @@
   "devDependencies": {
     "@tailwindcss/oxide": "^4.3.3",
     "@tailwindcss/postcss": "^4.3.3",
+    "@tanstack/eslint-plugin-query": "^5.101.4",
     "@types/base64id": "^2.0.2",
     "@types/midtrans-client": "^1.4.0",
     "@types/node": "^25.9.5",
@@ -75,6 +76,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/swagger-jsdoc": "^6.0.4",
     "baseline-browser-mapping": "^2.10.43",
+    "globals": "^17.11.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.9.5",

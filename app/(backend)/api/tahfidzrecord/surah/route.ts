@@ -9,9 +9,9 @@
 //   @@map("surah_quran")
 // }
 
-"use server";
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -40,7 +40,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newSurah);
   } catch (error) {
-    console.error("Error creating surah:", error);
-    return NextResponse.json({ error: "Failed to create surah" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

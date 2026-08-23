@@ -1,5 +1,6 @@
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ idTeacher: string }> }) {
   const { idTeacher } = await params;
@@ -24,6 +25,6 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ idTeac
     });
     return NextResponse.json(tahfidzRecordByIdTeacher);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

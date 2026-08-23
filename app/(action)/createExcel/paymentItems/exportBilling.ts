@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
@@ -71,7 +71,8 @@ export async function exportToExcelBilling(data: PaymentItemData[], filename: st
     // Write file
     XLSX.writeFile(wb, filename);
     toast.success("Data berhasil diexport ke Excel!");
-  } catch (error: any) {
-    toast.error("Gagal mengexport data: " + error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    toast.error("Gagal mengexport data: " + errorMessage);
   }
 }

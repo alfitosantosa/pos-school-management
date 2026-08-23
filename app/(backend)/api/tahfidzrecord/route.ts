@@ -17,9 +17,9 @@
 //   @@map("tahfidz_records")
 // }
 
-"use server";
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -33,8 +33,7 @@ export async function GET() {
     });
     return NextResponse.json(tahfidzRecords);
   } catch (error) {
-    console.error("Error fetching tahfidz records:", error);
-    return NextResponse.json({ error: "Failed to fetch tahfidz records" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -55,8 +54,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(newRecord);
   } catch (error) {
-    console.error("Error creating tahfidz record:", error);
-    return NextResponse.json({ error: "Failed to create tahfidz record" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -78,8 +76,7 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json(updatedRecord);
   } catch (error) {
-    console.error("Error updating tahfidz record:", error);
-    return NextResponse.json({ error: "Failed to update tahfidz record" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }
 
@@ -91,7 +88,6 @@ export async function DELETE(request: NextRequest) {
     });
     return NextResponse.json(deletedRecord);
   } catch (error) {
-    console.error("Error deleting tahfidz record:", error);
-    return NextResponse.json({ error: "Failed to delete tahfidz record" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

@@ -105,7 +105,7 @@ export const exportClassAttendanceDailyToExcel = async (classData: any, attendan
       return {
         No: index + 1,
         "Nama Siswa": student.name,
-        "Email": student.email || "-",
+        Email: student.email || "-",
         Hadir: stats.hadir,
         Terlambat: stats.terlambat,
         Sakit: stats.sakit,
@@ -159,14 +159,14 @@ export const exportClassAttendanceDailyToExcel = async (classData: any, attendan
 
     // Set column widths for student summary sheet
     const studentColWidths = [
-      { wch: 5 },  // No
+      { wch: 5 }, // No
       { wch: 30 }, // Nama Siswa
       { wch: 25 }, // Email
-      { wch: 8 },  // Hadir
+      { wch: 8 }, // Hadir
       { wch: 10 }, // Terlambat
-      { wch: 8 },  // Sakit
-      { wch: 8 },  // Izin
-      { wch: 8 },  // Alfa
+      { wch: 8 }, // Sakit
+      { wch: 8 }, // Izin
+      { wch: 8 }, // Alfa
       { wch: 15 }, // Total Kehadiran
       { wch: 15 }, // Total Tidak Hadir
       { wch: 20 }, // Persentase Kehadiran
@@ -210,4 +210,3 @@ export const exportClassAttendanceDailyToExcel = async (classData: any, attendan
     };
   }
 };
-

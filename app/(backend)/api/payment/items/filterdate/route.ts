@@ -1,6 +1,7 @@
 "use server";
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 //filter by date
 export async function GET(request: NextRequest) {
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     endDate.setHours(23, 59, 59, 999);
 
     // Build where clause dynamically
-    const whereClause: any = {
+    const whereClause: Record<string, unknown> = {
       createdAt: {
         gte: startDate,
         lte: endDate,
@@ -74,7 +75,6 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(paymentItems);
   } catch (error) {
-    console.error("Error fetching paymentItems:", error);
-    return NextResponse.json({ error: "Failed to fetch paymentItems" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

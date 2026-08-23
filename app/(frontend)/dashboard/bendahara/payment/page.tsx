@@ -1,107 +1,43 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, Receipt, Building2, BadgeCheck, Clock, XCircle, Package, FileDown } from "lucide-react";
+import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoice";
+import { useGetAccountBankByIdMajor } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
+import { useCreatePayment, useDeletePayment, useUpdatePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
+import { usePaymentsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
+import { usePaymentItemsSetPaid, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { AccountBankTypes, PaymentData, PaymentItemData, UserDataTypes } from "@/app/(types)";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import { DatePickerTime } from "@/components/date/datePickerTime";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { StudentCombobox } from "@/components/ui/student-combobox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/authClients";
+import { errorHandlerFrontend } from "@/lib/errorHandlerFrontend";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-
-import { useCreatePayment, useUpdatePayment, useDeletePayment } from "@/app/(hooks)/hooks/Payments/usePayment";
-import { usePaymentItemsSetPaid, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
-import { useGetAccountBankByIdMajor } from "@/app/(hooks)/hooks/AccountBank/useAccountBank";
-import Loading from "@/components/loading";
-import { StudentCombobox } from "@/components/ui/student-combobox";
-import { useSession } from "@/lib/auth-client";
+import { ArrowUpDown, BadgeCheck, Building2, CalendarDays, ChevronDown, Clock, CreditCard, FileDown, FileText, MoreHorizontal, Package, Pencil, Plus, Receipt, Search, Trash2, User, X, XCircle } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { v4 as uuidv4 } from "uuid";
-import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-import { createPDFKwitansi } from "@/app/(action)/createPDF/Invoice/studentInvoice";
-import { DatePickerWithRange } from "@/components/date/datePicker";
+import * as React from "react";
 import { DateRange } from "react-day-picker";
-import { usePaymentsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentByDate";
-import { DatePickerTime } from "@/components/date/datePickerTime";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-export type PaymentTypeData = {
-  id: string;
-  name: string;
-  description: string;
-  amount: string;
-  isMonthly: boolean;
-  isActive: boolean;
-  isFixedAmount: boolean;
-  isFixedQuantity: boolean;
-  quantity: string;
-  subtotal: string;
-  owner: string;
-  majorId: string;
-};
-
-export type PaymentItemData = {
-  id: string;
-  paymentId: string | null;
-  studentId: string;
-  paymentTypeId: string;
-  month: string;
-  year: string;
-  isPaid: boolean;
-  isMonthly: boolean;
-  isActive: boolean;
-  isFixedAmount: boolean;
-  isFixedQuantity: boolean;
-  quantity: number;
-  amount: number;
-  subtotal: number;
-  name: string;
-  skuType: string;
-  paymentType?: PaymentTypeData;
-};
-
-export type PaymentData = {
-  id: string;
-  studentId: string;
-  bendaharaId: string;
-  amount: number | string;
-  dueDate?: string;
-  status: string;
-  notes?: string;
-  createdAt: string;
-  paymentDate: string;
-  transferDate: string;
-  receiptNumber: string;
-  bankRef: string;
-  accountBankId: string;
-  majorId: string;
-  month: string;
-  student?: {
-    id: string;
-    name: string;
-    parentPhone: string;
-    class: {
-      name: string;
-    };
-  };
-  major?: { id: string; name: string; adminName: string; signatureUrl: string };
-  accountBank?: { id: string; accountName: string; accountBank?: string; accountNumber: string };
-  paymentItems?: PaymentItemData[];
-};
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
+import * as z from "zod";
 
 // ─── Status Config ────────────────────────────────────────────────────────────
 const statusConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
@@ -136,9 +72,8 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
       Tahun: new Date(item.createdAt).getFullYear(),
       "Jumlah (Rp)": Number(item.amount),
       Status: statusConfig[item.status]?.label ?? item.status,
-      "Tanggal Transfer":
-        item.transferDate ?
-          new Date(item.transferDate).toLocaleString("id-ID", {
+      "Tanggal Transfer": item.transferDate
+        ? new Date(item.transferDate).toLocaleString("id-ID", {
             dateStyle: "medium",
             timeStyle: "short",
           })
@@ -250,7 +185,7 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
     ];
 
     // ── 8. Freeze pane: bekukan 3 baris header + 2 kolom kiri ─────────────
-    ws2["!freeze"] = { xSplit: 2, ySplit: 3 } as any;
+    ws2["!freeze"] = { xSplit: 2, ySplit: 3 };
 
     // ── 9. Simpan ke file ─────────────────────────────────────────────────
     const wb = XLSX.utils.book_new();
@@ -258,9 +193,8 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
     XLSX.writeFile(wb, filename);
 
     toast.success(`${data.length} data pembayaran berhasil diexport!`);
-  } catch (error: any) {
-    console.error("Export error:", error);
-    toast.error("Gagal mengexport data: " + (error?.message ?? "Unknown error"));
+  } catch (error) {
+    errorHandlerFrontend(error);
   }
 }
 
@@ -355,14 +289,8 @@ function PaymentFormDialog({
   onOpenChange: (open: boolean) => void;
   editData?: PaymentData | null;
   onSuccess: () => void;
-  allStudents: any[];
-  allAccountBanks: {
-    id: string;
-    accountName: string;
-    accountBank?: string;
-    accountNumber: string;
-    major: { name: string };
-  }[];
+  allStudents: UserDataTypes[];
+  allAccountBanks: AccountBankTypes[];
   userDataId?: string;
   userDataMajorId?: string;
 }) {
@@ -395,6 +323,7 @@ function PaymentFormDialog({
     formState: { errors },
     reset,
   } = useForm<PaymentFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(paymentSchema as any),
     defaultValues: {
       status: "pending",
@@ -526,9 +455,8 @@ function PaymentFormDialog({
         notes: editData.notes || "",
         bendaharaId: userDataId || "",
         majorId: userDataMajorId || "",
-        items:
-          editData.paymentItems?.length ?
-            editData.paymentItems.map((item) => ({
+        items: editData.paymentItems?.length
+          ? editData.paymentItems.map((item) => ({
               id: item.id,
               name: item.name,
               amount: item.amount,
@@ -610,7 +538,7 @@ function PaymentFormDialog({
         toast.success("Pembayaran berhasil diperbarui!");
       } else {
         const created = await createPayment.mutateAsync(paymentPayload);
-        const newPaymentId = created?.id;
+        const newPaymentId = created?.id as string;
         if (newPaymentId) {
           const paymentItemsIds = selectedItems.map((item) => item.id);
           await setPaidMutation.mutateAsync({
@@ -627,8 +555,8 @@ function PaymentFormDialog({
       setTotalTransfer("");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error) {
+      errorHandlerFrontend(error);
     }
   };
 
@@ -685,7 +613,7 @@ function PaymentFormDialog({
                       <SelectValue placeholder="Pilih Rekening Bank" />
                     </SelectTrigger>
                     <SelectContent>
-                      {allAccountBanks?.map((b) => (
+                      {allAccountBanks?.map((b: AccountBankTypes) => (
                         <SelectItem key={b.id} value={b.id}>
                           {`${b.accountBank} - ${b.accountName} - ${b.accountNumber}`}
                         </SelectItem>
@@ -807,7 +735,7 @@ function PaymentFormDialog({
               </Label>
             </div>
 
-            {errors.items && typeof errors.items === "object" && "message" in errors.items && <p className="text-sm text-red-500">{(errors.items as any).message}</p>}
+            {errors.items && typeof errors.items === "object" && "message" in errors.items && <p className="text-sm text-red-500">{errors.items.message}</p>}
 
             {!selectedStudentId && !editData && (
               <div className="text-center p-8 border rounded-lg bg-muted/20">
@@ -835,10 +763,11 @@ function PaymentFormDialog({
               <>
                 <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground px-1">
                   <div className="col-span-1 text-center">Pilih</div>
-                  <div className="col-span-3">Jenis Transaksi</div>
+                  <div className="col-span-2">Jenis Transaksi</div>
+                  <div className="col-span-2">Status</div>
                   <div className="col-span-2 text-center">Bulan/Tahun</div>
                   <div className="col-span-2">Nominal (Rp)</div>
-                  <div className="col-span-2 text-center">Qty</div>
+                  <div className="col-span-1 text-center">Qty</div>
                   <div className="col-span-2 text-right">Subtotal</div>
                 </div>
 
@@ -853,14 +782,13 @@ function PaymentFormDialog({
                         <div className="col-span-1 flex justify-center">
                           <Checkbox checked={isSelected} onCheckedChange={() => toggleItemSelection(index)} />
                         </div>
-                        <div className="col-span-3">
+                        <div className="col-span-2">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium">{currentItem?.name}</p>
-                            {isPaid ?
-                              <Badge className="bg-green-600 text-white ">Lunas</Badge>
-                            : <Badge className="bg-red-600 text-white ">Belum Lunas</Badge>}
                           </div>
                         </div>
+                        <div className="col-span-2"> {isPaid ? <Badge className="bg-green-600 text-white ">Lunas</Badge> : <Badge className="bg-red-600 text-white ">Belum Lunas</Badge>}</div>
+
                         <div className="col-span-2 text-center">
                           <Badge variant="outline" className="text-xs">
                             {currentItem?.month} {currentItem?.year}
@@ -869,10 +797,10 @@ function PaymentFormDialog({
                         <div className="col-span-2">
                           <p className="text-sm">{formatRupiah(currentItem?.amount ?? 0)}</p>
                         </div>
-                        <div className="col-span-2 text-center">
+                        <div className="col-span-1 text-center">
                           <p className="text-sm font-medium">{currentItem?.quantity}</p>
                         </div>
-                        <div className="col-span-2 text-right">
+                        <div className="col-span-2  text-right">
                           <p className="text-sm font-semibold tabular-nums">{formatRupiah(currentItem?.subtotal ?? 0)}</p>
                         </div>
                       </div>
@@ -917,20 +845,9 @@ function PaymentFormDialog({
                     const val = e.target.value;
                     setTotalTransfer(val === "" ? "" : Number(val));
                   }}
-                  className={
-                    isTransferEmpty ? ""
-                    : isTransferValid ?
-                      "border-green-500 focus-visible:ring-green-500"
-                    : "border-red-500 focus-visible:ring-red-500"
-                  }
+                  className={isTransferEmpty ? "" : isTransferValid ? "border-green-500 focus-visible:ring-green-500" : "border-red-500 focus-visible:ring-red-500"}
                 />
-                {!isTransferEmpty && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {isTransferValid ?
-                      <BadgeCheck className="h-4 w-4 text-green-600" />
-                    : <XCircle className="h-4 w-4 text-red-500" />}
-                  </div>
-                )}
+                {!isTransferEmpty && <div className="absolute right-3 top-1/2 -translate-y-1/2">{isTransferValid ? <BadgeCheck className="h-4 w-4 text-green-600" /> : <XCircle className="h-4 w-4 text-red-500" />}</div>}
               </div>
 
               {isTransferEmpty && grandTotal > 0 && <p className="text-xs text-muted-foreground">Masukkan jumlah yang ditransfer untuk melanjutkan</p>}
@@ -973,11 +890,7 @@ function PaymentFormDialog({
                 Batal
               </Button>
               <Button type="submit" disabled={!isSubmitDisabled} title={selectedItemsCount === 0 ? "Pilih minimal 1 item" : undefined}>
-                {isPending ?
-                  "Menyimpan..."
-                : editData ?
-                  "Perbarui"
-                : "Simpan"}
+                {isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
               </Button>
             </div>
           </div>
@@ -1010,8 +923,8 @@ function DeletePaymentDialog({ open, onOpenChange, paymentData, onSuccess }: { o
       toast.success("Pembayaran berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus pembayaran");
+    } catch (error) {
+      errorHandlerFrontend(error);
     }
   };
 
@@ -1143,9 +1056,7 @@ function PaymentDataTable({
             <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs px-2" onClick={() => toggleExpand(p.id)}>
               <Package className="h-3.5 w-3.5" />
               {itemCount}
-              {isExpanded ?
-                <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" />
-              : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
+              {isExpanded ? <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" /> : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
             </Button>
           );
         },
@@ -1292,7 +1203,7 @@ function PaymentDataTable({
                 <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.id)}>Copy ID Pembayaran</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigator.clipboard.writeText(p.receiptNumber)}>Copy No. Kwitansi</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => createPDFKwitansi(p as any)}>
+                <DropdownMenuItem onClick={() => createPDFKwitansi(p as unknown as Parameters<typeof createPDFKwitansi>[0])}>
                   <FileDown className="mr-2 h-4 w-4" />
                   Invoice PDF
                 </DropdownMenuItem>
@@ -1352,7 +1263,7 @@ function PaymentDataTable({
   if (isLoading) return <Loading />;
 
   const filteredRows = table.getFilteredRowModel().rows;
-  const totalPayments = (payments as any[]).length;
+  const totalPayments = payments.length;
   const totalPaid = filteredRows.filter((r) => r.original.status === "paid").reduce((sum, r) => sum + parseFloat(String(r.original.amount)), 0);
 
   const columnLabels: Record<string, string> = {
@@ -1502,7 +1413,7 @@ function PaymentDataTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
                   <TableRow data-state={row.getIsSelected() && "selected"}>
@@ -1520,7 +1431,8 @@ function PaymentDataTable({
                   )}
                 </React.Fragment>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1543,7 +1455,7 @@ function PaymentDataTable({
                   </div>
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>

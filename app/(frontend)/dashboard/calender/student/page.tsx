@@ -1,13 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
-import { CalendarBody, CalendarDate, CalendarDatePagination, CalendarDatePicker, CalendarHeader, CalendarItem, CalendarMonthPicker, CalendarProvider, CalendarYearPicker } from "@/components/ui/kibo-ui/calendar";
-
-import { useGetSpecialSchedules } from "@/app/(hooks)/hooks/SpecialSchedules/useSpecialSchedule";
 import { useGetSchedulesByStudent } from "@/app/(hooks)/hooks/Schedules/useSchedules";
-import { useSession } from "@/lib/auth-client";
+import { useGetSpecialSchedules } from "@/app/(hooks)/hooks/SpecialSchedules/useSpecialSchedule";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Loading from "@/components/loading";
+import { CalendarBody, CalendarDate, CalendarDatePagination, CalendarDatePicker, CalendarHeader, CalendarItem, CalendarMonthPicker, CalendarProvider, CalendarYearPicker } from "@/components/ui/kibo-ui/calendar";
+import { useSession } from "@/lib/authClients";
+import { useMemo } from "react";
 
 // Type definitions berdasarkan JSON
 type Schedule = {
@@ -90,7 +89,7 @@ export default function CalendarPage() {
 
     const features: CalendarFeature[] = [];
 
-    schedules.forEach((schedule: Schedule) => {
+    schedules.forEach((schedule) => {
       // Generate recurring events untuk setiap minggu dalam tahun
       const currentWeekStart = new Date(startOfYear);
 
@@ -112,11 +111,11 @@ export default function CalendarPage() {
 
         features.push({
           id: `${schedule.id}-${currentWeekStart.getTime()}`,
-          name: `${schedule.subject.name} - ${schedule.class.name}`,
+          name: `${schedule?.subject?.name} - ${schedule?.class?.name}`,
           startAt,
           endAt,
           status: statuses.regularClass,
-          description: `Guru: ${schedule.teacher.name}\nRuang: ${schedule.room}\nWaktu: ${schedule.startTime} - ${schedule.endTime}`,
+          description: `Guru: ${schedule?.teacher?.name}\nRuang: ${schedule?.room}\nWaktu: ${schedule?.startTime} - ${schedule?.endTime}`,
           type: "schedule",
         });
 
@@ -133,8 +132,8 @@ export default function CalendarPage() {
     if (!specialSchedules || specialSchedules.length === 0) return [];
 
     return specialSchedules
-      .filter((schedule: SpecialSchedule) => schedule.isPublished)
-      .map((schedule: SpecialSchedule) => {
+      .filter((schedule) => schedule.isPublished)
+      .map((schedule ) => {
         const eventDate = new Date(schedule.eventDate);
 
         // Set waktu untuk event khusus (full day event)
@@ -226,7 +225,7 @@ export default function CalendarPage() {
             </div>
             <div className="p-4 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800">
               <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Event Khusus</p>
-              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300 mt-1">{specialSchedules.filter((s: SpecialSchedule) => s.isPublished).length}</p>
+              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300 mt-1">{specialSchedules.filter((s) => s.isPublished).length}</p>
             </div>
             <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
               <p className="text-sm text-green-600 dark:text-green-400 font-medium">Total Event</p>

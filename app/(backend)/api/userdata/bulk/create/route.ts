@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 function replaceUndefinedWithNull<T>(value: T): T {
   if (Array.isArray(value)) {
@@ -76,8 +77,8 @@ export async function POST(request: NextRequest) {
     // Process and clean data
     const cleanedUsers = users.map((user) => {
       // Create base user object
-      const userData: any = {
-        name: user.name,
+      const userData = {
+        name: user.name as string,
         email: user.email || null,
         nik: user.nik || null,
         nisn: user.nisn || null,
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
         startDate: user.startDate || null,
         endDate: user.endDate || null,
         status: user.status || "active",
-        isActive: user.isActive || true,
+        isActive: user.isActive !== undefined ? user.isActive : true,
         relation: user.relation || null,
         avatarUrl: user.avatarUrl || null,
         studentIds: user.studentIds || [],
@@ -221,68 +222,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 },
     );
-  } catch (error: any) {
-    console.error("[Bulk Create] Error caught:", {
-      message: error.message,
-      code: error.code,
-      meta: error.meta,
-      timestamp: new Date().toISOString(),
-    });
-
-    // Handle Prisma-specific errors
-    if (error.code === "P2002") {
-      console.log("[Bulk Create] Duplicate entry detected:", {
-        field: error.meta?.target,
-        target: error.meta?.target?.[0],
-      });
-      return NextResponse.json(
-        {
-          error: "Duplicate entry found",
-          details: "Some users may already exist with the same unique fields (email, NIK, NISN, etc.)",
-          field: error.meta?.target?.[0],
-          suggestion: `Check if any ${error.meta?.target?.[0]} values already exist in the database`,
-        },
-        { status: 409 },
-      );
-    }
-
-    if (error.code === "P2003") {
-      console.log("[Bulk Create] Foreign key constraint failed:", {
-        field: error.meta?.field_name,
-      });
-      return NextResponse.json(
-        {
-          error: "Foreign key constraint failed",
-          details: "Invalid reference to role, class, major, or academic year",
-          field: error.meta?.field_name,
-          suggestion: "Verify all foreign key IDs match the available options",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (error.code === "P2000") {
-      console.log("[Bulk Create] Value too long for column:", {
-        column: error.meta?.column_name,
-      });
-      return NextResponse.json(
-        {
-          error: "Value too long for column",
-          details: error.meta?.column_name,
-          suggestion: `Check that the ${error.meta?.column_name} value is not too long`,
-        },
-        { status: 400 },
-      );
-    }
-
-    return NextResponse.json(
-      {
-        error: "Failed to create users",
-        details: error.message,
-        code: error.code,
-        suggestion: "Check the error code and message above for details",
-      },
-      { status: 500 },
-    );
+  } catch (error) {
+    return handlePrismaError(error);
   }
 }

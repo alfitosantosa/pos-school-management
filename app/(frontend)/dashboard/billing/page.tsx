@@ -1,36 +1,35 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, BadgeCheck, Clock, Package, Layers, Calendar, Building } from "lucide-react";
+import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
+import { useCreatePaymentItems, useDeletePaymentItems, usePaymentItemsUnpaidStudent, useUpdatePaymentItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { usePaymentsItemsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentItemsByDate";
+import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
+import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { majorTypes, PaymentTypeTypes, UserDataTypes } from "@/app/(types)";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-
-import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
-
-import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
-import Loading from "@/components/loading";
 import { StudentCombobox } from "@/components/ui/student-combobox";
-import { useSession } from "@/lib/auth-client";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, Row, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, BadgeCheck, Building, Calendar, CalendarDays, ChevronDown, Clock, CreditCard, FileText, MoreHorizontal, Package, Pencil, Plus, Search, Trash2, User, X } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
-import { DatePickerWithRange } from "@/components/date/datePicker";
+import * as React from "react";
 import { DateRange } from "react-day-picker";
-import { usePaymentsItemsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentItemsByDate";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -121,15 +120,15 @@ function PaidBadge({ isPaid }: { isPaid: boolean }) {
       </Badge>;
 }
 
-function ActiveBadge({ isActive }: { isActive: boolean }) {
-  return isActive ?
-      <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
-        Aktif
-      </Badge>
-    : <Badge variant="outline" className="text-gray-400 text-xs">
-        Nonaktif
-      </Badge>;
-}
+// function ActiveBadge({ isActive }: { isActive: boolean }) {
+//   return isActive ?
+//       <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+//         Aktif
+//       </Badge>
+//     : <Badge variant="outline" className="text-gray-400 text-xs">
+//         Nonaktif
+//       </Badge>;
+// }
 
 // ─── Single Item Form Schema ──────────────────────────────────────────────────
 const singleItemSchema = z.object({
@@ -137,11 +136,11 @@ const singleItemSchema = z.object({
   studentId: z.string().min(1, "Siswa wajib dipilih"),
   paymentTypeId: z.string().min(1, "Jenis pembayaran wajib dipilih"),
   name: z.string().min(1, "Nama wajib diisi"),
-  skuType: z.string().optional(),
+  skuType: z.string().default("default"),
   month: z.string().min(1, "Bulan wajib dipilih"),
   year: z.string().min(1, "Tahun wajib dipilih"),
-  quantity: z.number().optional(),
-  amount: z.number().optional(),
+  quantity: z.number().default(1),
+  amount: z.number().default(0),
   subtotal: z.number(),
   isFixedAmount: z.boolean().default(false),
   isFixedQuantity: z.boolean().default(false),
@@ -164,8 +163,8 @@ function SingleItemDialog({
   onOpenChange: (open: boolean) => void;
   editData?: PaymentItemData | null;
   onSuccess: () => void;
-  allStudents: any[];
-  allPaymentTypes: PaymentTypeData[];
+  allStudents?: UserDataTypes[];
+  allPaymentTypes: PaymentTypeTypes[];
 }) {
   const createItem = useCreatePaymentItems();
   const updateItem = useUpdatePaymentItems();
@@ -179,7 +178,8 @@ function SingleItemDialog({
     formState: { errors, isValid },
     reset,
   } = useForm<SingleItemFormValues>({
-    resolver: zodResolver(singleItemSchema as any),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(singleItemSchema) as any,
     mode: "onChange", // ✅ Enable validation on change
     defaultValues: {
       quantity: 1,
@@ -198,9 +198,9 @@ function SingleItemDialog({
 
   const watchedPaymentTypeId = watch("paymentTypeId");
   const watchedStudentId = watch("studentId");
-  const isPaid = watch("isPaid");
-  const isActive = watch("isActive");
-  const isMonthly = watch("isMonthly");
+  // const isPaid = watch("isPaid");
+  // const isActive = watch("isActive");
+  // const isMonthly = watch("isMonthly");
 
   // Fetch unpaid items for selected student
   const { data: unpaidItems = [] } = usePaymentItemsUnpaidStudent(watchedStudentId);
@@ -213,14 +213,13 @@ function SingleItemDialog({
     (ptId: string) => {
       const pt = allPaymentTypes.find((p) => p.id === ptId);
       if (pt) {
-        const amount = parseFloat(pt.amount) || 0;
         const qty = pt.isFixedQuantity ? parseFloat(String(pt.quantity)) || 1 : (watch("quantity") ?? 1);
         setValue("paymentTypeId", ptId);
         setValue("name", pt.name);
         setValue("skuType", pt.owner || "default");
-        setValue("amount", amount);
+        setValue("amount", pt.amount || 0);
         setValue("quantity", qty);
-        setValue("subtotal", amount * qty);
+        setValue("subtotal", pt.amount * qty);
         setValue("isFixedAmount", pt.isFixedAmount);
         setValue("isFixedQuantity", pt.isFixedQuantity);
         setValue("isMonthly", pt.isMonthly);
@@ -298,12 +297,7 @@ function SingleItemDialog({
   const onSubmit = async (data: SingleItemFormValues) => {
     try {
       if (editData) {
-        await updateItem.mutateAsync({
-          id: editData.id,
-          ...data,
-          month: String(MONTH_NUMBER[data.month] ?? data.month),
-          year: data.year,
-        });
+        await updateItem.mutateAsync(data);
         toast.success("Item tagihan berhasil diperbarui!");
       } else {
         await createItem.mutateAsync({
@@ -317,8 +311,9 @@ function SingleItemDialog({
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan";
+      toast.error(errorMessage);
     }
   };
 
@@ -340,7 +335,7 @@ function SingleItemDialog({
               control={control}
               render={({ field }) => (
                 <StudentCombobox
-                  students={allStudents}
+                  students={allStudents || []}
                   value={field.value}
                   onValueChange={(v) => {
                     field.onChange(v);
@@ -358,7 +353,7 @@ function SingleItemDialog({
             <div className="space-y-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <Label className="text-sm font-semibold text-blue-900">Tagihan Belum Lunas</Label>
               <div className="space-y-1 max-h-40 overflow-y-auto">
-                {unpaidItems.map((item: any) => (
+                {unpaidItems.map((item) => (
                   <div key={item.id} className="text-xs p-2 bg-white rounded border border-blue-100 flex justify-between">
                     <span className="font-medium">{item.name}</span>
                     <span className="text-blue-600 font-semibold">{formatRupiah(item.subtotal)}</span>
@@ -394,7 +389,7 @@ function SingleItemDialog({
             />
             {selectedPT && (
               <p className="text-xs text-muted-foreground">
-                {selectedPT.description} · {formatRupiah(parseFloat(selectedPT.amount))}
+                {selectedPT.description} · {formatRupiah(selectedPT.amount)}
               </p>
             )}
             {errors.paymentTypeId && <p className="text-sm text-red-500">{errors.paymentTypeId.message}</p>}
@@ -552,8 +547,9 @@ function DeleteItemDialog({ open, onOpenChange, itemData, onSuccess }: { open: b
       toast.success("Item tagihan berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus item tagihan");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal menghapus item tagihan";
+      toast.error(errorMessage);
     }
   };
 
@@ -623,8 +619,9 @@ async function exportToExcel(data: PaymentItemData[], filename: string = "Data_T
     // Write file
     XLSX.writeFile(wb, filename);
     toast.success("Data berhasil diexport ke Excel!");
-  } catch (error: any) {
-    toast.error("Gagal mengexport data: " + error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Gagal menghapus item tagihan";
+    toast.error(errorMessage);
   }
 }
 
@@ -682,9 +679,9 @@ function BillingDataTable({
   const { data: allClassById = [] } = useGetClassByIdMajor(majorData?.id);
   const handleSuccess = () => refetch();
 
-  const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
+  const globalFilterFn = React.useCallback((row: Row<PaymentItemData>, _: string, filterValue: string) => {
     if (!filterValue) return true;
-    const item = row.original as PaymentItemData;
+    const item = row.original;
     const text = [item.name, item.skuType, item.student?.name, item.PaymentType?.name, item.payment?.receiptNumber, item.month, item.year].filter(Boolean).join(" ").toLowerCase();
     return text.includes(filterValue.toLowerCase());
   }, []);
@@ -692,10 +689,10 @@ function BillingDataTable({
   // ✅ FIX: Get students in selected class
   const studentsInSelectedClass = React.useMemo(() => {
     if (classFilter === "all") return null;
-    const selectedClass = allClassById.find((c: any) => c.id === classFilter);
+    const selectedClass = allClassById.find((c) => c.id === classFilter);
     if (!selectedClass) return [];
     // Assuming class has students array or we match by student.classId
-    return (selectedClass.students || []).map((s: any) => s.id);
+    return (selectedClass.students || []).map((s) => s.id);
   }, [classFilter, allClassById]);
 
   const columns: ColumnDef<PaymentItemData>[] = [
@@ -728,9 +725,9 @@ function BillingDataTable({
         </Button>
       ),
       cell: ({ row }) => <div className="font-medium">{row.original.student?.name ?? "-"}</div>,
-      filterFn: (row, _id, filterValue) => {
+      filterFn: (row: Row<PaymentItemData>, _id: string, filterValue): boolean => {
         if (filterValue === "all" || !filterValue) return true;
-        return row.original.studentId === filterValue || studentsInSelectedClass?.includes(row.original.studentId);
+        return row.original.studentId === filterValue || (studentsInSelectedClass?.includes(row.original.studentId) ?? false);
       },
     },
     {
@@ -803,7 +800,7 @@ function BillingDataTable({
           {MONTHS[parseInt(row.getValue("month")) - 1] ?? row.getValue("month")} {row.original.year}
         </Badge>
       ),
-      filterFn: (row, _id, value) => {
+      filterFn: (row: Row<PaymentItemData>, _id: string, value): boolean => {
         if (value === "all") return true;
         const monthNum = MONTH_NUMBER[value];
         return String(row.original.month) === String(monthNum);
@@ -819,7 +816,7 @@ function BillingDataTable({
         </Button>
       ),
       cell: ({ row }) => <div>{row.getValue("year")}</div>,
-      filterFn: (row, _id, value) => {
+      filterFn: (row: Row<PaymentItemData>, _id: string, value): boolean => {
         if (value === "all") return true;
         return String(row.original.year) === String(value);
       },
@@ -828,7 +825,7 @@ function BillingDataTable({
       accessorKey: "isPaid",
       header: "Status Bayar",
       cell: ({ row }) => <PaidBadge isPaid={row.getValue("isPaid")} />,
-      filterFn: (row, _id, value) => {
+      filterFn: (row: Row<PaymentItemData>, _id: string, value): boolean => {
         if (value === "all") return true;
         if (value === "paid") return row.original.isPaid === true;
         if (value === "unpaid") return row.original.isPaid === false;
@@ -938,7 +935,7 @@ function BillingDataTable({
   if (isLoading) return <Loading />;
 
   const filteredRows = table.getFilteredRowModel().rows;
-  const totalItems = (paymentItems as any[]).length;
+  const totalItems: number = (paymentItems as PaymentItemData[]).length;
   const totalSubtotal = filteredRows.reduce((sum, r) => {
     const subtotal = parseFloat(String(r.original.subtotal ?? 0));
     return sum + (isNaN(subtotal) ? 0 : subtotal);
@@ -991,7 +988,7 @@ function BillingDataTable({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Kelas</SelectItem>
-              {allClassById.map((m: any) => (
+              {allClassById.map((m) => (
                 <SelectItem key={m.id} value={m.id}>
                   {m.name}
                 </SelectItem>
@@ -1122,7 +1119,7 @@ function BillingDataTable({
           )}
           {classFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
-              Kelas: {allClassById.find((c: any) => c.id === classFilter)?.name ?? classFilter}
+              Kelas: {allClassById.find((c) => c.id === classFilter)?.name ?? classFilter}
               <X className="h-3 w-3 cursor-pointer" onClick={() => setClassFilter("all")} />
             </Badge>
           )}
@@ -1264,5 +1261,5 @@ export default function BillingPage() {
       return null;
     }
   }
-  return <BillingDataTable majorData={majorData} />;
+  return <BillingDataTable majorData={majorData as majorTypes} />;
 }

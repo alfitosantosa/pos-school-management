@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -81,7 +82,6 @@ export async function POST(req: NextRequest) {
       data: attendances,
     });
   } catch (error) {
-    console.error("Error creating bulk teacher attendance:", error);
-    return NextResponse.json({ error: "Failed to create bulk attendance records" }, { status: 500 });
+    return handlePrismaError(error);
   }
 }

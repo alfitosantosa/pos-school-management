@@ -1,31 +1,30 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Eye } from "lucide-react";
-
+import { useCreateAcademicYear, useDeleteAcademicYear, useGetAcademicYears, useUpdateAcademicYear } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { AcademicYearDataTypes, AcademicYearForm, academicYearSchema } from "@/app/(types)/types/academicyear-types";
+import { UserDataTypes } from "@/app/(types)/types/userData";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { unauthorized } from "next/navigation";
+import * as React from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 // Import hooks
-import { useGetAcademicYears, useCreateAcademicYear, useUpdateAcademicYear, useDeleteAcademicYear } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
-import Loading from "@/components/loading";
-import { useSession } from "@/lib/auth-client";
-import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { AcademicYearForm, AcademicYearDataTypes, academicYearSchema } from "@/app/types/academicyear-types";
-
 // Create/Edit Dialog Component
 function AcademicYearFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: AcademicYearDataTypes | null; onSuccess: () => void }) {
   const createAcademicYear = useCreateAcademicYear();
@@ -72,8 +71,9 @@ function AcademicYearFormDialog({ open, onOpenChange, editData, onSuccess }: { o
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan";
+      toast.error(errorMessage);
     }
   };
 
@@ -139,8 +139,9 @@ function DeleteAcademicYearDialog({ open, onOpenChange, academicYearData, onSucc
 
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus tahun ajaran");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan";
+      toast.error(errorMessage);
     }
   };
 
@@ -324,7 +325,7 @@ function AcademicYearDataTable() {
   ];
 
   const table = useReactTable({
-    data: academicYears,
+    data: academicYears as AcademicYearDataTypes[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -457,7 +458,7 @@ export default function UserDataTable() {
   const userId = session?.user?.id;
 
   const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
-  const userRole = userData?.role?.name;
+  const userRole = (userData as UserDataTypes)?.role?.name;
 
   // Show loading while checking authorization
   if (isPending || isLoadingUserData) {
@@ -465,7 +466,7 @@ export default function UserDataTable() {
   }
 
   // Check if user is Admin
-  if (userRole !== "Admin") {
+  if ((userRole as string) !== "Admin") {
     unauthorized();
     return null;
   }

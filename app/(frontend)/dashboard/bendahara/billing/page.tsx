@@ -1,37 +1,36 @@
 "use client";
 
-import * as React from "react";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Pencil, Trash2, Search, X, FileText, CreditCard, User, CalendarDays, BadgeCheck, Clock, Package, Layers, Calendar, Building } from "lucide-react";
+import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
+import { useCreatePaymentItems, useDeletePaymentItems, usePaymentItemsUnpaidStudent, useUpdatePaymentItems } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
+import { usePaymentsItemsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentItemsByDate";
+import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
+import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
+import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import { UserDataTypes } from "@/app/(types)";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import Loading from "@/components/loading";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { toast } from "sonner";
-
-import { useCreatePaymentItems, useUpdatePaymentItems, useDeletePaymentItems, usePaymentItemsUnpaidStudent } from "@/app/(hooks)/hooks/Payments/usePaymentItems";
-
-import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
-import Loading from "@/components/loading";
 import { StudentCombobox } from "@/components/ui/student-combobox";
-import { useSession } from "@/lib/auth-client";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/lib/authClients";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, Row, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+// import { id } from "date-fns/locale";
+import { ArrowUpDown, BadgeCheck, Building, Calendar, CalendarDays, ChevronDown, Clock, CreditCard, FileText, MoreHorizontal, Package, Pencil, Plus, Search, Trash2, User, X } from "lucide-react";
 import { unauthorized } from "next/navigation";
-import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { useGetStudentByIdMajor } from "@/app/(hooks)/hooks/Users/useGetStudentById";
-import { useGetClassByIdMajor } from "@/app/(hooks)/hooks/Classes/useGetClassById";
-import { DatePickerWithRange } from "@/components/date/datePicker";
+import * as React from "react";
 import { DateRange } from "react-day-picker";
-import { usePaymentsItemsByDate } from "@/app/(hooks)/hooks/Payments/usePaymentItemsByDate";
-import { id } from "date-fns/locale";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type PaymentTypeData = {
@@ -49,7 +48,7 @@ export type PaymentTypeData = {
   skuType: string;
   majorId: string;
   major?: { id: string; name: string };
-  student: {
+  student?: {
     class: {
       name: string;
     };
@@ -111,26 +110,30 @@ const YEARS = Array.from({ length: 5 }, (_, i) => String(currentYear - 2 + i));
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function PaidBadge({ isPaid }: { isPaid: boolean }) {
-  return isPaid ?
-      <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
-        <BadgeCheck className="h-3 w-3" />
-        Lunas
-      </Badge>
-    : <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
-        <Clock className="h-3 w-3" />
-        Belum Lunas
-      </Badge>;
+  return isPaid ? (
+    <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
+      <BadgeCheck className="h-3 w-3" />
+      Lunas
+    </Badge>
+  ) : (
+    <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
+      <Clock className="h-3 w-3" />
+      Belum Lunas
+    </Badge>
+  );
 }
 
-function ActiveBadge({ isActive }: { isActive: boolean }) {
-  return isActive ?
-      <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
-        Aktif
-      </Badge>
-    : <Badge variant="outline" className="text-gray-400 text-xs">
-        Nonaktif
-      </Badge>;
-}
+// function ActiveBadge({ isActive }: { isActive: boolean }) {
+//   return isActive ? (
+//     <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+//       Aktif
+//     </Badge>
+//   ) : (
+//     <Badge variant="outline" className="text-gray-400 text-xs">
+//       Nonaktif
+//     </Badge>
+//   );
+// }
 
 // ─── Single Item Form Schema ──────────────────────────────────────────────────
 const singleItemSchema = z.object({
@@ -165,7 +168,7 @@ function SingleItemDialog({
   onOpenChange: (open: boolean) => void;
   editData?: PaymentItemData | null;
   onSuccess: () => void;
-  allStudents: any[];
+  allStudents: UserDataTypes[];
   allPaymentTypes: PaymentTypeData[];
 }) {
   const createItem = useCreatePaymentItems();
@@ -180,9 +183,14 @@ function SingleItemDialog({
     formState: { errors, isValid },
     reset,
   } = useForm<SingleItemFormValues>({
-    resolver: zodResolver(singleItemSchema as any),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(singleItemSchema as unknown as any),
     mode: "onChange", // ✅ Enable validation on change
     defaultValues: {
+      paymentId: "",
+      studentId: "",
+      paymentTypeId: "",
+      name: "",
       quantity: 1,
       amount: 0,
       subtotal: 0,
@@ -199,9 +207,9 @@ function SingleItemDialog({
 
   const watchedPaymentTypeId = watch("paymentTypeId");
   const watchedStudentId = watch("studentId");
-  const isPaid = watch("isPaid");
-  const isActive = watch("isActive");
-  const isMonthly = watch("isMonthly");
+  // const isPaid = watch("isPaid");
+  // const isActive = watch("isActive");
+  // const isMonthly = watch("isMonthly");
 
   // Fetch unpaid items for selected student
   const { data: unpaidItems = [] } = usePaymentItemsUnpaidStudent(watchedStudentId);
@@ -281,6 +289,10 @@ function SingleItemDialog({
       });
     } else if (open && !editData) {
       reset({
+        paymentId: "",
+        studentId: "",
+        paymentTypeId: "",
+        name: "",
         quantity: 1,
         amount: 0,
         subtotal: 0,
@@ -299,12 +311,7 @@ function SingleItemDialog({
   const onSubmit = async (data: SingleItemFormValues) => {
     try {
       if (editData) {
-        await updateItem.mutateAsync({
-          id: editData.id,
-          ...data,
-          month: String(MONTH_NUMBER[data.month] ?? data.month),
-          year: data.year,
-        });
+        await updateItem.mutateAsync(data);
         toast.success("Item tagihan berhasil diperbarui!");
       } else {
         await createItem.mutateAsync({
@@ -318,8 +325,9 @@ function SingleItemDialog({
       reset();
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Terjadi kesalahan");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan";
+      toast.error(errorMessage);
     }
   };
 
@@ -359,7 +367,7 @@ function SingleItemDialog({
             <div className="space-y-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <Label className="text-sm font-semibold text-blue-900">Tagihan Belum Lunas</Label>
               <div className="space-y-1 max-h-40 overflow-y-auto">
-                {unpaidItems.map((item: any) => (
+                {unpaidItems.map((item) => (
                   <div key={item.id} className="text-xs p-2 bg-white rounded border border-blue-100 flex justify-between">
                     <span className="font-medium">{item.name}</span>
                     <span className="text-blue-600 font-semibold">{formatRupiah(item.subtotal)}</span>
@@ -501,13 +509,7 @@ function SingleItemDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Batal
             </Button>
-            <Button type="submit">
-              {isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
-            </Button>
+            <Button type="submit">{isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}</Button>
           </div>
 
           {/* Debug: Show current form values */}
@@ -553,8 +555,9 @@ function DeleteItemDialog({ open, onOpenChange, itemData, onSuccess }: { open: b
       toast.success("Item tagihan berhasil dihapus!");
       onOpenChange(false);
       onSuccess();
-    } catch (error: any) {
-      toast.error(error.message || "Gagal menghapus item tagihan");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan saat menghapus data tagihan";
+      toast.error(errorMessage);
     }
   };
 
@@ -627,20 +630,14 @@ async function exportToExcel(data: PaymentItemData[], filename: string = "Data_T
     // Write file
     XLSX.writeFile(wb, filename);
     toast.success("Data berhasil diexport ke Excel!");
-  } catch (error: any) {
-    toast.error("Gagal mengexport data: " + error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan";
+    toast.error(errorMessage);
   }
 }
 
 // ─── Main DataTable ───────────────────────────────────────────────────────────
-function BillingDataTable({
-  majorData,
-}: {
-  majorData: {
-    id: string;
-    name: string;
-  };
-}) {
+function BillingDataTable({ majorData }: { majorData: { id: string; name: string } | null | undefined }) {
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>(() => {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -683,33 +680,29 @@ function BillingDataTable({
   } = usePaymentsItemsByDate({
     fromdate: dateRange?.from,
     todate: dateRange?.to,
-    majorId: majorData.id,
+    majorId: majorData?.id,
     skuType: skuFilter !== "all" ? skuFilter : undefined,
-    isPaid:
-      paidFilter === "all" ? undefined
-      : paidFilter === "paid" ? true
-      : false,
+    isPaid: paidFilter === "all" ? undefined : paidFilter === "paid" ? true : false,
   });
 
-  const { data: allStudents = [] } = useGetStudentByIdMajor(majorData?.id);
-  const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorData?.id);
-  const { data: allClassById = [] } = useGetClassByIdMajor(majorData?.id);
+  const { data: allStudents = [] } = useGetStudentByIdMajor(majorData?.id ?? "");
+  const { data: allPaymentTypes = [] } = useGetPaymentTypeByIdMajor(majorData?.id ?? "");
+  const { data: allClassById = [] } = useGetClassByIdMajor(majorData?.id ?? "");
   const handleSuccess = () => refetch();
 
-  const globalFilterFn = React.useCallback((row: any, _: string, filterValue: string) => {
+  const globalFilterFn = React.useCallback((row: Row<PaymentItemData>, _: string, filterValue: string) => {
     if (!filterValue) return true;
-    const item = row.original as PaymentItemData;
+    const item = row.original;
     const text = [item.name, item.skuType, item.student?.name, item.PaymentType?.name, item.payment?.receiptNumber, item.month, item.year].filter(Boolean).join(" ").toLowerCase();
     return text.includes(filterValue.toLowerCase());
   }, []);
-
   // ✅ FIX: Get students in selected class
   const studentsInSelectedClass = React.useMemo(() => {
     if (classFilter === "all") return null;
-    const selectedClass = allClassById.find((c: any) => c.id === classFilter);
+    const selectedClass = allClassById.find((c) => c.id === classFilter);
     if (!selectedClass) return [];
     // Assuming class has students array or we match by student.classId
-    return (selectedClass.students || []).map((s: any) => s.id);
+    return (selectedClass.students || []).map((s) => s.id);
   }, [classFilter, allClassById]);
 
   const columns: ColumnDef<PaymentItemData>[] = [
@@ -742,9 +735,9 @@ function BillingDataTable({
         </Button>
       ),
       cell: ({ row }) => <div className="font-medium">{row.original.student?.name ?? "-"}</div>,
-      filterFn: (row, _id, filterValue) => {
+      filterFn: (row: Row<PaymentItemData>, _id: string, filterValue: string): boolean => {
         if (filterValue === "all" || !filterValue) return true;
-        return row.original.studentId === filterValue || studentsInSelectedClass?.includes(row.original.studentId);
+        return row.original.studentId === filterValue || (studentsInSelectedClass?.includes(row.original.studentId) ?? false);
       },
     },
     {
@@ -914,7 +907,7 @@ function BillingDataTable({
   ];
 
   const table = useReactTable({
-    data: paymentItems as PaymentItemData[],
+    data: paymentItems as unknown as PaymentItemData[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -952,7 +945,7 @@ function BillingDataTable({
   if (isLoading) return <Loading />;
 
   const filteredRows = table.getFilteredRowModel().rows;
-  const totalItems = (paymentItems as any[]).length;
+  const totalItems = paymentItems.length;
   const totalSubtotal = filteredRows.reduce((sum, r) => {
     const subtotal = parseFloat(String(r.original.subtotal ?? 0));
     return sum + (isNaN(subtotal) ? 0 : subtotal);
@@ -987,7 +980,7 @@ function BillingDataTable({
   return (
     <div>
       <div className="font-bold text-3xl mb-3">Data Tagihan</div>
-      <Badge>{majorData.name}</Badge>
+      <Badge>{majorData?.name}</Badge>
       {/* Toolbar */}
       <div className="flex items-center justify-between py-4 flex-wrap gap-y-3">
         <div className="flex items-center space-x-2 flex-wrap gap-y-2">
@@ -1005,7 +998,7 @@ function BillingDataTable({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Kelas</SelectItem>
-              {allClassById.map((m: any) => (
+              {allClassById.map((m) => (
                 <SelectItem key={m.id} value={m.id}>
                   {m.name}
                 </SelectItem>
@@ -1096,7 +1089,7 @@ function BillingDataTable({
           <Button
             onClick={async () => {
               setIsExporting(true);
-              await exportToExcel(paymentItems as PaymentItemData[]);
+              await exportToExcel(paymentItems as unknown as PaymentItemData[]);
               setIsExporting(false);
             }}
             disabled={isExporting}
@@ -1136,7 +1129,7 @@ function BillingDataTable({
           )}
           {classFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
-              Kelas: {allClassById.find((c: any) => c.id === classFilter)?.name ?? classFilter}
+              Kelas: {allClassById.find((c) => c.id === classFilter)?.name ?? classFilter}
               <X className="h-3 w-3 cursor-pointer" onClick={() => setClassFilter("all")} />
             </Badge>
           )}
@@ -1168,7 +1161,7 @@ function BillingDataTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ?
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -1176,7 +1169,8 @@ function BillingDataTable({
                   ))}
                 </TableRow>
               ))
-            : <TableRow>
+            ) : (
+              <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1189,7 +1183,7 @@ function BillingDataTable({
                   </div>
                 </TableCell>
               </TableRow>
-            }
+            )}
           </TableBody>
         </Table>
       </div>
@@ -1254,8 +1248,8 @@ function BillingDataTable({
       {/* dialog find studnet */}
 
       {/* Dialogs */}
-      <SingleItemDialog open={singleDialogOpen} onOpenChange={setSingleDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allPaymentTypes={allPaymentTypes} />
-      <SingleItemDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedItem} onSuccess={handleSuccess} allStudents={allStudents} allPaymentTypes={allPaymentTypes} />
+      <SingleItemDialog open={singleDialogOpen} onOpenChange={setSingleDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allPaymentTypes={allPaymentTypes as unknown as PaymentTypeData[]} />
+      <SingleItemDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedItem} onSuccess={handleSuccess} allStudents={allStudents} allPaymentTypes={allPaymentTypes as unknown as PaymentTypeData[]} />
       <DeleteItemDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} itemData={selectedItem} onSuccess={handleSuccess} />
     </div>
   );
