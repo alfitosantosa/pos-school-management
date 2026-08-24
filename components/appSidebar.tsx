@@ -152,7 +152,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       {/* Content */}
-      <SidebarContent className="px-3 py-4">
+      <SidebarContent className="px-3 py-4 overflow-auto">
         {currentMenuGroups.map((group, groupIndex) => {
           const filteredItems = filterMenuByPermissions(group.items);
           if (filteredItems.length === 0) return null;
@@ -239,7 +239,7 @@ export function AppSidebar() {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
               <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
+              <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

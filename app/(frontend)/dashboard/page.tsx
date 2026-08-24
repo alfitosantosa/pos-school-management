@@ -1,50 +1,19 @@
 "use client";
 
-import { useAttendanceByDate } from '@/app/(hooks)/hooks/Attendances/useAttendanceByDate';
-import { DatePickerWithRange } from '@/components/date/datePicker';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import {
-  Activity,
-  AlertCircle,
-  AlertTriangle,
-  BarChart3,
-  BookOpen,
-  CalendarDays,
-  CheckCircle,
-  Clock,
-  MapPin,
-  PieChart as PieChartIcon,
-  RefreshCw,
-  Search,
-  TrendingUp,
-  User,
-  Users,
-  XCircle,
-} from 'lucide-react';
-import React, { useMemo, useState } from 'react';
-import type { DateRange } from 'react-day-picker';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { useAttendanceByDate } from "@/app/(hooks)/hooks/Attendances/useAttendanceByDate";
+import { DatePickerWithRange } from "@/components/date/datePicker";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Activity, AlertCircle, AlertTriangle, BarChart3, BookOpen, CalendarDays, CheckCircle, Clock, MapPin, PieChart as PieChartIcon, RefreshCw, Search, TrendingUp, User, Users, XCircle } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import type { DateRange } from "react-day-picker";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -159,7 +128,7 @@ const STATUS_MAP: Record<
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number; color: string }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border bg-background/95 backdrop-blur shadow-xl p-3 min-w-[160px]">
+    <div className="rounded-xl border bg-background/95 backdrop-blur shadow-xl p-3 min-w-40">
       <p className="text-xs font-semibold text-muted-foreground mb-2">{label}</p>
       {payload.map((p, i) => (
         <div key={i} className="flex items-center justify-between gap-4 text-xs">
@@ -180,7 +149,7 @@ function DashboardSkeleton() {
   return (
     <div className="min-h-screen p-6 max-w-7xl mx-auto space-y-6">
       {/* Header skeleton */}
-      <div className="h-32 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 animate-pulse" />
+      <div className="h-32 rounded-2xl bg-linear-to-r from-blue-600 to-indigo-700 animate-pulse" />
 
       {/* Filter skeleton */}
       <div className="h-24 rounded-xl border bg-card animate-pulse" />
@@ -342,7 +311,7 @@ export default function AttendanceDashboardPage() {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* ── Page Header ── */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white shadow-xl">
+        <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 text-white shadow-xl">
           {/* decorative circles */}
           <div className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-white/10" />
           <div className="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/10" />
@@ -766,7 +735,7 @@ export default function AttendanceDashboardPage() {
                                 year: "numeric",
                               })}
                             </TableCell>
-                            <TableCell className="py-2.5 max-w-[160px]">
+                            <TableCell className="py-2.5 max-w-40">
                               <span className="text-xs text-muted-foreground truncate block" title={record.notes ?? "-"}>
                                 {record.notes ?? "-"}
                               </span>

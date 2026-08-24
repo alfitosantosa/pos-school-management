@@ -9,12 +9,15 @@ datasource db {
   provider = "postgresql"
 }
 
-model Client {
-  id              String  @id @unique
-  name            String
-  imageUrl        String
+model clientIdentity {
+  id          String   @id @default(cuid())
+  clientId    String   @unique
+  clientName  String
+  LogoUrl     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-@@map("client")
+  @@map("client_identity")
 }
 
 model User {

@@ -72,8 +72,9 @@ async function exportToExcel(data: PaymentData[], filename: string = "Data_Pemba
       Tahun: new Date(item.createdAt).getFullYear(),
       "Jumlah (Rp)": Number(item.amount),
       Status: statusConfig[item.status]?.label ?? item.status,
-      "Tanggal Transfer": item.transferDate
-        ? new Date(item.transferDate).toLocaleString("id-ID", {
+      "Tanggal Transfer":
+        item.transferDate ?
+          new Date(item.transferDate).toLocaleString("id-ID", {
             dateStyle: "medium",
             timeStyle: "short",
           })
@@ -455,8 +456,9 @@ function PaymentFormDialog({
         notes: editData.notes || "",
         bendaharaId: userDataId || "",
         majorId: userDataMajorId || "",
-        items: editData.paymentItems?.length
-          ? editData.paymentItems.map((item) => ({
+        items:
+          editData.paymentItems?.length ?
+            editData.paymentItems.map((item) => ({
               id: item.id,
               name: item.name,
               amount: item.amount,
@@ -778,7 +780,7 @@ function PaymentFormDialog({
                     const isPaid = currentItem?.isPaid ?? false;
 
                     return (
-                      <div key={field.id} className={`grid border p-3 rounded-lg grid-cols-12 gap-2 items-center transition-all ${isSelected ? "bg-blue-50 border-blue-200" : "bg-muted/20 opacity-60"}`}>
+                      <div key={field.id} className={`grid border p-2 rounded-lg grid-cols-12 gap-1 items-center transition-all ${isSelected ? "bg-blue-50 border-blue-200" : "bg-muted/20 opacity-60"}`}>
                         <div className="col-span-1 flex justify-center">
                           <Checkbox checked={isSelected} onCheckedChange={() => toggleItemSelection(index)} />
                         </div>
@@ -787,7 +789,12 @@ function PaymentFormDialog({
                             <p className="text-sm font-medium">{currentItem?.name}</p>
                           </div>
                         </div>
-                        <div className="col-span-2"> {isPaid ? <Badge className="bg-green-600 text-white ">Lunas</Badge> : <Badge className="bg-red-600 text-white ">Belum Lunas</Badge>}</div>
+                        <div className="col-span-2">
+                          {" "}
+                          {isPaid ?
+                            <Badge className="bg-green-600 text-white ">Lunas</Badge>
+                          : <Badge className="bg-red-600 text-white ">Belum Lunas</Badge>}
+                        </div>
 
                         <div className="col-span-2 text-center">
                           <Badge variant="outline" className="text-xs">
@@ -845,9 +852,20 @@ function PaymentFormDialog({
                     const val = e.target.value;
                     setTotalTransfer(val === "" ? "" : Number(val));
                   }}
-                  className={isTransferEmpty ? "" : isTransferValid ? "border-green-500 focus-visible:ring-green-500" : "border-red-500 focus-visible:ring-red-500"}
+                  className={
+                    isTransferEmpty ? ""
+                    : isTransferValid ?
+                      "border-green-500 focus-visible:ring-green-500"
+                    : "border-red-500 focus-visible:ring-red-500"
+                  }
                 />
-                {!isTransferEmpty && <div className="absolute right-3 top-1/2 -translate-y-1/2">{isTransferValid ? <BadgeCheck className="h-4 w-4 text-green-600" /> : <XCircle className="h-4 w-4 text-red-500" />}</div>}
+                {!isTransferEmpty && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {isTransferValid ?
+                      <BadgeCheck className="h-4 w-4 text-green-600" />
+                    : <XCircle className="h-4 w-4 text-red-500" />}
+                  </div>
+                )}
               </div>
 
               {isTransferEmpty && grandTotal > 0 && <p className="text-xs text-muted-foreground">Masukkan jumlah yang ditransfer untuk melanjutkan</p>}
@@ -890,7 +908,11 @@ function PaymentFormDialog({
                 Batal
               </Button>
               <Button type="submit" disabled={!isSubmitDisabled} title={selectedItemsCount === 0 ? "Pilih minimal 1 item" : undefined}>
-                {isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+                {isPending ?
+                  "Menyimpan..."
+                : editData ?
+                  "Perbarui"
+                : "Simpan"}
               </Button>
             </div>
           </div>
@@ -1056,7 +1078,9 @@ function PaymentDataTable({
             <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs px-2" onClick={() => toggleExpand(p.id)}>
               <Package className="h-3.5 w-3.5" />
               {itemCount}
-              {isExpanded ? <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" /> : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
+              {isExpanded ?
+                <ChevronDown className="h-3.5 w-3.5 rotate-180 transition-transform" />
+              : <ChevronDown className="h-3.5 w-3.5 transition-transform" />}
             </Button>
           );
         },
@@ -1413,7 +1437,7 @@ function PaymentDataTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
                   <TableRow data-state={row.getIsSelected() && "selected"}>
@@ -1431,8 +1455,7 @@ function PaymentDataTable({
                   )}
                 </React.Fragment>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1455,7 +1478,7 @@ function PaymentDataTable({
                   </div>
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>

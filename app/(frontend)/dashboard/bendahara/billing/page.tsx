@@ -110,17 +110,15 @@ const YEARS = Array.from({ length: 5 }, (_, i) => String(currentYear - 2 + i));
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function PaidBadge({ isPaid }: { isPaid: boolean }) {
-  return isPaid ? (
-    <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
-      <BadgeCheck className="h-3 w-3" />
-      Lunas
-    </Badge>
-  ) : (
-    <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
-      <Clock className="h-3 w-3" />
-      Belum Lunas
-    </Badge>
-  );
+  return isPaid ?
+      <Badge className="bg-green-600 text-white flex items-center gap-1 w-fit">
+        <BadgeCheck className="h-3 w-3" />
+        Lunas
+      </Badge>
+    : <Badge className="bg-yellow-500 text-white flex items-center gap-1 w-fit">
+        <Clock className="h-3 w-3" />
+        Belum Lunas
+      </Badge>;
 }
 
 // function ActiveBadge({ isActive }: { isActive: boolean }) {
@@ -310,13 +308,14 @@ function SingleItemDialog({
 
   const onSubmit = async (data: SingleItemFormValues) => {
     try {
+      const month = String(MONTH_NUMBER[data.month] ?? data.month);
       if (editData) {
-        await updateItem.mutateAsync({ ...data, id: editData.id, skuType: data.skuType ?? "default" });
+        await updateItem.mutateAsync({ ...data, month, id: editData.id, skuType: data.skuType ?? "default" });
         toast.success("Item tagihan berhasil diperbarui!");
       } else {
         await createItem.mutateAsync({
           ...data,
-          month: String(MONTH_NUMBER[data.month] ?? data.month),
+          month,
           year: data.year,
         });
         console.log(data);
@@ -509,7 +508,13 @@ function SingleItemDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Batal
             </Button>
-            <Button type="submit">{isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}</Button>
+            <Button type="submit">
+              {isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
+            </Button>
           </div>
 
           {/* Debug: Show current form values */}
@@ -682,7 +687,10 @@ function BillingDataTable({ majorData }: { majorData: { id: string; name: string
     todate: dateRange?.to,
     majorId: majorData?.id,
     skuType: skuFilter !== "all" ? skuFilter : undefined,
-    isPaid: paidFilter === "all" ? undefined : paidFilter === "paid" ? true : false,
+    isPaid:
+      paidFilter === "all" ? undefined
+      : paidFilter === "paid" ? true
+      : false,
   });
 
   const { data: allStudents = [] } = useGetStudentByIdMajor(majorData?.id ?? "");
@@ -1161,7 +1169,7 @@ function BillingDataTable({ majorData }: { majorData: { id: string; name: string
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -1169,8 +1177,7 @@ function BillingDataTable({ majorData }: { majorData: { id: string; name: string
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="h-8 w-8 text-muted-foreground" />
@@ -1183,7 +1190,7 @@ function BillingDataTable({ majorData }: { majorData: { id: string; name: string
                   </div>
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>
