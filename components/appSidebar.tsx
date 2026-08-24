@@ -26,6 +26,7 @@ import * as React from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { menuGroups } from "@/app/repository/menuGroupsSidebar";
 
 // Icon mapping
 const iconMap: Record<string, React.ElementType> = {
@@ -59,199 +60,6 @@ type MenuGroup = {
 };
 
 // Define menu groups
-const menuGroups: Record<string, MenuGroup[]> = {
-  // Admin menu
-  admin: [
-    {
-      title: "Utama",
-      items: [
-        { title: "Home", url: "/", icon: "home" },
-        { title: "Dashboard", url: "/dashboard", icon: "dashboard" },
-      ],
-    },
-    {
-      title: "Master Data",
-      items: [
-        { title: "BetterAuth", url: "/dashboard/betterauth", icon: "settings" },
-        { title: "Roles", url: "/dashboard/roles", icon: "settings" },
-        { title: "Users", url: "/dashboard/users", icon: "users" },
-        { title: "Tahun Ajaran", url: "/dashboard/academicyear", icon: "academic" },
-        { title: "Branch", url: "/dashboard/majors", icon: "academic" },
-        { title: "Kelas", url: "/dashboard/classes", icon: "academic" },
-        { title: "Mata Pelajaran", url: "/dashboard/subjects", icon: "academic" },
-        { title: "Tahfidz Group", url: "/dashboard/classes/tahfidz", icon: "academic" },
-      ],
-    },
-    {
-      title: "Akademik",
-      items: [
-        { title: "Jadwal", url: "/dashboard/schedules", icon: "calendar" },
-        { title: "Jadwal Khusus", url: "/dashboard/specialschedule", icon: "calendar" },
-        { title: "Absensi", url: "/dashboard/attendance", icon: "attendance" },
-        { title: "Setoran Tahfidz", url: "/dashboard/tahfidzrecord", icon: "academic" },
-        {
-          title: "Kalender",
-          url: "/dashboard/calender",
-          icon: "calendar",
-          items: [
-            { title: "Guru", url: "/dashboard/calender/teacher" },
-            { title: "Siswa", url: "/dashboard/calender/student" },
-            { title: "List Guru", url: "/dashboard/calender/list/teacher" },
-            { title: "List Siswa", url: "/dashboard/calender/list/student" },
-          ],
-        },
-        {
-          title: "Rekap Absensi",
-          url: "/dashboard/recapattendance",
-          icon: "attendance",
-          items: [{ title: "Per Kelas", url: "/dashboard/recapattendance/class" }],
-        },
-      ],
-    },
-    {
-      title: "Pelanggaran",
-      items: [
-        { title: "Jenis Pelanggaran", url: "/dashboard/typeviolations", icon: "violation" },
-        { title: "Data Pelanggaran", url: "/dashboard/violations", icon: "violation" },
-      ],
-    },
-    {
-      title: "Keuangan",
-      items: [
-        { title: "Jenis Tagihan", url: "/dashboard/paymenttypes", icon: "payment" },
-        { title: "Tagihan", url: "/dashboard/billing", icon: "file" },
-        { title: "Transaksi", url: "/dashboard/payments", icon: "payment" },
-        { title: "Account Bank", url: "/dashboard/accountbank", icon: "bank" },
-        { title: "Informasi Siswa", url: "/dashboard/studentinformation", icon: "users" },
-      ],
-    },
-    {
-      title: "Dashboard",
-      items: [
-        { title: "Dashboard Transaksi", url: "/dashboard/payments/chart", icon: "chart" },
-        { title: "Dashboard Tagihan", url: "/dashboard/billing/chart", icon: "chart" },
-        { title: "Dashboard Saldo", url: "/dashboard/accountbank/chart", icon: "chart" },
-      ],
-    },
-    {
-      title: "Utilitas",
-      items: [
-        { title: "Upload Users", url: "/dashboard/upload/users", icon: "upload" },
-        { title: "Upload Jadwal", url: "/dashboard/upload/schedules", icon: "upload" },
-        { title: "Botwa", url: "/dashboard/botwa", icon: "bot" },
-      ],
-    },
-  ],
-  // Bendahara menu
-  bendahara: [
-    {
-      title: "Utama",
-      items: [
-        { title: "Home", url: "/", icon: "home" },
-        { title: "Dashboard", url: "/dashboard", icon: "dashboard" },
-      ],
-    },
-    {
-      title: "Dashboard",
-      items: [
-        { title: "Dashboard Transaksi", url: "/dashboard/payments/chart", icon: "chart" },
-        { title: "Dashboard Tagihan", url: "/dashboard/billing/chart", icon: "chart" },
-        { title: "Dashboard Saldo", url: "/dashboard/accountbank/chart", icon: "chart" },
-      ],
-    },
-    {
-      title: "Keuangan",
-      items: [
-        { title: "Data Transaksi", url: "/dashboard/bendahara/payment", icon: "payment" },
-        { title: "Data Tagihan", url: "/dashboard/bendahara/billing", icon: "file" },
-        { title: "Jenis Tagihan", url: "/dashboard/bendahara/paymenttype", icon: "payment" },
-        { title: "Data Siswa", url: "/dashboard/bendahara/users", icon: "users" },
-        { title: "Data Kelas", url: "/dashboard/bendahara/class", icon: "academic" },
-        { title: "Informasi Siswa", url: "/dashboard/bendahara/studentinformation", icon: "users" },
-      ],
-    },
-    {
-      title: "Upload Data",
-      items: [
-        { title: "Upload Tagihan", url: "/dashboard/bendahara/billing/upload", icon: "upload" },
-        { title: "Upload Siswa", url: "/dashboard/bendahara/users/upload", icon: "upload" },
-      ],
-    },
-  ],
-  // Teacher menu
-  teacher: [
-    {
-      title: "Utama",
-      items: [
-        { title: "Home", url: "/", icon: "home" },
-        { title: "Dashboard", url: "/dashboard", icon: "dashboard" },
-      ],
-    },
-    {
-      title: "Akademik",
-      items: [
-        { title: "Jadwal Saya", url: "/dashboard/teacher/schedule", icon: "calendar" },
-        { title: "Absensi Kepala Sekolah", url: "/dashboard/attendance/teacher", icon: "attendance" },
-        {
-          title: "Kalender",
-          url: "/dashboard/calender/teacher",
-          icon: "calendar",
-          items: [{ title: "List Kalender", url: "/dashboard/calender/list/teacher" }],
-        },
-      ],
-    },
-    {
-      title: "Pelanggaran",
-      items: [{ title: "Data Pelanggaran", url: "/dashboard/violations/teacher", icon: "violation" }],
-    },
-  ],
-  // Student menu
-  student: [
-    {
-      title: "Utama",
-      items: [
-        { title: "Home", url: "/", icon: "home" },
-        { title: "Dashboard", url: "/dashboard", icon: "dashboard" },
-      ],
-    },
-    {
-      title: "Akademik",
-      items: [
-        { title: "Jadwal", url: "/dashboard/student/schedule", icon: "calendar" },
-        { title: "Absensi", url: "/dashboard/student/attendance", icon: "attendance" },
-        { title: "Setoran Tahfidz", url: "/dashboard/student/tahfidzrecord", icon: "academic" },
-        {
-          title: "Kalender",
-          url: "/dashboard/calender/student",
-          icon: "calendar",
-          items: [{ title: "List Kalender", url: "/dashboard/calender/list/student" }],
-        },
-      ],
-    },
-    {
-      title: "Keuangan",
-      items: [{ title: "Pembayaran", url: "/dashboard/student/payment", icon: "payment" }],
-    },
-    {
-      title: "Pelanggaran",
-      items: [{ title: "Data Pelanggaran", url: "/dashboard/violations/student", icon: "violation" }],
-    },
-  ],
-  // Parent menu
-  parent: [
-    {
-      title: "Utama",
-      items: [
-        { title: "Home", url: "/", icon: "home" },
-        { title: "Dashboard", url: "/dashboard", icon: "dashboard" },
-      ],
-    },
-    {
-      title: "Informasi Anak",
-      items: [{ title: "Portal Orang Tua", url: "/dashboard/parent", icon: "users" }],
-    },
-  ],
-};
 
 export function AppSidebar() {
   const router = useRouter();
@@ -262,19 +70,46 @@ export function AppSidebar() {
   const userRole = userData?.role?.name?.toLowerCase() || "student";
   const permissions = userData?.role?.permissions || [];
 
-  // Get menu groups based on role
-  const currentMenuGroups = menuGroups[userRole] || menuGroups.student;
+  // Map role names to menu groups
+  // Super Admin, Admin → admin menu
+  // Bendahara → bendahara menu
+  // Teacher, Guru → teacher menu
+  // Student, Siswa → student menu
+  // Parent, Orang Tua → parent menu
+  const getRoleMenuKey = (role: string): string => {
+    if (role.includes("admin")) return "admin";
+    if (role.includes("bendahara")) return "bendahara";
+    if (role.includes("teacher") || role.includes("guru")) return "teacher";
+    if (role.includes("parent") || role.includes("orang tua")) return "parent";
+    return "student";
+  };
+
+  const roleMenuKey = getRoleMenuKey(userRole);
+  const currentMenuGroups = menuGroups[roleMenuKey] || menuGroups.student;
+
+  // Debug log (hapus setelah testing)
+  React.useEffect(() => {
+    console.log("🔍 Sidebar Debug:", {
+      originalRole: userData?.role?.name,
+      userRole,
+      roleMenuKey,
+      permissionsCount: permissions.length,
+      hasSchedulesPermission: permissions.includes("/dashboard/schedules"),
+      hasStudentSchedulePermission: permissions.includes("/dashboard/student/schedule"),
+    });
+  }, [userData?.role?.name, userRole, roleMenuKey, permissions]);
 
   // Filter menu items based on permissions
   const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
     return items
       .filter((item) => {
-        // If item has sub-items, filter them recursively
+        // If item has sub-items, check if parent has permission OR any sub-item has permission
         if (item.items) {
           const filteredSub = filterMenuByPermissions(item.items);
-          return filteredSub.length > 0;
+          // Show parent if it has permission OR if any sub-items passed the filter
+          return permissions.includes(item.url) || filteredSub.length > 0;
         }
-        // Check if user has permission
+        // For items without sub-items, check if user has permission
         return permissions.includes(item.url);
       })
       .map((item) => {

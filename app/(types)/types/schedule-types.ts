@@ -1,3 +1,5 @@
+"use client";
+
 // Schedule Types
 export interface ScheduleTypes {
   id: string;

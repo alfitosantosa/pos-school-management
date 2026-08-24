@@ -144,9 +144,9 @@ const singleItemSchema = z.object({
   skuType: z.string().optional(),
   month: z.string().min(1, "Bulan wajib dipilih"),
   year: z.string().min(1, "Tahun wajib dipilih"),
-  quantity: z.number().optional(),
-  amount: z.number().optional(),
-  subtotal: z.number(),
+  quantity: z.number().default(1),
+  amount: z.number().default(0),
+  subtotal: z.number().default(0),
   isFixedAmount: z.boolean().default(false),
   isFixedQuantity: z.boolean().default(false),
   isMonthly: z.boolean().default(false),
@@ -311,7 +311,7 @@ function SingleItemDialog({
   const onSubmit = async (data: SingleItemFormValues) => {
     try {
       if (editData) {
-        await updateItem.mutateAsync(data);
+        await updateItem.mutateAsync({ ...data, id: editData.id, skuType: data.skuType ?? "default" });
         toast.success("Item tagihan berhasil diperbarui!");
       } else {
         await createItem.mutateAsync({
