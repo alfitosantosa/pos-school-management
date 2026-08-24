@@ -470,7 +470,7 @@ Terima kasih.
               </div>
 
               <div className="flex justify-between items-center">
-                <Button onClick={saveAttendance} disabled={isLoadingClass || createAttendanceMutation.isPending || isSendingWA} className="min-w-[180px]">
+                <Button onClick={saveAttendance} disabled={isLoadingClass || createAttendanceMutation.isPending || isSendingWA} className="min-w-45">
                   {createAttendanceMutation.isPending || isSendingWA ? (
                     <>
                       <span className="animate-spin mr-2">⏳</span>

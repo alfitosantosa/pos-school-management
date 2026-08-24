@@ -19,7 +19,7 @@ export default function SignIn() {
   const [rememberMe, setRememberMe] = useState(false);
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 p-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-blue-50 p-4">
       <div className="w-full max-w-md">
         {/* Logo and Brand */}
         <div className="flex flex-col items-center mb-8">

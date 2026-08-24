@@ -1,4 +1,9 @@
 {
   "json.schemaDownload.enable": false,
-  "search.useIgnoreFiles": true
+  "search.useIgnoreFiles": true,
+  "editor.quickSuggestions": {
+    "other": "offWhenInlineCompletions",
+    "comments": "off",
+    "strings": "off"
+  }
 }

@@ -29,11 +29,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
     const { studentId, paymentTypeId, quantity, amount, subtotal, month, name, year, skuType } = body;
-
-    console.log("[PaymentItems] Creating with quantity:", quantity, "type:", typeof quantity);
-
     const createPaymentItems = await prisma.paymentItems.create({
       data: {
         studentId,
