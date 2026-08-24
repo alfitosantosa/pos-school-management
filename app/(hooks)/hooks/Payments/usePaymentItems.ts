@@ -30,7 +30,7 @@ export const useCreatePaymentItems = () => {
 export const useUpdatePaymentItems = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: PaymentItemsInput) => {
+    mutationFn: async (data: PaymentItemData) => {
       const res = await apiPut("/api/payment/items", data);
       return res.data;
     },
