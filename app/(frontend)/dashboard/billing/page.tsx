@@ -297,7 +297,10 @@ function SingleItemDialog({
   const onSubmit = async (data: SingleItemFormValues) => {
     try {
       if (editData) {
-        await updateItem.mutateAsync(data);
+        await updateItem.mutateAsync({
+          ...data,
+          id: editData.id,
+        });
         toast.success("Item tagihan berhasil diperbarui!");
       } else {
         await createItem.mutateAsync({
