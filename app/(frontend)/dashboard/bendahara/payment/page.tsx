@@ -36,7 +36,7 @@ import * as React from "react";
 import { DateRange } from "react-day-picker";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
+import { v7 as uuidv7 } from "uuid";
 import * as z from "zod";
 
 // ─── Status Config ────────────────────────────────────────────────────────────
@@ -345,7 +345,7 @@ function PaymentFormDialog({
   // Generate receipt number saat dialog dibuka untuk mode create
   React.useEffect(() => {
     if (open && !editData) {
-      const newReceiptNumber = `KWT-${uuidv4().substring(0, 8).toUpperCase()}`;
+      const newReceiptNumber = `KWT-${uuidv7().substring(0, 12).toUpperCase()}`;
       setValue("receiptNumber", newReceiptNumber);
       setValue("month", MONTHS[new Date().getMonth()]);
     } else if (editData) {
@@ -474,7 +474,7 @@ function PaymentFormDialog({
       setSelectedStudentId(editData.studentId || "");
       setTotalTransfer(Number(editData.amount) || "");
     } else {
-      const newReceiptNumber = `KWT-${uuidv4().substring(0, 8).toUpperCase()}`;
+      const newReceiptNumber = `KWT-${uuidv7().substring(0, 12).toUpperCase()}`;
       reset({
         studentId: "",
         accountBankId: "",
@@ -823,7 +823,7 @@ function PaymentFormDialog({
           {/* Grand Total */}
           {selectedItemsCount > 0 && (
             <div className="flex justify-end">
-              <div className="space-y-1 text-right min-w-[200px]">
+              <div className="space-y-1 text-right min-w-50">
                 <div className="flex justify-between text-sm gap-8">
                   <span className="text-muted-foreground">Total Pembayaran</span>
                   <span className="font-bold text-lg tabular-nums text-blue-600">{formatRupiah(grandTotal)}</span>
