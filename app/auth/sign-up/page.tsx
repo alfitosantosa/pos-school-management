@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn, signUp } from "@/lib/authClients";
-import Logo from "@/public/Logo.svg";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
