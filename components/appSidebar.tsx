@@ -17,7 +17,6 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { signOut, useSession } from "@/lib/authClients";
-import Logo from "@/public/Logo.svg";
 import { AlertTriangle, BarChart3, Building2, Calendar, ChevronRight, ClipboardCheck, CreditCard, FileText, GraduationCap, Home, LayoutDashboard, LogOut, MessageSquare, Settings, Upload, User as UserIcon, Users } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -138,12 +137,15 @@ export function AppSidebar() {
     router.push("/auth/sign-in");
   };
 
+  const LogoUrl = process.env.NEXT_PUBLIC_CLIENT_IMAGE_URL;
+  const DefaultLogo = "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png";
+
   return (
     <Sidebar>
       {/* Header */}
       <SidebarHeader className="border-b px-6 py-4">
         <div className="flex items-center gap-3">
-          <Image src={Logo} alt="Logo" className="h-10 w-10" loading="eager" />
+          <Image src={LogoUrl || DefaultLogo} alt="Logo" width={120} height={120} className="h-10 w-10" loading="eager" />
           <div className="flex flex-col">
             <span className="text-sm font-semibold">{process.env.NEXT_PUBLIC_CLIENT_NAME}</span>
             <span className="text-xs text-muted-foreground">Sistem Informasi</span>

@@ -309,7 +309,7 @@ function MajorFormDialog({ open, onOpenChange, editData, onSuccess }: { open: bo
             <Label htmlFor="name">
               Nama Branch <span className="text-red-500">*</span>
             </Label>
-            <Input id="name" placeholder="Contoh: SMA IT Rahmany" {...register("name")} />
+            <Input id="name" placeholder={`Contoh: SMA IT ${process.env.NEXT_PUBLIC_CLIENT_NAME?.toUpperCase()}`} {...register("name")} />
             {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
           </div>
 

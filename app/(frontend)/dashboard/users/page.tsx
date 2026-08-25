@@ -669,12 +669,7 @@ function UserDashboard() {
       <UserFormDialog open={createDialogOpen} onOpenChange={handleCloseCreateDialog} onSuccess={handleSuccess} />
       <UserFormDialog open={editDialogOpen} onOpenChange={handleCloseEditDialog} editData={selectedUser} onSuccess={handleSuccess} />
       <DeleteUserDialog open={deleteDialogOpen} onOpenChange={handleCloseDeleteDialog} userData={selectedUser} onSuccess={handleSuccess} />
-      <DeleteUserBulkDialog
-        open={deleteBulkDialogOpen}
-        onOpenChange={handleCloseBulkDeleteDialog}
-        userDatas={table.getSelectedRowModel().rows.map((row) => row.original) as UserData[]}
-        onSuccess={handleSuccess}
-      />
+      <DeleteUserBulkDialog open={deleteBulkDialogOpen} onOpenChange={handleCloseBulkDeleteDialog} userDatas={table.getSelectedRowModel().rows.map((row) => row.original) as UserData[]} onSuccess={handleSuccess} />
     </div>
   );
 }

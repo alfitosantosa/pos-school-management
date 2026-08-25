@@ -164,7 +164,7 @@ Sebelum memulai, pastikan Anda telah menginstall:
 
 ```bash
 git clone <repository-url>
-cd pos-rahmany-new-2
+cd pos-`${process.env.NEXT_PUBLIC_CLIENT_NAME?.toUpperCase()}`-new-2
 ```
 
 ### 2. Install Dependencies
