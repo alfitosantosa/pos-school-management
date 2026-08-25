@@ -1,5 +1,5 @@
 {
-  "name": "rahmaniyah-pos-app",
+  "name": "lms-rahmaniyah-pos-app",
   "version": "0.4.0",
   "private": true,
   "scripts": {
@@ -8,7 +8,8 @@
     "dev:fast": "NODE_ENV=development WATCHPACK_POLLING=false FAST_REFRESH=true next dev",
     "dev:clean": "rm -rf .next && npm run dev",
     "prebuild": "rm -rf node_modules/.cache && rm -rf .next",
-    "build": "NODE_NO_WARNINGS=1 next build",
+    "build": "NODE_NO_WARNINGS=1 next build --webpack",
+    "build:turbopack": "NODE_NO_WARNINGS=1 next build --turbopack",
     "start": "NODE_ENV=production next start",
     "lint": "eslint",
     "prepare": "husky"
@@ -16,6 +17,9 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
     "@better-auth/core": "^1.6.23",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@hookform/resolvers": "^5.4.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "7.3.0",

@@ -16,22 +16,16 @@ const inter = Inter({
   preload: true,
 });
 
-export const viewport: Viewport = {
-  themeColor: "#000000",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
+export const metadata: Metadata = {
+  title: `Yayasan ${process.env.NEXT_PUBLIC_CLIENT_NAME}`,
+  description: "Sistem Informasi Sekolah",
 };
 
-export const metadata: Metadata = {
-  title: `${process.env.NEXT_PUBLIC_CLIENT_NAME} App`,
-  description: `Aplikasi portal utama ${process.env.NEXT_PUBLIC_CLIENT_NAME}`,
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: `${process.env.NEXT_PUBLIC_CLIENT_NAME} App`,
-  },
+// Viewport must be a separate export in Next.js 14+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({

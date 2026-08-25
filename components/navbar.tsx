@@ -127,9 +127,9 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <Image src={Logo} alt="Logo Rahmaniyah Al-Islamy" className="h-10 w-10" />
+              <Image src={Logo} alt={`Logo ${process.env.NEXT_PUBLIC_CLIENT_NAME}`} className="h-10 w-10" />
               <div className="hidden md:block">
-                <h1 className="text-xl font-bold text-gray-900">Rahmaniyah Al-Islamy</h1>
+                <h1 className="text-xl font-bold text-gray-900">{process.env.NEXT_PUBLIC_CLIENT_NAME}</h1>
                 <p className="text-sm text-gray-500">Sistem Informasi Sekolah</p>
               </div>
             </div>
@@ -149,9 +149,9 @@ export default function Navbar() {
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <Image src={Logo} alt="Logo Rahmaniyah" className="h-10 w-10" />
+              <Image src={Logo} alt={`Logo ${process.env.NEXT_PUBLIC_CLIENT_NAME}`} className="h-10 w-10" />
               <div className="hidden md:block">
-                <h1 className="text-xl font-bold text-gray-900">Rahmaniyah</h1>
+                <h1 className="text-xl font-bold text-gray-900">{process.env.NEXT_PUBLIC_CLIENT_NAME}</h1>
                 <p className="text-sm text-gray-500">Sistem Informasi Sekolah</p>
               </div>
             </div>

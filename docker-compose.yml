@@ -7,13 +7,13 @@ services:
         - NODE_ENV=production
       # PENTING: Tambahkan ini untuk cleanup build cache
       cache_from:
-        - rahmaniyah-web:latest
+        - ${COMPOSE_PROJECT_NAME}-web:latest
       # Batasi build context
       labels:
-        - "com.docker.compose.project=rahmaniyah-web"
+        - "com.docker.compose.project=${COMPOSE_PROJECT_NAME}-web"
 
-    image: rahmaniyah-web:latest
-    container_name: rahmaniyah-web-app
+    image: ${COMPOSE_PROJECT_NAME}-web:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-web-app
     restart: unless-stopped
 
     ports:
@@ -60,15 +60,15 @@ services:
       - no-new-privileges:true
 
     labels:
-      - "com.rahmaniyah-web.service=app"
-      - "com.rahmaniyah-web.environment=production"
+      - "com.${COMPOSE_PROJECT_NAME}.service=app"
+      - "com.${COMPOSE_PROJECT_NAME}.environment=production"
 
   # ==========================================
   # CLEANUP SERVICE - Otomatis bersihkan unused images/containers
   # ==========================================
   docker-cleanup:
     image: docker:cli
-    container_name: docker-cleanup
+    container_name: ${COMPOSE_PROJECT_NAME}-cleanup
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -78,7 +78,7 @@ services:
       - cleanup
 
 networks:
-  app-network:
+  ${COMPOSE_PROJECT_NAME}-app-network:
     driver: bridge
 
 # PENTING: Batasi volume size (jika didukung driver)

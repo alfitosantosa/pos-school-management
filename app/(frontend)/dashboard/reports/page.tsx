@@ -1,21 +1,10 @@
 "use client";
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  AlertTriangle,
-  Calendar,
-  ClipboardCheck,
-  CreditCard,
-  Download,
-  FileSpreadsheet,
-  FileText,
-  Filter,
-  GraduationCap,
-  Users,
-} from 'lucide-react';
-import React, { useState } from 'react';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertTriangle, Calendar, ClipboardCheck, CreditCard, Download, FileSpreadsheet, FileText, Filter, GraduationCap, Users } from "lucide-react";
+import React, { useState } from "react";
 
 const reportCategories = [
   {
@@ -123,7 +112,7 @@ export default function ReportsModule() {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <FileText className="h-6 w-6 text-blue-600" />
-            <span>Sistem Laporan Rahmaniyah</span>
+            <span>Sistem Laporan {process.env.NEXT_PUBLIC_CLIENT_NAME}</span>
           </CardTitle>
           <CardDescription>Generate dan download laporan untuk semua modul administrasi sekolah</CardDescription>
         </CardHeader>

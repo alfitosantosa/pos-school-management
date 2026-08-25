@@ -6,7 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/authClients";
-import Logo from "@/public/Logo.svg";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,13 +17,16 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  const LogoUrl = process.env.NEXT_PUBLIC_CLIENT_IMAGE_URL;
+  const DefaultLogo = "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png";
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-blue-50 p-4">
       <div className="w-full max-w-md">
         {/* Logo and Brand */}
         <div className="flex flex-col items-center mb-8">
-          <Image src={Logo} alt="Logo Rahmaniyah" className="h-10 w-10 mb-5" loading="eager" />
-          <h1 className="text-2xl font-bold text-gray-900">Rahmaniyah Al-Islamy</h1>
+          <Image src={LogoUrl || DefaultLogo} alt="logo" width={200} height={200} className="h-10 w-10 mb-5" loading="eager" />
+          <h1 className="text-2xl font-bold text-gray-900">{process.env.NEXT_PUBLIC_CLIENT_NAME}</h1>
           <p className="text-sm text-gray-600 mt-1">Sistem Informasi Sekolah</p>
         </div>
 
@@ -138,7 +140,9 @@ export default function SignIn() {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-xs text-gray-500">&copy; {new Date().getFullYear()} Yayasan Rahmaniyah Al-Islamy. All rights reserved.</p>
+          <p className="text-xs text-gray-500">
+            &copy; {new Date().getFullYear()} Yayasan {process.env.NEXT_PUBLIC_CLIENT_NAME}. All rights reserved.
+          </p>
         </div>
       </div>
     </div>

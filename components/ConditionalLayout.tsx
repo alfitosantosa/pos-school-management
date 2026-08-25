@@ -5,6 +5,7 @@ import Footer from "@/components/footer";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import React from "react";
+import InstallButton from "./installButton";
 
 const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up", "/auth/register"];
 
@@ -30,6 +31,7 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
           <div className=" mx-auto p-4 md:p-6 lg:p-8 space-y-6">{children}</div>
         </main>
         <Footer />
+        <InstallButton />
       </SidebarInset>
     </SidebarProvider>
   );
