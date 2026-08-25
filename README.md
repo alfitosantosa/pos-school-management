@@ -31,24 +31,28 @@ Sistem manajemen sekolah berbasis web yang komprehensif untuk SMK Fajar Sentosa.
 ## ✨ Fitur Utama
 
 ### 🎯 Manajemen Akademik
+
 - **Tahun Akademik**: Kelola tahun ajaran dan periode akademik
 - **Jurusan**: Manajemen jurusan dan program studi
 - **Kelas**: Organisasi kelas dan pembagian siswa
 - **Mata Pelajaran**: Daftar dan manajemen mata pelajaran
 
 ### 👥 Manajemen Pengguna
+
 - **Siswa**: Profil siswa, data lengkap, dan tracking progress
 - **Guru**: Data guru, jadwal mengajar, dan performa
 - **Admin**: Multi-role access control dan permissions
 - **Role-Based Access Control (RBAC)**: Fine-grained permissions
 
 ### 📊 Sistem Kehadiran
+
 - **Absensi Siswa**: Tracking kehadiran harian siswa
 - **Absensi Guru**: Monitoring kehadiran staff pengajar
 - **Rekap Kehadiran**: Laporan dan analytics kehadiran
 - **Schedule Integration**: Terintegrasi dengan jadwal pelajaran
 
 ### 💰 Sistem Pembayaran
+
 - **Billing Management**: Invoice dan tagihan otomatis
 - **Payment Items**: Daftar item pembayaran (SPP, biaya lainnya)
 - **Payment Types**: Kategori pembayaran yang fleksibel
@@ -58,36 +62,42 @@ Sistem manajemen sekolah berbasis web yang komprehensif untuk SMK Fajar Sentosa.
 - **Account Bank**: Multi-bank account management
 
 ### 📅 Manajemen Jadwal
+
 - **Jadwal Reguler**: Penjadwalan kelas reguler
 - **Jadwal Khusus**: Special events dan kegiatan khusus
 - **Kalender**: View kalender akademik interaktif
 - **Conflict Detection**: Deteksi bentrok jadwal otomatis
 
 ### 📖 Program Tahfidz
+
 - **Tahfidz Groups**: Manajemen kelompok tahfidz
 - **Progress Tracking**: Tracking hafalan dan progress
 - **Records Management**: Catatan setoran hafalan
 - **Performance Reports**: Laporan progress individual
 
 ### ⚠️ Sistem Pelanggaran
+
 - **Violation Types**: Kategori jenis pelanggaran
 - **Violation Records**: Pencatatan pelanggaran siswa
 - **Point System**: Sistem poin pelanggaran
 - **Reporting**: Laporan pelanggaran per siswa/kelas
 
 ### 📱 Integrasi WhatsApp
+
 - **WhatsApp Bot**: Notifikasi otomatis via WhatsApp
 - **Bulk Messaging**: Kirim pesan massal ke orang tua/siswa
 - **Attendance Alerts**: Notifikasi absensi real-time
 - **Payment Reminders**: Reminder pembayaran otomatis
 
 ### 📈 Reporting & Analytics
+
 - **Dashboard Analytics**: Real-time metrics dan KPIs
 - **Custom Reports**: Generate laporan custom
 - **Data Export**: Export data ke Excel/PDF
 - **Visual Charts**: Grafik dan visualisasi data
 
 ### 🔐 Keamanan & Authentication
+
 - **Better Auth**: Modern authentication system
 - **Session Management**: Secure session handling
 - **Password Security**: Bcrypt hashing
@@ -98,6 +108,7 @@ Sistem manajemen sekolah berbasis web yang komprehensif untuk SMK Fajar Sentosa.
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework**: [Next.js 16.2.7](https://nextjs.org/) (App Router + Turbopack)
 - **UI Library**: [React 19.2.7](https://reactjs.org/)
 - **Language**: [TypeScript 5.9.3](https://www.typescriptlang.org/)
@@ -113,6 +124,7 @@ Sistem manajemen sekolah berbasis web yang komprehensif untuk SMK Fajar Sentosa.
 - **PDF Generation**: [@react-pdf/renderer](https://react-pdf.org/)
 
 ### Backend
+
 - **Runtime**: Node.js v26.0.0
 - **API**: Next.js API Routes (App Router)
 - **Authentication**: [Better Auth](https://www.better-auth.com/)
@@ -122,10 +134,12 @@ Sistem manajemen sekolah berbasis web yang komprehensif untuk SMK Fajar Sentosa.
 - **API Documentation**: [Swagger](https://swagger.io/)
 
 ### Payment & Integration
+
 - **Payment Gateway**: [Midtrans](https://midtrans.com/)
 - **WhatsApp Bot**: Custom WhatsApp integration
 
 ### Development Tools
+
 - **Package Manager**: npm
 - **Code Quality**: Prettier, ESLint
 - **Git Hooks**: Husky, Lint-staged
@@ -198,18 +212,21 @@ Aplikasi akan berjalan di [http://localhost:3000](http://localhost:3000)
 Buat file `.env` dan `.env.local` dengan variabel berikut:
 
 ### Database
+
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/smk_db"
 DIRECT_URL="postgresql://user:password@localhost:5432/smk_db"
 ```
 
 ### Authentication (Better Auth)
+
 ```env
 BETTER_AUTH_SECRET="your-secret-key-min-32-characters"
 BETTER_AUTH_URL="http://localhost:3000"
 ```
 
 ### Midtrans Payment Gateway
+
 ```env
 MIDTRANS_SERVER_KEY="your-midtrans-server-key"
 MIDTRANS_CLIENT_KEY="your-midtrans-client-key"
@@ -217,24 +234,28 @@ MIDTRANS_IS_PRODUCTION="false"
 ```
 
 ### WhatsApp Bot (Optional)
+
 ```env
 WHATSAPP_API_URL="your-whatsapp-api-url"
 WHATSAPP_API_KEY="your-whatsapp-api-key"
 ```
 
 ### Next.js Configuration
+
 ```env
 NODE_ENV="development"
 NEXT_PUBLIC_API_URL="http://localhost:3000"
 ```
 
 ### Development-Specific (`.env.local` only)
+
 ```env
 WATCHPACK_POLLING=false
 FAST_REFRESH=true
 ```
 
-⚠️ **Penting**: 
+⚠️ **Penting**:
+
 - File `.env.local` **TIDAK** di-commit ke Git
 - Gunakan `.env.example` sebagai template
 - Jangan share credentials di public repository
@@ -244,6 +265,7 @@ FAST_REFRESH=true
 ## 📜 Available Scripts
 
 ### Development
+
 ```bash
 # Start development server dengan Turbopack (Recommended)
 npm run dev
@@ -259,6 +281,7 @@ npm run dev:clean
 ```
 
 ### Production
+
 ```bash
 # Build untuk production (dengan suppressed warnings)
 npm run build
@@ -268,6 +291,7 @@ npm start
 ```
 
 ### Code Quality
+
 ```bash
 # Run ESLint
 npm run lint
@@ -277,6 +301,7 @@ npm run format
 ```
 
 ### Database
+
 ```bash
 # Generate Prisma Client
 npx prisma generate
@@ -390,31 +415,31 @@ http://localhost:3000/api/docs
 
 ### Endpoint Utama
 
-| Kategori | Endpoint | Deskripsi |
-|----------|----------|-----------|
-| **Academic** | `/api/academicyear` | Manajemen tahun akademik |
-| **Academic** | `/api/major` | Manajemen jurusan |
-| **Academic** | `/api/class` | Manajemen kelas |
-| **Academic** | `/api/subjects` | Manajemen mata pelajaran |
-| **Users** | `/api/students` | Manajemen siswa |
-| **Users** | `/api/teachers` | Manajemen guru |
-| **Users** | `/api/roles` | Manajemen role |
-| **Auth** | `/api/auth/[...all]` | Better Auth endpoints |
-| **Auth** | `/api/betterauth/users` | User management |
-| **Attendance** | `/api/attendance` | Absensi siswa |
-| **Attendance** | `/api/teacherattendance` | Absensi guru |
-| **Payment** | `/api/payment` | Transaksi pembayaran |
-| **Payment** | `/api/paymenttype` | Tipe pembayaran |
-| **Payment** | `/api/midtrans` | Midtrans integration |
-| **Payment** | `/api/accountbank` | Rekening bank |
-| **Schedule** | `/api/schedules` | Jadwal pelajaran |
-| **Schedule** | `/api/specialschedule` | Jadwal khusus |
-| **Tahfidz** | `/api/tahfidzgroup` | Kelompok tahfidz |
-| **Tahfidz** | `/api/tahfidzrecord` | Catatan hafalan |
-| **Violations** | `/api/violations` | Pelanggaran siswa |
-| **Violations** | `/api/typeviolations` | Tipe pelanggaran |
-| **Integration** | `/api/botwa` | WhatsApp bot |
-| **System** | `/api/health` | Health check |
+| Kategori        | Endpoint                 | Deskripsi                |
+| --------------- | ------------------------ | ------------------------ |
+| **Academic**    | `/api/academicyear`      | Manajemen tahun akademik |
+| **Academic**    | `/api/major`             | Manajemen jurusan        |
+| **Academic**    | `/api/class`             | Manajemen kelas          |
+| **Academic**    | `/api/subjects`          | Manajemen mata pelajaran |
+| **Users**       | `/api/students`          | Manajemen siswa          |
+| **Users**       | `/api/teachers`          | Manajemen guru           |
+| **Users**       | `/api/roles`             | Manajemen role           |
+| **Auth**        | `/api/auth/[...all]`     | Better Auth endpoints    |
+| **Auth**        | `/api/betterauth/users`  | User management          |
+| **Attendance**  | `/api/attendance`        | Absensi siswa            |
+| **Attendance**  | `/api/teacherattendance` | Absensi guru             |
+| **Payment**     | `/api/payment`           | Transaksi pembayaran     |
+| **Payment**     | `/api/paymenttype`       | Tipe pembayaran          |
+| **Payment**     | `/api/midtrans`          | Midtrans integration     |
+| **Payment**     | `/api/accountbank`       | Rekening bank            |
+| **Schedule**    | `/api/schedules`         | Jadwal pelajaran         |
+| **Schedule**    | `/api/specialschedule`   | Jadwal khusus            |
+| **Tahfidz**     | `/api/tahfidzgroup`      | Kelompok tahfidz         |
+| **Tahfidz**     | `/api/tahfidzrecord`     | Catatan hafalan          |
+| **Violations**  | `/api/violations`        | Pelanggaran siswa        |
+| **Violations**  | `/api/typeviolations`    | Tipe pelanggaran         |
+| **Integration** | `/api/botwa`             | WhatsApp bot             |
+| **System**      | `/api/health`            | Health check             |
 
 ### Contoh Request
 
@@ -436,33 +461,39 @@ Database menggunakan **PostgreSQL** dengan **Prisma ORM**.
 ### Core Models
 
 #### User & Authentication
+
 - **User**: Data user utama (id, name, email, role, banned status)
 - **Session**: Manajemen sesi login
 - **Account**: Provider account (untuk OAuth)
 - **UserData**: Data tambahan user (profile lengkap)
 
 #### Academic Models
+
 - **AcademicYear**: Tahun ajaran
 - **Major**: Jurusan/program studi
 - **Class**: Kelas
 - **Subject**: Mata pelajaran
 
 #### Attendance Models
+
 - **Attendance**: Absensi siswa
 - **TeacherAttendance**: Absensi guru
 - **Schedule**: Jadwal pelajaran
 
 #### Payment Models
+
 - **Payment**: Transaksi pembayaran
 - **PaymentItem**: Item pembayaran
 - **PaymentType**: Tipe pembayaran
 - **AccountBank**: Rekening bank
 
 #### Tahfidz Models
+
 - **TahfidzGroup**: Kelompok tahfidz
 - **TahfidzRecord**: Catatan setoran hafalan
 
 #### Violation Models
+
 - **Violation**: Pelanggaran siswa
 - **TypeViolation**: Jenis pelanggaran
 
@@ -504,6 +535,7 @@ npx prisma studio
 Aplikasi menggunakan **Better Auth** untuk sistem autentikasi yang modern dan aman.
 
 ### Fitur Authentication
+
 - ✅ Email & Password authentication
 - ✅ Session management dengan secure cookies
 - ✅ Role-based access control (RBAC)
@@ -512,6 +544,7 @@ Aplikasi menggunakan **Better Auth** untuk sistem autentikasi yang modern dan am
 - ✅ Email verification
 
 ### Roles
+
 - **admin**: Full access ke semua fitur
 - **teacher**: Akses ke fitur guru (absensi, nilai, jadwal)
 - **student**: Akses portal siswa (jadwal, pembayaran, absensi)
@@ -520,6 +553,7 @@ Aplikasi menggunakan **Better Auth** untuk sistem autentikasi yang modern dan am
 - **user**: Default role dengan akses terbatas
 
 ### Protected Routes
+
 Routes di bawah `/dashboard` memerlukan autentikasi. Middleware akan redirect ke halaman login jika belum terautentikasi.
 
 ---
@@ -529,6 +563,7 @@ Routes di bawah `/dashboard` memerlukan autentikasi. Middleware akan redirect ke
 ### **Development Environment** (`NODE_ENV=development`)
 
 #### Optimasi di Development:
+
 - **Zero Cache**: Semua response di-set ke `no-store, no-cache, must-revalidate, max-age=0`
 - **Fast Refresh**: Update komponen instant tanpa reload halaman penuh
 - **Disabled ETags**: Skip cache validation untuk build lebih cepat
@@ -536,6 +571,7 @@ Routes di bawah `/dashboard` memerlukan autentikasi. Middleware akan redirect ke
 - **HMR Enabled**: Server Components cache disabled untuk instant updates
 
 #### Scripts Development:
+
 ```bash
 npm run dev          # Start dengan Turbopack (default, recommended)
 npm run dev:hmr      # Alternative dengan HMR
@@ -546,6 +582,7 @@ npm run dev:clean    # Clean cache dan start fresh
 ### **Production Environment** (`NODE_ENV=production`)
 
 #### Optimasi di Production:
+
 - **Aggressive Caching**: 1-year immutable cache untuk static assets
 - **Tree-Shaking**: Optimized package imports hilangkan unused code
 - **Compression**: Gzip compression enabled untuk response lebih kecil
@@ -554,6 +591,7 @@ npm run dev:clean    # Clean cache dan start fresh
 - **Security Headers**: Reduced response size dengan no `X-Powered-By`
 
 #### Caching Strategy:
+
 ```
 Static Assets (SVG, JPG, PNG, etc):  1 year (immutable)
 /_next/static/*:                      1 year (immutable)
@@ -562,6 +600,7 @@ HTML Pages:                           1 hour dengan s-maxage
 ```
 
 #### Scripts Production:
+
 ```bash
 npm run build   # Build untuk production (NODE_NO_WARNINGS=1)
 npm start       # Start production server
@@ -569,30 +608,33 @@ npm start       # Start production server
 
 ### Performance Comparison
 
-| Feature | Development | Production |
-|---------|-------------|-----------|
-| Cache | Disabled | Aggressive (1 year) |
-| Compression | ❌ No | ✅ Yes (Gzip) |
-| Console.log | ✅ Kept | ❌ Removed |
-| ETags | ❌ Disabled | ✅ Enabled |
-| HMR | ✅ Fast Refresh | ❌ N/A |
-| Build Time | 🚀 Fast | 🔨 Slower (optimized) |
-| Bundle Size | Larger | 📉 Minimal |
+| Feature     | Development     | Production            |
+| ----------- | --------------- | --------------------- |
+| Cache       | Disabled        | Aggressive (1 year)   |
+| Compression | ❌ No           | ✅ Yes (Gzip)         |
+| Console.log | ✅ Kept         | ❌ Removed            |
+| ETags       | ❌ Disabled     | ✅ Enabled            |
+| HMR         | ✅ Fast Refresh | ❌ N/A                |
+| Build Time  | 🚀 Fast         | 🔨 Slower (optimized) |
+| Bundle Size | Larger          | 📉 Minimal            |
 
 ### Troubleshooting
 
 **Problem**: Changes tidak terlihat di dev
+
 ```bash
 npm run dev:clean  # Clean cache dan restart
 ```
 
 **Problem**: Slow hot reload
+
 ```bash
 # Pastikan .env.local punya WATCHPACK_POLLING=false
 npm run dev:fast
 ```
 
 **Problem**: Production lambat
+
 ```bash
 npm run build
 npm start
@@ -608,11 +650,13 @@ npm start
 Aplikasi sudah dikonfigurasi untuk Docker dengan output `standalone`.
 
 #### Build Docker Image:
+
 ```bash
 docker build -t smk-fajar-sentosa .
 ```
 
 #### Run Docker Container:
+
 ```bash
 docker run -p 3000:3000 \
   -e DATABASE_URL="postgresql://..." \
@@ -656,6 +700,7 @@ Kami menerima kontribusi dari developer mana pun! Silakan follow guide di bawah:
 ### Development Workflow
 
 1. **Fork & Clone**
+
 ```bash
 git clone https://github.com/yourusername/pos-rahmany-new-2.git
 cd pos-rahmany-new-2
@@ -663,23 +708,27 @@ npm install
 ```
 
 2. **Create Feature Branch**
+
 ```bash
 git checkout -b feature/your-feature-name
 ```
 
 3. **Make Changes**
+
 - Follow existing code style
 - Pastikan TypeScript types lengkap
 - Add comments untuk complex logic
 - Update related tests
 
 4. **Run Quality Checks**
+
 ```bash
 npm run lint           # ESLint check
 npm run format         # Format dengan Prettier
 ```
 
 5. **Commit & Push**
+
 ```bash
 git add .
 git commit -m "feat: add new feature"
@@ -687,6 +736,7 @@ git push origin feature/your-feature-name
 ```
 
 6. **Create Pull Request**
+
 - Clear description of changes
 - Reference related issues
 - Include screenshots untuk UI changes
@@ -712,6 +762,7 @@ git push origin feature/your-feature-name
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 Example:
+
 ```
 feat: add payment receipt PDF generation
 
@@ -735,12 +786,14 @@ This project is proprietary software developed for SMK Fajar Sentosa.
 ## 📞 Contact & Support
 
 ### Project Information
+
 - **Project Name**: SMK Fajar Sentosa - School Management System
 - **Version**: 0.4.0
 - **Last Updated**: June 2026
 - **Next.js Version**: 16.2.7
 
 ### Technical Stack Versions
+
 - **React**: 19.2.7
 - **TypeScript**: 5.9.3
 - **Tailwind CSS**: 4.3.0
@@ -748,8 +801,10 @@ This project is proprietary software developed for SMK Fajar Sentosa.
 - **Node.js**: v26.0.0
 
 ### Support
+
 Untuk pertanyaan teknis atau support, silakan hubungi tim development:
-- Email: support@rahmaniyah.sch.id
+
+- Email: support@{COMPOSE_PROJECT_NAME}.sch.id
 - GitHub Issues: [Report a bug](https://github.com/yourusername/pos-rahmany-new-2/issues)
 
 ---
@@ -757,6 +812,7 @@ Untuk pertanyaan teknis atau support, silakan hubungi tim development:
 ## 🎯 Roadmap
 
 ### Upcoming Features
+
 - [ ] Mobile App (React Native)
 - [ ] E-learning Integration
 - [ ] Advanced Analytics Dashboard
@@ -767,6 +823,7 @@ Untuk pertanyaan teknis atau support, silakan hubungi tim development:
 - [ ] Multi-language Support (Bahasa & English)
 
 ### Recent Updates (v0.4.0)
+
 - ✅ Next.js 16 upgrade dengan Turbopack
 - ✅ React 19 migration
 - ✅ Tailwind CSS 4 upgrade
@@ -781,6 +838,7 @@ Untuk pertanyaan teknis atau support, silakan hubungi tim development:
 ## 🙏 Acknowledgments
 
 Special thanks to:
+
 - **Next.js Team** - Amazing framework
 - **Vercel** - Deployment platform
 - **Prisma** - Excellent ORM

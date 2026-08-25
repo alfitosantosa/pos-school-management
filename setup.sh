@@ -2,7 +2,7 @@
 git pull
 
 # Hapus image lama
-docker rmi rahmaniyah-web:latest
+docker rmi ${COMPOSE_PROJECT_NAME}-web:latest
 
 # Build ulang dengan optimasi
 docker compose build --no-cache

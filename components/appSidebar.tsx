@@ -145,7 +145,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-3">
           <Image src={Logo} alt="Logo" className="h-10 w-10" loading="eager" />
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">Rahmaniyah</span>
+            <span className="text-sm font-semibold">{process.env.NEXT_PUBLIC_CLIENT_NAME}</span>
             <span className="text-xs text-muted-foreground">Sistem Informasi</span>
           </div>
         </div>

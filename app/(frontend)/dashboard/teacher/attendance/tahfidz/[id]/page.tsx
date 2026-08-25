@@ -60,8 +60,9 @@ function AttendanceModule() {
   const createAttendanceMutation = useCreateAttendanceBulk();
   const bulkSendWA = useBulkSendWhatsApp();
 
-  const currentSession = scheduleDataById[0]
-    ? {
+  const currentSession =
+    scheduleDataById[0] ?
+      {
         subject: scheduleDataById[0]?.subject?.name,
         class: classData?.name || "Loading...",
         time: `${scheduleDataById[0]?.startTime} - ${scheduleDataById[0]?.endTime}`,
@@ -142,7 +143,7 @@ Anda tidak perlu membalas pesan ini.
 
 Terima kasih atas perhatiannya.
 
-~IT Rahmaniyah Al-Islamy
+~IT ${process.env.NEXT_PUBLIC_CLIENT_NAME}
 _Pesan ini dikirim otomatis oleh sistem._`,
 
       // Template 2: Formal & Concise
@@ -164,7 +165,7 @@ Kami menginformasikan kehadiran putra/putri Anda pada:
 Anda tidak perlu membalas pesan ini.
 
 Hormat kami,
-Tim IT Rahmaniyah Al-Islamy
+Tim IT ${process.env.NEXT_PUBLIC_CLIENT_NAME}
 _(Pesan Otomatis)_`,
 
       // Template 3: Friendly & Polite
@@ -187,7 +188,7 @@ Anda tidak perlu membalas pesan ini.
 Terima kasih atas kerja samanya dalam memantau pendidikan ananda. 🙏
 
 Salam,
-IT Rahmaniyah Al-Islamy`,
+IT ${process.env.NEXT_PUBLIC_CLIENT_NAME}`,
 
       // Template 4: Bullet Points Focus
       `🔔 *INFO SEKOLAH*
@@ -208,7 +209,7 @@ Anda tidak perlu membalas pesan ini.
 
 Mohon dapat diterima dengan baik. Terima kasih.
 
-~ Admin IT Rahmaniyah Al-Islamy ~`,
+~ Admin IT ${process.env.NEXT_PUBLIC_CLIENT_NAME} ~`,
 
       // Template 5: Direct & Clear
       `📢 *STATUS KEHADIRAN*
@@ -227,7 +228,7 @@ Anda tidak perlu membalas pesan ini.
 Guru Pengampu: ${schedule.teacher?.name || "Guru"}
 
 Terima kasih.
-*IT Rahmaniyah Al-Islamy*`,
+*IT ${process.env.NEXT_PUBLIC_CLIENT_NAME}*`,
     ];
 
     // Send individual messages with personalized status
@@ -380,9 +381,9 @@ Terima kasih.
             </div>
           </CardHeader>
           <CardContent>
-            {isLoadingSchedule || isLoadingClass ? (
+            {isLoadingSchedule || isLoadingClass ?
               <Loading />
-            ) : currentSession ? (
+            : currentSession ?
               <div className="bg-blue-50 p-4 rounded-lg mb-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -408,13 +409,12 @@ Terima kasih.
                   </div>
                 </div>
               </div>
-            ) : null}
+            : null}
 
             <div className="space-y-3">
-              {isLoadingClass ? (
+              {isLoadingClass ?
                 <Loading />
-              ) : (
-                classData?.students.map((student) => (
+              : classData?.students.map((student) => (
                   <div key={student.id} className="flex flex-wrap items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors gap-3">
                     <div className={`w-3 h-3 rounded-xl ${getStatusColor(attendanceData[student.id]?.status)}`}></div>
                     <div>
@@ -450,7 +450,7 @@ Terima kasih.
                     </div>
                   </div>
                 ))
-              )}
+              }
             </div>
 
             <div className="mt-6 space-y-4">
@@ -471,18 +471,17 @@ Terima kasih.
 
               <div className="flex justify-between items-center">
                 <Button onClick={saveAttendance} disabled={isLoadingClass || createAttendanceMutation.isPending || isSendingWA} className="min-w-45">
-                  {createAttendanceMutation.isPending || isSendingWA ? (
+                  {createAttendanceMutation.isPending || isSendingWA ?
                     <>
                       <span className="animate-spin mr-2">⏳</span>
                       {isSendingWA ? "Mengirim WA..." : "Menyimpan..."}
                     </>
-                  ) : (
-                    <>
+                  : <>
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Simpan Absensi
                       {sendWhatsApp && " & Kirim WA"}
                     </>
-                  )}
+                  }
                 </Button>
 
                 {/* Show success/error states */}
@@ -499,13 +498,16 @@ Terima kasih.
         <Card>
           <CardHeader>
             <CardTitle>Ringkasan Absensi Hari Ini</CardTitle>
-            <CardDescription>{isLoadingClass ? <Loading /> : `${classData?.students.length || 0} siswa dalam kelas ini`}</CardDescription>
+            <CardDescription>
+              {isLoadingClass ?
+                <Loading />
+              : `${classData?.students.length || 0} siswa dalam kelas ini`}
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoadingClass ? (
+            {isLoadingClass ?
               <Loading />
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            : <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <div className="text-2xl font-bold text-green-600">{stats.present}</div>
                   <div className="text-sm text-gray-600">Hadir</div>
@@ -527,7 +529,7 @@ Terima kasih.
                   <div className="text-sm text-gray-600">Tidak Hadir</div>
                 </div>
               </div>
-            )}
+            }
           </CardContent>
         </Card>
 
