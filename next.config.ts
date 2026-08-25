@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
 
   // Hanya aktifkan standalone/export saat build production
   ...(isProduction && {
-    // output: "export", // Menghasilkan folder 'out' saat di-build
+    output: "standalone", // Menghasilkan folder 'out' saat di-build
     // images: { unoptimized: true }, // Diperlukan untuk static export
     images: {
       remotePatterns: [
