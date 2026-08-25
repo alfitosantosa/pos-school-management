@@ -1,7 +1,7 @@
 "use client";
 
-import { Document, Image, Page, pdf, StyleSheet, Text, View } from '@react-pdf/renderer';
-import React from 'react';
+import { Document, Image, Page, pdf, StyleSheet, Text, View } from "@react-pdf/renderer";
+import React from "react";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -586,7 +586,7 @@ const S = StyleSheet.create({
 // ─────────────────────────────────────────────────────────────────────────────
 
 const INSTITUTION = {
-  name: "YAYASAN PENDIDIKAN RAHMANY",
+  name: `YAYASAN PENDIDIKAN ${process.env.NEXT_PUBLIC_CLIENT_NAME?.toUpperCase()}`,
   address: "Jl. Lapangan Member, Blok C No. 11, Sukmajaya, Depok 16412",
   phone: "(021) 77833598",
   fax: "(021) 77835420",
