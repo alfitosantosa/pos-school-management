@@ -5,10 +5,10 @@ git pull
 docker rmi ${COMPOSE_PROJECT_NAME}-web:latest
 
 # Build ulang dengan optimasi
-# docker compose --env-file .env.production build  --no-cache
+docker compose build  --no-cache
 
 # Jalankan
-docker compose --env-file .env.production up -d --build --no-cache
+docker compose --env-file .env.production up -d
 
 # Hapus semua yang tidak terpakai
 docker system prune -af --volumes
