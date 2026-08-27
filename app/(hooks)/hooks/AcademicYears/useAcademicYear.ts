@@ -23,8 +23,8 @@ export const useGetAcademicYears = () => {
 export const useCreateAcademicYear = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
-      const res = await apiPost("/api/academicyear", data);
+    mutationFn: async (data: AcademicYearDataTypes) => {
+      const res = await apiPost<AcademicYearDataTypes>("/api/academicyear", data);
       return res.data;
     },
     onSuccess: () => {
@@ -39,8 +39,8 @@ export const useCreateAcademicYear = () => {
 export const useUpdateAcademicYear = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
-      const res = await apiPut("/api/academicyear", data);
+    mutationFn: async (data: AcademicYearDataTypes) => {
+      const res = await apiPut<AcademicYearDataTypes>("/api/academicyear", data);
       return res.data;
     },
     onSuccess: () => {
@@ -56,7 +56,7 @@ export const useDeleteAcademicYear = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await apiDelete(`/api/academicyear`, {
+      const res = await apiDelete<AcademicYearDataTypes>(`/api/academicyear`, {
         body: JSON.stringify({ id }),
         headers: {
           "Content-Type": "application/json",

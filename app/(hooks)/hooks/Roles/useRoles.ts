@@ -1,5 +1,5 @@
 "use client";
-import { RoleDataTypes, RolesInputData } from "@/app/(types)";
+import { RoleDataTypes, RoleUpdateData, RolesInputData } from "@/app/(types)";
 import { CACHE_STRATEGIES } from "@/app/client/providers";
 import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -33,7 +33,7 @@ export const useCreateRole = () => {
 export const useUpdateRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: RolesInputData) => {
+    mutationFn: async (data: RoleUpdateData) => {
       const res = await apiPut("/api/roles", data);
       return res.data;
     },

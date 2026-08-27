@@ -2,7 +2,7 @@
 
 import { useCreateRole, useDeleteRole, useGetRoles, useUpdateRole } from "@/app/(hooks)/hooks/Roles/useRoles";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
-import { RoleDataTypes } from "@/app/(types)";
+import { RoleDataTypes, RolesInputData } from "@/app/(types)";
 import Loading from "@/components/loading";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -26,21 +26,11 @@ import * as z from "zod";
 
 // Import hooks (Anda perlu membuat hooks ini sesuai dengan API backend)
 // Type definitions
-export type RoleData = {
-  id: string;
-  name: string;
-  description?: string;
-  permissions?: string[];
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  _count?: {
-    userData: number;
-  };
-};
+type RoleData = RoleDataTypes;
 
 // Form schema
 const roleSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Nama role wajib diisi").max(50, "Nama role maksimal 50 karakter"),
   description: z.string().optional(),
   isActive: z.boolean(),
@@ -224,18 +214,21 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
 
     if (editData) {
       await updateRole.mutateAsync({
-        ...submitData,
-        createdAt: editData.createdAt,
-        updatedAt: editData.updatedAt,
+        id: editData.id,
+        name: submitData.name,
+        description: submitData.description,
+        isActive: submitData.isActive,
+        permissions: submitData.permissions,
       });
       toast.success("Role berhasil diperbarui!");
     } else {
       const now = new Date().toISOString();
-      await createRole.mutateAsync({
+      const createData: RolesInputData = {
         ...submitData,
         createdAt: now,
         updatedAt: now,
-      });
+      };
+      await createRole.mutateAsync(createData);
       toast.success("Role berhasil dibuat!");
     }
     reset();
