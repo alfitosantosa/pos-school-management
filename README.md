@@ -1,4 +1,4 @@
-# 🎓 SMK Fajar Sentosa - School Management System
+# 🎓 LMS PLATFORM FROM SANTOSATECHID
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.7-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.7-blue)](https://reactjs.org/)
@@ -6,7 +6,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.3.0-38bdf8)](https://tailwindcss.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-7.8.0-2D3748)](https://www.prisma.io/)
 
-Sistem manajemen sekolah berbasis web yang komprehensif untuk SMK Fajar Sentosa. Dibangun dengan Next.js 16, React 19, dan TypeScript untuk memberikan pengalaman modern, cepat, dan scalable.
+Sistem manajemen sekolah berbasis web yang komprehensif untuk lms-platform-santosatechid. Dibangun dengan Next.js 16, React 19, dan TypeScript untuk memberikan pengalaman modern, cepat, dan scalable.
 
 ---
 
@@ -652,7 +652,7 @@ Aplikasi sudah dikonfigurasi untuk Docker dengan output `standalone`.
 #### Build Docker Image:
 
 ```bash
-docker build -t smk-fajar-sentosa .
+docker build -t lms-platform-santosatechid .
 ```
 
 #### Run Docker Container:
@@ -661,7 +661,7 @@ docker build -t smk-fajar-sentosa .
 docker run -p 3000:3000 \
   -e DATABASE_URL="postgresql://..." \
   -e BETTER_AUTH_SECRET="..." \
-  smk-fajar-sentosa
+  lms-platform-santosatechid
 ```
 
 ### Environment for Production
@@ -777,9 +777,9 @@ Closes #123
 
 ## 📄 License
 
-This project is proprietary software developed for SMK Fajar Sentosa.
+This project is proprietary software developed for lms-platform-santosatechid.
 
-© 2024-2026 SMK Fajar Sentosa. All rights reserved.
+© 2024-2026 lms-platform-santosatechid. All rights reserved.
 
 ---
 
@@ -787,7 +787,7 @@ This project is proprietary software developed for SMK Fajar Sentosa.
 
 ### Project Information
 
-- **Project Name**: SMK Fajar Sentosa - School Management System
+- **Project Name**: lms-platform-santosatechid - School Management System
 - **Version**: 0.4.0
 - **Last Updated**: June 2026
 - **Next.js Version**: 16.2.7
@@ -871,7 +871,7 @@ Special thanks to:
 
 <div align="center">
 
-**Built with ❤️ for SMK Fajar Sentosa**
+**Built with ❤️ for lms-platform-santosatechid**
 
 🎓 Empowering Education Through Technology 🎓
 
@@ -884,6 +884,6 @@ Special thanks to:
 
 ---
 
-**[⬆ Back to Top](#-smk-fajar-sentosa---school-management-system)**
+**[⬆ Back to Top](#-lms-platform-santosatechid---school-management-system)**
 
 </div>
