@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, name, description, permissions } = await request.json();
+    const { id, name, description, permissions, isActive } = await request.json();
     if (!id || !name) {
       return NextResponse.json({ error: "ID and name are required" }, { status: 400 });
     }
@@ -71,6 +71,7 @@ export async function PUT(request: NextRequest) {
       data: {
         name,
         description,
+        isActive,
         permissions: {
           set: permissions || [],
         },
