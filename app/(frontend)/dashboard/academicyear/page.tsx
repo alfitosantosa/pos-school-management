@@ -62,7 +62,10 @@ function AcademicYearFormDialog({ open, onOpenChange, editData, onSuccess }: { o
   const onSubmit = async (data: AcademicYearForm) => {
     try {
       if (editData) {
-        await updateAcademicYear.mutateAsync({ id: editData.id, ...data });
+        await updateAcademicYear.mutateAsync({
+          id: editData.id,
+          ...data,
+        });
         toast.success("Tahun ajaran berhasil diperbarui!");
       } else {
         await createAcademicYear.mutateAsync(data);

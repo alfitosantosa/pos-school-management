@@ -1,5 +1,5 @@
 "use client";
-import { AcademicYearDataTypes } from "@/app/(types)";
+import { AcademicYearDataTypes, AcademicYearInputData, AcademicYearUpdateData } from "@/app/(types)";
 import { CACHE_STRATEGIES } from "@/app/client/providers";
 import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -23,8 +23,8 @@ export const useGetAcademicYears = () => {
 export const useCreateAcademicYear = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: AcademicYearDataTypes) => {
-      const res = await apiPost<AcademicYearDataTypes>("/api/academicyear", data);
+    mutationFn: async (data: AcademicYearInputData) => {
+      const res = await apiPost<AcademicYearInputData>("/api/academicyear", data);
       return res.data;
     },
     onSuccess: () => {
@@ -39,7 +39,7 @@ export const useCreateAcademicYear = () => {
 export const useUpdateAcademicYear = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: AcademicYearDataTypes) => {
+    mutationFn: async (data: AcademicYearUpdateData) => {
       const res = await apiPut<AcademicYearDataTypes>("/api/academicyear", data);
       return res.data;
     },

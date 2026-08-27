@@ -1,5 +1,5 @@
 // Academic Year Types
-import { z } from 'zod';
+import { z } from "zod";
 
 export interface AcademicYearTypes {
   id: string;
@@ -79,3 +79,7 @@ export const academicYearSchema = z
   );
 
 export type AcademicYearForm = z.infer<typeof academicYearSchema>;
+
+export type AcademicYearInputData = Omit<AcademicYearTypes, "id" | "createdAt" | "updatedAt" | "_count">;
+
+export type AcademicYearUpdateData = Omit<AcademicYearTypes, "createdAt" | "updatedAt" | "_count">;

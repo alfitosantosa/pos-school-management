@@ -86,18 +86,6 @@ export function AppSidebar() {
   const roleMenuKey = getRoleMenuKey(userRole);
   const currentMenuGroups = menuGroups[roleMenuKey] || menuGroups.student;
 
-  // Debug log (hapus setelah testing)
-  React.useEffect(() => {
-    console.log("🔍 Sidebar Debug:", {
-      originalRole: userData?.role?.name,
-      userRole,
-      roleMenuKey,
-      permissionsCount: permissions.length,
-      hasSchedulesPermission: permissions.includes("/dashboard/schedules"),
-      hasStudentSchedulePermission: permissions.includes("/dashboard/student/schedule"),
-    });
-  }, [userData?.role?.name, userRole, roleMenuKey, permissions]);
-
   // Filter menu items based on permissions
   const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
     return items
