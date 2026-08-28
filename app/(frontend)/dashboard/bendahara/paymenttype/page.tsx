@@ -81,6 +81,7 @@ const COLUMN_LABELS = {
 } as const;
 
 const paymentTypeSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Nama jenis pembayaran wajib diisi"),
   description: z.string().min(1, "Deskripsi wajib diisi"),
   amount: z.number().min(0, "Jumlah minimal 0"),
@@ -171,6 +172,7 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
   // Populate form when editing or auto-assign majorId
   React.useEffect(() => {
     if (editData) {
+      setValue("id", editData.id);
       setValue("majorId", editData.majorId);
       setValue("name", editData.name);
       setValue("description", editData.description);
@@ -336,7 +338,11 @@ function PaymentTypeFormDialog({ open, onOpenChange, editData, onSuccess, id }: 
               Batal
             </Button>
             <Button type="submit" disabled={createPaymentType.isPending || updatePaymentType.isPending}>
-              {createPaymentType.isPending || updatePaymentType.isPending ? "Menyimpan..." : editData ? "Perbarui" : "Simpan"}
+              {createPaymentType.isPending || updatePaymentType.isPending ?
+                "Menyimpan..."
+              : editData ?
+                "Perbarui"
+              : "Simpan"}
             </Button>
           </div>
         </form>
@@ -630,7 +636,7 @@ function PaymentTypeDataTable({ userMajorData }: { userMajorData: { id: string; 
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ?
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -638,13 +644,12 @@ function PaymentTypeDataTable({ userMajorData }: { userMajorData: { id: string; 
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
+            : <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   Tidak ada data jenis pembayaran.
                 </TableCell>
               </TableRow>
-            )}
+            }
           </TableBody>
         </Table>
       </div>

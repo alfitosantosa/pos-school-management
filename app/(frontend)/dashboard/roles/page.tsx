@@ -604,11 +604,11 @@ export default function UserDataTable() {
     return <Loading />;
   }
 
-  // Check if user is Admin
-  if (userRole !== "Admin") {
-    unauthorized();
-    return null;
-  }
+  // // Check if user is Admin
+  // if (userRole !== "Admin") {
+  //   unauthorized();
+  //   return null;
+  // }
 
   // Render dashboard only after authorization is confirmed
   return <RoleDataTable />;

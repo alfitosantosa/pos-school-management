@@ -5,6 +5,7 @@ import { useGetTahfidzGroup } from "@/app/(hooks)/hooks/TahfidzGroup/useTahfidzG
 import { useGetBetterAuth } from "@/app/(hooks)/hooks/Users/useBetterAuth";
 import { useGetUsers } from "@/app/(hooks)/hooks/Users/useUsers";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
+import unauthorized from "@/app/unauthorized";
 import { BetterAuthUser, DeleteUserBulkDialog, DeleteUserDialog, UserData, UserFormDialog } from "@/components/dialog/DialogUser";
 import Loading from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
@@ -688,10 +689,10 @@ export default function UserDataTable() {
   }
 
   // Check if user is Admin
-  // if (userRole !== "Admin") {
-  //   unauthorized();
-  //   return null;
-  // }
+  if (userRole !== "Admin") {
+    unauthorized();
+    return null;
+  }
 
   // Render dashboard only after authorization is confirmed
   return <UserDashboard />;

@@ -56,6 +56,7 @@ interface PaymentItemPaymentTypeTypes {
 
 // ─── Input for create/update ──────────────────────────────────────────────────
 export interface PaymentTypeInput {
+  id?: string;
   name: string;
   description: string;
   amount: number;

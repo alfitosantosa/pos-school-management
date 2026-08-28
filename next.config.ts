@@ -11,7 +11,6 @@ const withPWA = withPWAInit({
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
-  // swcMinify: true,
   disable: !isProduction, // Matikan PWA di mode dev agar tidak error cache
 });
 

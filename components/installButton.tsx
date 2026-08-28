@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 // Definisi tipe data untuk event instalasi browser
 interface BeforeInstallPromptEvent extends Event {
@@ -53,11 +54,11 @@ export default function InstallButton() {
   if (!isVisible) return null;
 
   return (
-    <button
+    <Button
       onClick={handleInstallClick}
       className="fixed bottom-8 right-8 z-50 bg-black text-white border-2 border-black px-6 py-3 font-mono text-sm uppercase tracking-widest shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-white hover:text-black transition-all duration-300"
     >
       [+] Install App
-    </button>
+    </Button>
   );
 }
