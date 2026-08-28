@@ -27,6 +27,11 @@ export const metadata: Metadata = {
   title: `${process.env.NEXT_PUBLIC_CLIENT_NAME} App`,
   description: `Aplikasi portal utama ${process.env.NEXT_PUBLIC_CLIENT_NAME}`,
   manifest: "/manifest.json",
+  icons: {
+    // Memanggil favicon dari .env dengan fallback ke default
+    icon: process.env.CLIENT_FAVICON || "/favicon.ico",
+    apple: process.env.CLIENT_APPLE_ICON || "/apple-touch-icon.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
