@@ -71,7 +71,7 @@
   },
   "devDependencies": {
     "@tailwindcss/oxide": "^4.3.3",
-    "@tailwindcss/postcss": "8.5.23",
+    "@tailwindcss/postcss": "4.3.3",
     "@tanstack/eslint-plugin-query": "^5.101.4",
     "@types/base64id": "^2.0.2",
     "@types/midtrans-client": "^1.4.0",
