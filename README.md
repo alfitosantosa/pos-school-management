@@ -142,7 +142,7 @@ Sistem manajemen sekolah berbasis web yang komprehensif untuk lms-platform-santo
 
 - **Package Manager**: npm
 - **Code Quality**: Prettier, ESLint
-- **Git Hooks**: Husky, Lint-staged
+- **Git Hooks**: Husky
 - **Type Checking**: TypeScript strict mode
 
 ---

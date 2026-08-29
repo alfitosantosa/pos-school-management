@@ -1,5 +1,5 @@
 {
-  "name": "lms-rahmaniyah-pos-app",
+  "name": "lms-platform-app",
   "version": "0.4.0",
   "private": true,
   "scripts": {
@@ -47,8 +47,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.4.0",
+    "deepmerge-ts": "^8.0.2",
     "dotenv": "^17.4.2",
-    "jotai": "^2.20.3",
     "lucide-react": "^0.563.0",
     "midtrans-client": "^1.4.3",
     "motion": "^12.43.0",
@@ -61,8 +61,10 @@
     "react-hook-form": "^7.86.0",
     "read-excel-file": "^6.0.3",
     "recharts": "3.8.0",
+    "serialize-javascript": "^7.1.1",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.6.0",
+    "uuid": "^14.0.2",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -77,7 +79,6 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "baseline-browser-mapping": "^2.11.20",
     "globals": "^17.11.0",
-    "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.9.6",
     "prisma": "^7.10.0",
