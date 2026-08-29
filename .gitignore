@@ -6,10 +6,7 @@ node_modules
 
 .env.production
 
-
 .env.example
-
-.env.uswatunhasanah
 
 .DS-Store
 
@@ -26,3 +23,5 @@ rules
 .claude
 
 .kiro
+
+.zed
