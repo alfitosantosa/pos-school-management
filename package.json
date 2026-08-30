@@ -4,15 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "dev:hmr": "NODE_ENV=development WATCHPACK_POLLING=false next dev",
-    "dev:fast": "NODE_ENV=development WATCHPACK_POLLING=false FAST_REFRESH=true next dev",
-    "dev:clean": "rm -rf .next && npm run dev",
-    "prebuild": "rm -rf node_modules/.cache && rm -rf .next",
-    "build": "NODE_NO_WARNINGS=1 next build --webpack",
-    "build:turbopack": "NODE_NO_WARNINGS=1 next build --turbopack",
+    "build": "next build --turbopack",
+    "build:webpack": "next build --webpack",
+    "build:turbopack": "next build --turbopack",
     "start": "NODE_ENV=production next start",
-    "lint": "eslint",
-    "prepare": "husky"
+    "lint": "eslint"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
