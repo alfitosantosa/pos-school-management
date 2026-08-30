@@ -36,7 +36,6 @@ import * as React from "react";
 import { DateRange } from "react-day-picker";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { v7 as uuidv7 } from "uuid";
 import * as z from "zod";
 
 // ─── Status Config ────────────────────────────────────────────────────────────
@@ -345,7 +344,7 @@ function PaymentFormDialog({
   // Generate receipt number saat dialog dibuka untuk mode create
   React.useEffect(() => {
     if (open && !editData) {
-      const newReceiptNumber = `KWT-${uuidv7().substring(0, 12).toUpperCase()}`;
+      const newReceiptNumber = `KWT-${crypto.randomUUID().substring(0, 12).toUpperCase()}`;
       setValue("receiptNumber", newReceiptNumber);
       setValue("month", MONTHS[new Date().getMonth()]);
     } else if (editData) {
@@ -474,7 +473,7 @@ function PaymentFormDialog({
       setSelectedStudentId(editData.studentId || "");
       setTotalTransfer(Number(editData.amount) || "");
     } else {
-      const newReceiptNumber = `KWT-${uuidv7().substring(0, 12).toUpperCase()}`;
+      const newReceiptNumber = `KWT-${crypto.randomUUID().substring(0, 12).toUpperCase()}`;
       reset({
         studentId: "",
         accountBankId: "",

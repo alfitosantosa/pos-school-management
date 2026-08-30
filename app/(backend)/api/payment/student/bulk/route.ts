@@ -1,7 +1,6 @@
 import { handlePrismaError } from "@/lib/errorHandlerBackend";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { v7 as uuidv7 } from "uuid";
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,7 +48,7 @@ export async function POST(request: NextRequest) {
         status: status || "Unpaid",
         notes: notes ? notes : null,
         paymentDate: parsedPaymentDate,
-        receiptNumber: `KWT-${uuidv7()}`,
+        receiptNumber: `KWT-${crypto.randomUUID().substring(0, 8)}`,
       })),
     });
 
