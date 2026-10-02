@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   AlertTriangle,
   BarChart3,
@@ -85,13 +85,9 @@ type MenuItem = {
 export function AppSidebar() {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { data: session, isPending: isSessionPending } = useSession();
   const { data: userData, isLoading: isUserDataLoading } =
     useGetUserByIdBetterAuth(session?.user?.id ?? "");
-
-  // Local state for Select component (synced with context)
-  const [school, setSchool] = useState<string>("all");
 
   // Show loading state while data is being fetched
   if (isSessionPending || isUserDataLoading) {
@@ -121,15 +117,6 @@ export function AppSidebar() {
 
     // Admin School role - always use schooladministrator menu
     if (r.includes("admin school")) {
-      return "schooladministrator";
-    }
-
-    // If admin/yayasan selects a specific school, use schooladministrator menu
-    if (
-      (r.includes("admin") || r.includes("yayasan")) &&
-      school &&
-      school !== "all"
-    ) {
       return "schooladministrator";
     }
 
