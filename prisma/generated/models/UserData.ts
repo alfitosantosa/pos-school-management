@@ -378,6 +378,7 @@ export type UserDataWhereInput = {
   grades?: Prisma.GradeListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   paymentItems?: Prisma.PaymentItemsListRelationFilter
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineListRelationFilter
   PaymentCreated?: Prisma.PaymentListRelationFilter
   payments?: Prisma.PaymentListRelationFilter
   reportCards?: Prisma.ReportCardListRelationFilter
@@ -433,6 +434,7 @@ export type UserDataOrderByWithRelationInput = {
   grades?: Prisma.GradeOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   paymentItems?: Prisma.PaymentItemsOrderByRelationAggregateInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineOrderByRelationAggregateInput
   PaymentCreated?: Prisma.PaymentOrderByRelationAggregateInput
   payments?: Prisma.PaymentOrderByRelationAggregateInput
   reportCards?: Prisma.ReportCardOrderByRelationAggregateInput
@@ -491,6 +493,7 @@ export type UserDataWhereUniqueInput = Prisma.AtLeast<{
   grades?: Prisma.GradeListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   paymentItems?: Prisma.PaymentItemsListRelationFilter
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineListRelationFilter
   PaymentCreated?: Prisma.PaymentListRelationFilter
   payments?: Prisma.PaymentListRelationFilter
   reportCards?: Prisma.ReportCardListRelationFilter
@@ -610,6 +613,7 @@ export type UserDataCreateInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -665,6 +669,7 @@ export type UserDataUncheckedCreateInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -708,6 +713,7 @@ export type UserDataUpdateInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -763,6 +769,7 @@ export type UserDataUncheckedUpdateInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -1251,6 +1258,20 @@ export type UserDataUpdateOneRequiredWithoutPaymentItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserDataUpdateToOneWithWhereWithoutPaymentItemsInput, Prisma.UserDataUpdateWithoutPaymentItemsInput>, Prisma.UserDataUncheckedUpdateWithoutPaymentItemsInput>
 }
 
+export type UserDataCreateNestedOneWithoutPaymentItemsRoutineInput = {
+  create?: Prisma.XOR<Prisma.UserDataCreateWithoutPaymentItemsRoutineInput, Prisma.UserDataUncheckedCreateWithoutPaymentItemsRoutineInput>
+  connectOrCreate?: Prisma.UserDataCreateOrConnectWithoutPaymentItemsRoutineInput
+  connect?: Prisma.UserDataWhereUniqueInput
+}
+
+export type UserDataUpdateOneRequiredWithoutPaymentItemsRoutineNestedInput = {
+  create?: Prisma.XOR<Prisma.UserDataCreateWithoutPaymentItemsRoutineInput, Prisma.UserDataUncheckedCreateWithoutPaymentItemsRoutineInput>
+  connectOrCreate?: Prisma.UserDataCreateOrConnectWithoutPaymentItemsRoutineInput
+  upsert?: Prisma.UserDataUpsertWithoutPaymentItemsRoutineInput
+  connect?: Prisma.UserDataWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserDataUpdateToOneWithWhereWithoutPaymentItemsRoutineInput, Prisma.UserDataUpdateWithoutPaymentItemsRoutineInput>, Prisma.UserDataUncheckedUpdateWithoutPaymentItemsRoutineInput>
+}
+
 export type UserDataCreateNestedOneWithoutPaymentCreatedInput = {
   create?: Prisma.XOR<Prisma.UserDataCreateWithoutPaymentCreatedInput, Prisma.UserDataUncheckedCreateWithoutPaymentCreatedInput>
   connectOrCreate?: Prisma.UserDataCreateOrConnectWithoutPaymentCreatedInput
@@ -1515,6 +1536,7 @@ export type UserDataCreateWithoutUserInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -1568,6 +1590,7 @@ export type UserDataUncheckedCreateWithoutUserInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -1627,6 +1650,7 @@ export type UserDataUpdateWithoutUserInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -1680,6 +1704,7 @@ export type UserDataUncheckedUpdateWithoutUserInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -1723,6 +1748,7 @@ export type UserDataCreateWithoutRoleInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -1776,6 +1802,7 @@ export type UserDataUncheckedCreateWithoutRoleInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -1880,6 +1907,7 @@ export type UserDataCreateWithoutAcademicYearInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -1933,6 +1961,7 @@ export type UserDataUncheckedCreateWithoutAcademicYearInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -2002,6 +2031,7 @@ export type UserDataCreateWithoutMajorInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -2055,6 +2085,7 @@ export type UserDataUncheckedCreateWithoutMajorInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -2124,6 +2155,7 @@ export type UserDataCreateWithoutClassInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -2177,6 +2209,7 @@ export type UserDataUncheckedCreateWithoutClassInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -2246,6 +2279,7 @@ export type UserDataCreateWithoutSchedulesInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -2300,6 +2334,7 @@ export type UserDataUncheckedCreateWithoutSchedulesInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -2358,6 +2393,7 @@ export type UserDataUpdateWithoutSchedulesInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -2412,6 +2448,7 @@ export type UserDataUncheckedUpdateWithoutSchedulesInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -2453,6 +2490,7 @@ export type UserDataCreateWithoutAttendancesInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -2507,6 +2545,7 @@ export type UserDataUncheckedCreateWithoutAttendancesInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -2565,6 +2604,7 @@ export type UserDataUpdateWithoutAttendancesInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -2619,6 +2659,7 @@ export type UserDataUncheckedUpdateWithoutAttendancesInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -2662,6 +2703,7 @@ export type UserDataCreateWithoutViolationsInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -2716,6 +2758,7 @@ export type UserDataUncheckedCreateWithoutViolationsInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -2774,6 +2817,7 @@ export type UserDataUpdateWithoutViolationsInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -2828,6 +2872,7 @@ export type UserDataUncheckedUpdateWithoutViolationsInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -2869,6 +2914,7 @@ export type UserDataCreateWithoutPaymentItemsInput = {
   DashboardContents?: Prisma.DashboardContentCreateNestedManyWithoutUserInput
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -2923,6 +2969,7 @@ export type UserDataUncheckedCreateWithoutPaymentItemsInput = {
   DashboardContents?: Prisma.DashboardContentUncheckedCreateNestedManyWithoutUserInput
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -2981,6 +3028,7 @@ export type UserDataUpdateWithoutPaymentItemsInput = {
   DashboardContents?: Prisma.DashboardContentUpdateManyWithoutUserNestedInput
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -3035,6 +3083,219 @@ export type UserDataUncheckedUpdateWithoutPaymentItemsInput = {
   DashboardContents?: Prisma.DashboardContentUncheckedUpdateManyWithoutUserNestedInput
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
+  PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
+  reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
+  schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeacherNestedInput
+  tahfidzRecords?: Prisma.TahfidzRecordUncheckedUpdateManyWithoutStudentNestedInput
+  tahfidzRecordsAsTeacher?: Prisma.TahfidzRecordUncheckedUpdateManyWithoutTeacherNestedInput
+  createdAttendances?: Prisma.TeacherAttendanceUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  teacherAttendances?: Prisma.TeacherAttendanceUncheckedUpdateManyWithoutTeacherNestedInput
+  violations?: Prisma.ViolationUncheckedUpdateManyWithoutStudentNestedInput
+}
+
+export type UserDataCreateWithoutPaymentItemsRoutineInput = {
+  id?: string
+  address?: string | null
+  avatarUrl?: string | null
+  birthDate?: Date | string | null
+  birthPlace?: string | null
+  employeeId?: string | null
+  endDate?: Date | string | null
+  enrollmentDate?: Date | string | null
+  gender?: string | null
+  graduationDate?: Date | string | null
+  nik?: string | null
+  nisn?: string | null
+  parentPhone?: string | null
+  position?: string | null
+  relation?: string | null
+  startDate?: Date | string | null
+  status?: string | null
+  studentIds?: Prisma.UserDataCreatestudentIdsInput | string[]
+  email?: string | null
+  name: string
+  isActive?: boolean
+  createdAt?: Date | string | null
+  updatedAt?: Date | string | null
+  Announcements?: Prisma.AnnouncementCreateNestedManyWithoutUserInput
+  studentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  teacherAssignments?: Prisma.AssignmentCreateNestedManyWithoutTeacherInput
+  attendances?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
+  DashboardContents?: Prisma.DashboardContentCreateNestedManyWithoutUserInput
+  grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
+  reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
+  schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
+  tahfidzRecords?: Prisma.TahfidzRecordCreateNestedManyWithoutStudentInput
+  tahfidzRecordsAsTeacher?: Prisma.TahfidzRecordCreateNestedManyWithoutTeacherInput
+  createdAttendances?: Prisma.TeacherAttendanceCreateNestedManyWithoutCreatedByUserInput
+  teacherAttendances?: Prisma.TeacherAttendanceCreateNestedManyWithoutTeacherInput
+  academicYear?: Prisma.AcademicYearCreateNestedOneWithoutStudentsInput
+  class?: Prisma.ClassCreateNestedOneWithoutStudentsInput
+  major?: Prisma.MajorCreateNestedOneWithoutStudentsInput
+  role?: Prisma.RoleCreateNestedOneWithoutUserDataInput
+  tahfidzGroup?: Prisma.TahfidzGroupCreateNestedOneWithoutStudentsInput
+  user?: Prisma.UserCreateNestedOneWithoutUserDataInput
+  violations?: Prisma.ViolationCreateNestedManyWithoutStudentInput
+}
+
+export type UserDataUncheckedCreateWithoutPaymentItemsRoutineInput = {
+  id?: string
+  userId?: string | null
+  academicYearId?: string | null
+  address?: string | null
+  avatarUrl?: string | null
+  birthDate?: Date | string | null
+  birthPlace?: string | null
+  classId?: string | null
+  employeeId?: string | null
+  endDate?: Date | string | null
+  enrollmentDate?: Date | string | null
+  gender?: string | null
+  graduationDate?: Date | string | null
+  majorId?: string | null
+  nik?: string | null
+  nisn?: string | null
+  parentPhone?: string | null
+  position?: string | null
+  relation?: string | null
+  roleId?: string | null
+  startDate?: Date | string | null
+  status?: string | null
+  studentIds?: Prisma.UserDataCreatestudentIdsInput | string[]
+  email?: string | null
+  name: string
+  isActive?: boolean
+  createdAt?: Date | string | null
+  updatedAt?: Date | string | null
+  tahfidzGroupId?: string | null
+  Announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutUserInput
+  studentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  teacherAssignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeacherInput
+  attendances?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
+  DashboardContents?: Prisma.DashboardContentUncheckedCreateNestedManyWithoutUserInput
+  grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
+  reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
+  schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
+  tahfidzRecords?: Prisma.TahfidzRecordUncheckedCreateNestedManyWithoutStudentInput
+  tahfidzRecordsAsTeacher?: Prisma.TahfidzRecordUncheckedCreateNestedManyWithoutTeacherInput
+  createdAttendances?: Prisma.TeacherAttendanceUncheckedCreateNestedManyWithoutCreatedByUserInput
+  teacherAttendances?: Prisma.TeacherAttendanceUncheckedCreateNestedManyWithoutTeacherInput
+  violations?: Prisma.ViolationUncheckedCreateNestedManyWithoutStudentInput
+}
+
+export type UserDataCreateOrConnectWithoutPaymentItemsRoutineInput = {
+  where: Prisma.UserDataWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserDataCreateWithoutPaymentItemsRoutineInput, Prisma.UserDataUncheckedCreateWithoutPaymentItemsRoutineInput>
+}
+
+export type UserDataUpsertWithoutPaymentItemsRoutineInput = {
+  update: Prisma.XOR<Prisma.UserDataUpdateWithoutPaymentItemsRoutineInput, Prisma.UserDataUncheckedUpdateWithoutPaymentItemsRoutineInput>
+  create: Prisma.XOR<Prisma.UserDataCreateWithoutPaymentItemsRoutineInput, Prisma.UserDataUncheckedCreateWithoutPaymentItemsRoutineInput>
+  where?: Prisma.UserDataWhereInput
+}
+
+export type UserDataUpdateToOneWithWhereWithoutPaymentItemsRoutineInput = {
+  where?: Prisma.UserDataWhereInput
+  data: Prisma.XOR<Prisma.UserDataUpdateWithoutPaymentItemsRoutineInput, Prisma.UserDataUncheckedUpdateWithoutPaymentItemsRoutineInput>
+}
+
+export type UserDataUpdateWithoutPaymentItemsRoutineInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  birthPlace?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  enrollmentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  graduationDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nisn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  studentIds?: Prisma.UserDataUpdatestudentIdsInput | string[]
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  Announcements?: Prisma.AnnouncementUpdateManyWithoutUserNestedInput
+  studentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  teacherAssignments?: Prisma.AssignmentUpdateManyWithoutTeacherNestedInput
+  attendances?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
+  DashboardContents?: Prisma.DashboardContentUpdateManyWithoutUserNestedInput
+  grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
+  reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
+  schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
+  tahfidzRecords?: Prisma.TahfidzRecordUpdateManyWithoutStudentNestedInput
+  tahfidzRecordsAsTeacher?: Prisma.TahfidzRecordUpdateManyWithoutTeacherNestedInput
+  createdAttendances?: Prisma.TeacherAttendanceUpdateManyWithoutCreatedByUserNestedInput
+  teacherAttendances?: Prisma.TeacherAttendanceUpdateManyWithoutTeacherNestedInput
+  academicYear?: Prisma.AcademicYearUpdateOneWithoutStudentsNestedInput
+  class?: Prisma.ClassUpdateOneWithoutStudentsNestedInput
+  major?: Prisma.MajorUpdateOneWithoutStudentsNestedInput
+  role?: Prisma.RoleUpdateOneWithoutUserDataNestedInput
+  tahfidzGroup?: Prisma.TahfidzGroupUpdateOneWithoutStudentsNestedInput
+  user?: Prisma.UserUpdateOneWithoutUserDataNestedInput
+  violations?: Prisma.ViolationUpdateManyWithoutStudentNestedInput
+}
+
+export type UserDataUncheckedUpdateWithoutPaymentItemsRoutineInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicYearId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  birthPlace?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  enrollmentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  graduationDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  majorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nisn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  relation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  studentIds?: Prisma.UserDataUpdatestudentIdsInput | string[]
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tahfidzGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  Announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutUserNestedInput
+  studentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  teacherAssignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeacherNestedInput
+  attendances?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
+  DashboardContents?: Prisma.DashboardContentUncheckedUpdateManyWithoutUserNestedInput
+  grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -3078,6 +3339,7 @@ export type UserDataCreateWithoutPaymentCreatedInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
@@ -3132,6 +3394,7 @@ export type UserDataUncheckedCreateWithoutPaymentCreatedInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
@@ -3179,6 +3442,7 @@ export type UserDataCreateWithoutPaymentsInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
@@ -3233,6 +3497,7 @@ export type UserDataUncheckedCreateWithoutPaymentsInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
@@ -3291,6 +3556,7 @@ export type UserDataUpdateWithoutPaymentCreatedInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
@@ -3345,6 +3611,7 @@ export type UserDataUncheckedUpdateWithoutPaymentCreatedInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeacherNestedInput
@@ -3398,6 +3665,7 @@ export type UserDataUpdateWithoutPaymentsInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
@@ -3452,6 +3720,7 @@ export type UserDataUncheckedUpdateWithoutPaymentsInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeacherNestedInput
@@ -3493,6 +3762,7 @@ export type UserDataCreateWithoutGradesInput = {
   DashboardContents?: Prisma.DashboardContentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -3547,6 +3817,7 @@ export type UserDataUncheckedCreateWithoutGradesInput = {
   DashboardContents?: Prisma.DashboardContentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -3605,6 +3876,7 @@ export type UserDataUpdateWithoutGradesInput = {
   DashboardContents?: Prisma.DashboardContentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -3659,6 +3931,7 @@ export type UserDataUncheckedUpdateWithoutGradesInput = {
   DashboardContents?: Prisma.DashboardContentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -3702,6 +3975,7 @@ export type UserDataCreateWithoutReportCardsInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
@@ -3756,6 +4030,7 @@ export type UserDataUncheckedCreateWithoutReportCardsInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
@@ -3814,6 +4089,7 @@ export type UserDataUpdateWithoutReportCardsInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
@@ -3868,6 +4144,7 @@ export type UserDataUncheckedUpdateWithoutReportCardsInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeacherNestedInput
@@ -3909,6 +4186,7 @@ export type UserDataCreateWithoutTeacherAssignmentsInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -3963,6 +4241,7 @@ export type UserDataUncheckedCreateWithoutTeacherAssignmentsInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -4021,6 +4300,7 @@ export type UserDataUpdateWithoutTeacherAssignmentsInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -4075,6 +4355,7 @@ export type UserDataUncheckedUpdateWithoutTeacherAssignmentsInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -4117,6 +4398,7 @@ export type UserDataCreateWithoutStudentSubmissionsInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -4171,6 +4453,7 @@ export type UserDataUncheckedCreateWithoutStudentSubmissionsInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -4229,6 +4512,7 @@ export type UserDataUpdateWithoutStudentSubmissionsInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -4283,6 +4567,7 @@ export type UserDataUncheckedUpdateWithoutStudentSubmissionsInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -4325,6 +4610,7 @@ export type UserDataCreateWithoutNotificationsInput = {
   DashboardContents?: Prisma.DashboardContentCreateNestedManyWithoutUserInput
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -4379,6 +4665,7 @@ export type UserDataUncheckedCreateWithoutNotificationsInput = {
   DashboardContents?: Prisma.DashboardContentUncheckedCreateNestedManyWithoutUserInput
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -4437,6 +4724,7 @@ export type UserDataUpdateWithoutNotificationsInput = {
   DashboardContents?: Prisma.DashboardContentUpdateManyWithoutUserNestedInput
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -4491,6 +4779,7 @@ export type UserDataUncheckedUpdateWithoutNotificationsInput = {
   DashboardContents?: Prisma.DashboardContentUncheckedUpdateManyWithoutUserNestedInput
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -4533,6 +4822,7 @@ export type UserDataCreateWithoutDashboardContentsInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -4587,6 +4877,7 @@ export type UserDataUncheckedCreateWithoutDashboardContentsInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -4645,6 +4936,7 @@ export type UserDataUpdateWithoutDashboardContentsInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -4699,6 +4991,7 @@ export type UserDataUncheckedUpdateWithoutDashboardContentsInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -4741,6 +5034,7 @@ export type UserDataCreateWithoutAnnouncementsInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -4795,6 +5089,7 @@ export type UserDataUncheckedCreateWithoutAnnouncementsInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -4853,6 +5148,7 @@ export type UserDataUpdateWithoutAnnouncementsInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -4907,6 +5203,7 @@ export type UserDataUncheckedUpdateWithoutAnnouncementsInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -4950,6 +5247,7 @@ export type UserDataCreateWithoutTahfidzRecordsInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -5004,6 +5302,7 @@ export type UserDataUncheckedCreateWithoutTahfidzRecordsInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -5051,6 +5350,7 @@ export type UserDataCreateWithoutTahfidzRecordsAsTeacherInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -5105,6 +5405,7 @@ export type UserDataUncheckedCreateWithoutTahfidzRecordsAsTeacherInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -5163,6 +5464,7 @@ export type UserDataUpdateWithoutTahfidzRecordsInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -5217,6 +5519,7 @@ export type UserDataUncheckedUpdateWithoutTahfidzRecordsInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -5270,6 +5573,7 @@ export type UserDataUpdateWithoutTahfidzRecordsAsTeacherInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -5324,6 +5628,7 @@ export type UserDataUncheckedUpdateWithoutTahfidzRecordsAsTeacherInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -5366,6 +5671,7 @@ export type UserDataCreateWithoutCreatedAttendancesInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -5420,6 +5726,7 @@ export type UserDataUncheckedCreateWithoutCreatedAttendancesInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -5467,6 +5774,7 @@ export type UserDataCreateWithoutTeacherAttendancesInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -5521,6 +5829,7 @@ export type UserDataUncheckedCreateWithoutTeacherAttendancesInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -5579,6 +5888,7 @@ export type UserDataUpdateWithoutCreatedAttendancesInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -5633,6 +5943,7 @@ export type UserDataUncheckedUpdateWithoutCreatedAttendancesInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -5686,6 +5997,7 @@ export type UserDataUpdateWithoutTeacherAttendancesInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -5740,6 +6052,7 @@ export type UserDataUncheckedUpdateWithoutTeacherAttendancesInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -5782,6 +6095,7 @@ export type UserDataCreateWithoutTahfidzGroupInput = {
   grades?: Prisma.GradeCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardCreateNestedManyWithoutStudentInput
@@ -5835,6 +6149,7 @@ export type UserDataUncheckedCreateWithoutTahfidzGroupInput = {
   grades?: Prisma.GradeUncheckedCreateNestedManyWithoutStudentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   paymentItems?: Prisma.PaymentItemsUncheckedCreateNestedManyWithoutStudentInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedCreateNestedManyWithoutStudentInput
   PaymentCreated?: Prisma.PaymentUncheckedCreateNestedManyWithoutCreatedByInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutStudentInput
   reportCards?: Prisma.ReportCardUncheckedCreateNestedManyWithoutStudentInput
@@ -5935,6 +6250,7 @@ export type UserDataUpdateWithoutRoleInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -5988,6 +6304,7 @@ export type UserDataUncheckedUpdateWithoutRoleInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -6093,6 +6410,7 @@ export type UserDataUpdateWithoutAcademicYearInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -6146,6 +6464,7 @@ export type UserDataUncheckedUpdateWithoutAcademicYearInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -6251,6 +6570,7 @@ export type UserDataUpdateWithoutMajorInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -6304,6 +6624,7 @@ export type UserDataUncheckedUpdateWithoutMajorInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -6409,6 +6730,7 @@ export type UserDataUpdateWithoutClassInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -6462,6 +6784,7 @@ export type UserDataUncheckedUpdateWithoutClassInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -6567,6 +6890,7 @@ export type UserDataUpdateWithoutTahfidzGroupInput = {
   grades?: Prisma.GradeUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUpdateManyWithoutStudentNestedInput
@@ -6620,6 +6944,7 @@ export type UserDataUncheckedUpdateWithoutTahfidzGroupInput = {
   grades?: Prisma.GradeUncheckedUpdateManyWithoutStudentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   paymentItems?: Prisma.PaymentItemsUncheckedUpdateManyWithoutStudentNestedInput
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineUncheckedUpdateManyWithoutStudentNestedInput
   PaymentCreated?: Prisma.PaymentUncheckedUpdateManyWithoutCreatedByNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutStudentNestedInput
   reportCards?: Prisma.ReportCardUncheckedUpdateManyWithoutStudentNestedInput
@@ -6676,6 +7001,7 @@ export type UserDataCountOutputType = {
   grades: number
   notifications: number
   paymentItems: number
+  paymentItemsRoutine: number
   PaymentCreated: number
   payments: number
   reportCards: number
@@ -6696,6 +7022,7 @@ export type UserDataCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   grades?: boolean | UserDataCountOutputTypeCountGradesArgs
   notifications?: boolean | UserDataCountOutputTypeCountNotificationsArgs
   paymentItems?: boolean | UserDataCountOutputTypeCountPaymentItemsArgs
+  paymentItemsRoutine?: boolean | UserDataCountOutputTypeCountPaymentItemsRoutineArgs
   PaymentCreated?: boolean | UserDataCountOutputTypeCountPaymentCreatedArgs
   payments?: boolean | UserDataCountOutputTypeCountPaymentsArgs
   reportCards?: boolean | UserDataCountOutputTypeCountReportCardsArgs
@@ -6771,6 +7098,13 @@ export type UserDataCountOutputTypeCountNotificationsArgs<ExtArgs extends runtim
  */
 export type UserDataCountOutputTypeCountPaymentItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PaymentItemsWhereInput
+}
+
+/**
+ * UserDataCountOutputType without action
+ */
+export type UserDataCountOutputTypeCountPaymentItemsRoutineArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentItemsRoutineWhereInput
 }
 
 /**
@@ -6875,6 +7209,7 @@ export type UserDataSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   grades?: boolean | Prisma.UserData$gradesArgs<ExtArgs>
   notifications?: boolean | Prisma.UserData$notificationsArgs<ExtArgs>
   paymentItems?: boolean | Prisma.UserData$paymentItemsArgs<ExtArgs>
+  paymentItemsRoutine?: boolean | Prisma.UserData$paymentItemsRoutineArgs<ExtArgs>
   PaymentCreated?: boolean | Prisma.UserData$PaymentCreatedArgs<ExtArgs>
   payments?: boolean | Prisma.UserData$paymentsArgs<ExtArgs>
   reportCards?: boolean | Prisma.UserData$reportCardsArgs<ExtArgs>
@@ -7011,6 +7346,7 @@ export type UserDataInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   grades?: boolean | Prisma.UserData$gradesArgs<ExtArgs>
   notifications?: boolean | Prisma.UserData$notificationsArgs<ExtArgs>
   paymentItems?: boolean | Prisma.UserData$paymentItemsArgs<ExtArgs>
+  paymentItemsRoutine?: boolean | Prisma.UserData$paymentItemsRoutineArgs<ExtArgs>
   PaymentCreated?: boolean | Prisma.UserData$PaymentCreatedArgs<ExtArgs>
   payments?: boolean | Prisma.UserData$paymentsArgs<ExtArgs>
   reportCards?: boolean | Prisma.UserData$reportCardsArgs<ExtArgs>
@@ -7056,6 +7392,7 @@ export type $UserDataPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     grades: Prisma.$GradePayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     paymentItems: Prisma.$PaymentItemsPayload<ExtArgs>[]
+    paymentItemsRoutine: Prisma.$PaymentItemsRoutinePayload<ExtArgs>[]
     PaymentCreated: Prisma.$PaymentPayload<ExtArgs>[]
     payments: Prisma.$PaymentPayload<ExtArgs>[]
     reportCards: Prisma.$ReportCardPayload<ExtArgs>[]
@@ -7504,6 +7841,7 @@ export interface Prisma__UserDataClient<T, Null = never, ExtArgs extends runtime
   grades<T extends Prisma.UserData$gradesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserData$gradesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GradePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.UserData$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserData$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   paymentItems<T extends Prisma.UserData$paymentItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserData$paymentItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentItemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  paymentItemsRoutine<T extends Prisma.UserData$paymentItemsRoutineArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserData$paymentItemsRoutineArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentItemsRoutinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   PaymentCreated<T extends Prisma.UserData$PaymentCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserData$PaymentCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payments<T extends Prisma.UserData$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserData$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reportCards<T extends Prisma.UserData$reportCardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserData$reportCardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportCardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -8167,6 +8505,30 @@ export type UserData$paymentItemsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.PaymentItemsScalarFieldEnum | Prisma.PaymentItemsScalarFieldEnum[]
+}
+
+/**
+ * UserData.paymentItemsRoutine
+ */
+export type UserData$paymentItemsRoutineArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentItemsRoutine
+   */
+  select?: Prisma.PaymentItemsRoutineSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentItemsRoutine
+   */
+  omit?: Prisma.PaymentItemsRoutineOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentItemsRoutineInclude<ExtArgs> | null
+  where?: Prisma.PaymentItemsRoutineWhereInput
+  orderBy?: Prisma.PaymentItemsRoutineOrderByWithRelationInput | Prisma.PaymentItemsRoutineOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentItemsRoutineWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentItemsRoutineScalarFieldEnum | Prisma.PaymentItemsRoutineScalarFieldEnum[]
 }
 
 /**

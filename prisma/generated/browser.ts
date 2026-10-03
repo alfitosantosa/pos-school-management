@@ -98,6 +98,11 @@ export type PaymentType = Prisma.PaymentTypeModel
  */
 export type PaymentItems = Prisma.PaymentItemsModel
 /**
+ * Model PaymentItemsRoutine
+ * 
+ */
+export type PaymentItemsRoutine = Prisma.PaymentItemsRoutineModel
+/**
  * Model Payment
  * 
  */

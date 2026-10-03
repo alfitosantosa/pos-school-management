@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.9.0
- * Query Engine version: e922089b7d7502aff4249d5da3420f6fa55fc6ad
+ * Prisma Client JS version: 7.10.0
+ * Query Engine version: 0edf323efd1d98336f3f0a68684b56f689b900d3
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.9.0",
-  engine: "e922089b7d7502aff4249d5da3420f6fa55fc6ad"
+  client: "7.10.0",
+  engine: "0edf323efd1d98336f3f0a68684b56f689b900d3"
 }
 
 /**
@@ -413,6 +413,7 @@ export const ModelName = {
   Violation: 'Violation',
   PaymentType: 'PaymentType',
   PaymentItems: 'PaymentItems',
+  PaymentItemsRoutine: 'PaymentItemsRoutine',
   Payment: 'Payment',
   PaymentTransaction: 'PaymentTransaction',
   AccountBank: 'AccountBank',
@@ -446,7 +447,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "userData" | "role" | "academicYear" | "major" | "class" | "subject" | "schedule" | "attendance" | "violationType" | "violation" | "paymentType" | "paymentItems" | "payment" | "paymentTransaction" | "accountBank" | "calendarEvent" | "gradeType" | "gradeConfiguration" | "grade" | "reportCard" | "gradeScale" | "assignment" | "assignmentSubmission" | "notification" | "dashboardContent" | "announcement" | "tahfidzRecord" | "surahQuran" | "teacherAttendance" | "tahfidzGroup"
+    modelProps: "user" | "session" | "account" | "verification" | "userData" | "role" | "academicYear" | "major" | "class" | "subject" | "schedule" | "attendance" | "violationType" | "violation" | "paymentType" | "paymentItems" | "paymentItemsRoutine" | "payment" | "paymentTransaction" | "accountBank" | "calendarEvent" | "gradeType" | "gradeConfiguration" | "grade" | "reportCard" | "gradeScale" | "assignment" | "assignmentSubmission" | "notification" | "dashboardContent" | "announcement" | "tahfidzRecord" | "surahQuran" | "teacherAttendance" | "tahfidzGroup"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1631,6 +1632,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PaymentItemsCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PaymentItemsCountAggregateOutputType> | number
+        }
+      }
+    }
+    PaymentItemsRoutine: {
+      payload: Prisma.$PaymentItemsRoutinePayload<ExtArgs>
+      fields: Prisma.PaymentItemsRoutineFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaymentItemsRoutineFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaymentItemsRoutineFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload>
+        }
+        findFirst: {
+          args: Prisma.PaymentItemsRoutineFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaymentItemsRoutineFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload>
+        }
+        findMany: {
+          args: Prisma.PaymentItemsRoutineFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload>[]
+        }
+        create: {
+          args: Prisma.PaymentItemsRoutineCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload>
+        }
+        createMany: {
+          args: Prisma.PaymentItemsRoutineCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaymentItemsRoutineCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload>[]
+        }
+        delete: {
+          args: Prisma.PaymentItemsRoutineDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload>
+        }
+        update: {
+          args: Prisma.PaymentItemsRoutineUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload>
+        }
+        deleteMany: {
+          args: Prisma.PaymentItemsRoutineDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaymentItemsRoutineUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaymentItemsRoutineUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload>[]
+        }
+        upsert: {
+          args: Prisma.PaymentItemsRoutineUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentItemsRoutinePayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentItemsRoutineAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaymentItemsRoutine>
+        }
+        groupBy: {
+          args: Prisma.PaymentItemsRoutineGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentItemsRoutineGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaymentItemsRoutineCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentItemsRoutineCountAggregateOutputType> | number
         }
       }
     }
@@ -3267,6 +3342,21 @@ export const PaymentItemsScalarFieldEnum = {
 export type PaymentItemsScalarFieldEnum = (typeof PaymentItemsScalarFieldEnum)[keyof typeof PaymentItemsScalarFieldEnum]
 
 
+export const PaymentItemsRoutineScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  paymentTypeId: 'paymentTypeId',
+  quantity: 'quantity',
+  amount: 'amount',
+  subtotal: 'subtotal',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentItemsRoutineScalarFieldEnum = (typeof PaymentItemsRoutineScalarFieldEnum)[keyof typeof PaymentItemsRoutineScalarFieldEnum]
+
+
 export const PaymentScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
@@ -3881,6 +3971,7 @@ export type GlobalOmitConfig = {
   violation?: Prisma.ViolationOmit
   paymentType?: Prisma.PaymentTypeOmit
   paymentItems?: Prisma.PaymentItemsOmit
+  paymentItemsRoutine?: Prisma.PaymentItemsRoutineOmit
   payment?: Prisma.PaymentOmit
   paymentTransaction?: Prisma.PaymentTransactionOmit
   accountBank?: Prisma.AccountBankOmit
