@@ -2,6 +2,7 @@
 export * from "./types/userData";
 export * from "./types/payment-types";
 export * from "./types/payment-items-types";
+export * from "./types/payment-items-routine-types";
 export * from "./types/accountbank-types";
 export * from "./types/academicyear-types";
 // export * from "./types/attendance-types";
