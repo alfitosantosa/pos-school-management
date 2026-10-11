@@ -400,11 +400,11 @@ export const menuGroups: Record<string, MenuGroup[]> = {
           url: "/dashboard/bendahara/paymenttype",
           icon: "payment",
         },
-        {
-          title: "Data Tagihan Rutin",
-          url: "/dashboard/bendahara/billing/routine",
-          icon: "file",
-        },
+        // {
+        //   title: "Data Tagihan Rutin",
+        //   url: "/dashboard/bendahara/billing/routine",
+        //   icon: "file",
+        // },
         {
           title: "Data Tagihan",
           url: "/dashboard/bendahara/billing",
