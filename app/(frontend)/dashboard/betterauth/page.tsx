@@ -3,6 +3,7 @@
 import { useGetBetterAuth } from "@/app/(hooks)/hooks/Users/useBetterAuth";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Loading from "@/components/loading";
+import { DataTablePageSize } from "@/components/ui/data-table-page-size";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -417,8 +418,9 @@ function DataTableBetterAuth() {
           </div>
 
           <div className="flex items-center justify-between space-x-2 py-4">
-            <div className="text-muted-foreground text-sm">
-              {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
+            <div className="flex items-center gap-3 text-muted-foreground text-sm">
+              <span>{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.</span>
+              <DataTablePageSize table={table} />
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>

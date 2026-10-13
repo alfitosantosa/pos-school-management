@@ -9,6 +9,7 @@ import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersById
 import { majorTypes, PaymentTypeTypes, UserDataTypes } from "@/app/(types)";
 import { DatePickerWithRange } from "@/components/date/datePicker";
 import Loading from "@/components/loading";
+import { DataTablePageSize } from "@/components/ui/data-table-page-size";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -659,6 +660,8 @@ function BillingDataTable({
   const [singleDialogOpen, setSingleDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = React.useState(false);
+  const bulkDelete = useDeletePaymentItems();
   const [selectedItem, setSelectedItem] = React.useState<PaymentItemData | null>(null);
 
   // ✅ Integrasikan hook dengan filter tanggal, major, skuType, dan isPaid
@@ -935,6 +938,22 @@ function BillingDataTable({
   //   table.getColumn("skuType")?.setFilterValue(skuFilter !== "all" ? skuFilter : undefined);
   // }, [skuFilter, table]);
 
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const selectedCount = selectedRows.length;
+
+  const handleBulkDelete = async () => {
+    const ids = selectedRows.map((row) => row.original.id);
+    if (ids.length === 0) return;
+    try {
+      await bulkDelete.mutateAsync(ids);
+      toast.success(`${ids.length} item tagihan dihapus`);
+      table.resetRowSelection();
+      setBulkDeleteOpen(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Gagal menghapus item tagihan");
+    }
+  };
+
   if (isLoading) return <Loading />;
 
   const filteredRows = table.getFilteredRowModel().rows;
@@ -1062,6 +1081,12 @@ function BillingDataTable({
         </div>
 
         <div className="flex items-center gap-2">
+          {selectedCount > 0 && (
+            <Button variant="destructive" onClick={() => setBulkDeleteOpen(true)}>
+              <Trash2 className="mr-2 h-4 w-4" />
+              Hapus {selectedCount} Item
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -1182,9 +1207,10 @@ function BillingDataTable({
 
       {/* Pagination */}
       <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} dari {filteredRows.length} baris dipilih.
+        <div className="flex flex-1 items-center gap-3 text-sm text-muted-foreground">
+          <span>{table.getFilteredSelectedRowModel().rows.length} dari {filteredRows.length} baris dipilih.</span>
           {filteredRows.length !== totalItems && <span className="ml-2">(difilter dari {totalItems} total)</span>}
+          <DataTablePageSize table={table} />
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">
@@ -1242,6 +1268,22 @@ function BillingDataTable({
       {/* Dialogs */}
       <SingleItemDialog open={singleDialogOpen} onOpenChange={setSingleDialogOpen} onSuccess={handleSuccess} allStudents={allStudents} allPaymentTypes={allPaymentTypes} />
       <SingleItemDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedItem} onSuccess={handleSuccess} allStudents={allStudents} allPaymentTypes={allPaymentTypes} />
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus {selectedCount} item tagihan?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedCount} item tagihan yang dipilih akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkDelete.isPending}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} disabled={bulkDelete.isPending} className="bg-red-600 hover:bg-red-700">
+              {bulkDelete.isPending ? "Menghapus..." : "Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <DeleteItemDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} itemData={selectedItem} onSuccess={handleSuccess} />
     </div>
   );

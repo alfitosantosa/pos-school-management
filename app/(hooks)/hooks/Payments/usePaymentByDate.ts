@@ -1,6 +1,6 @@
 import { PaymentData } from "@/app/(types)";
 import { apiGet } from "@/lib/apiClients";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const usePaymentsByDate = ({ fromdate, todate, majorId }: { fromdate?: Date; todate?: Date; majorId?: string }) => {
   // Format tanggal ke YYYY-MM-DD menggunakan timezone lokal
@@ -48,6 +48,9 @@ export const usePaymentsByDate = ({ fromdate, todate, majorId }: { fromdate?: Da
     },
     // ✅ FIX: Enable query when dates are available
     enabled: !!fromdateStr && !!todateStr,
+    // Tanggal berubah → tetap tampilkan data lama supaya halaman tidak
+    // unmount skeleton (yang menutup popover kalender saat memilih tanggal).
+    placeholderData: keepPreviousData,
     staleTime: 60_000, // 1 minute
     gcTime: 300_000, // 5 minutes
   });
@@ -104,5 +107,8 @@ export const usePaymentsDashboardByDate = ({ fromdate, todate, majorId }: { from
     },
     // Selalu enabled, tapi return empty dashboard data jika tidak ada date
     enabled: true,
+    // Tanggal berubah → tetap tampilkan data lama supaya halaman tidak
+    // unmount skeleton (yang menutup popover kalender saat memilih tanggal).
+    placeholderData: keepPreviousData,
   });
 };

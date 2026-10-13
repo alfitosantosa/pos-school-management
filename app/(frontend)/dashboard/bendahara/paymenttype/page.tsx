@@ -3,6 +3,7 @@
 import { useCreatePaymentType, useDeletePaymentType, useGetPaymentTypeByIdMajor, useUpdatePaymentType } from "@/app/(hooks)/hooks/Payments/usePaymentType";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Loading from "@/components/loading";
+import { DataTablePageSize } from "@/components/ui/data-table-page-size";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -656,8 +657,9 @@ function PaymentTypeDataTable({ userMajorData }: { userMajorData: { id: string; 
 
       {/* Pagination */}
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} dari {table.getFilteredRowModel().rows.length} baris dipilih.
+        <div className="flex flex-1 items-center gap-3 text-sm text-muted-foreground">
+          <span>{table.getFilteredSelectedRowModel().rows.length} dari {table.getFilteredRowModel().rows.length} baris dipilih.</span>
+          <DataTablePageSize table={table} />
         </div>
         <div className="space-x-2">
           <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>

@@ -19,6 +19,7 @@ import type {
   PaymentItemsInput,
 } from "@/app/(types)";
 import Loading from "@/components/loading";
+import { DataTablePageSize } from "@/components/ui/data-table-page-size";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -78,6 +79,7 @@ import {
 import type {
   ColumnDef,
   ColumnFiltersState,
+  PaginationState,
   Row,
   SortingState,
 } from "@tanstack/react-table";
@@ -155,6 +157,12 @@ function RoutineDataTable({
   const [paymentTypeFilter, setPaymentTypeFilter] = React.useState("all");
   const [deleteTarget, setDeleteTarget] =
     React.useState<PaymentItemRoutineData | null>(null);
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [bulkDeleteOpen, setBulkDeleteOpen] = React.useState(false);
   const [addOpen, setAddOpen] = React.useState(false);
   const [bulkOpen, setBulkOpen] = React.useState(false);
   const [sendOpen, setSendOpen] = React.useState(false);
@@ -192,6 +200,28 @@ function RoutineDataTable({
   );
 
   const columns: ColumnDef<PaymentItemRoutineData>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
+          aria-label="Pilih semua"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(v) => row.toggleSelected(!!v)}
+          aria-label="Pilih baris"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       id: "class",
       accessorFn: (row) => row.student?.class?.name ?? "-",
@@ -370,7 +400,10 @@ function RoutineDataTable({
     getFilteredRowModel: getFilteredRowModel(),
     globalFilterFn,
     onGlobalFilterChange: setGlobalFilter,
-    state: { sorting, columnFilters, globalFilter },
+    onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
+    getRowId: (row) => row.id,
+    state: { sorting, columnFilters, globalFilter, rowSelection, pagination },
   });
 
   React.useEffect(() => {
@@ -405,6 +438,24 @@ function RoutineDataTable({
       await deleteMutation.mutateAsync(deleteTarget.id);
       toast.success(`Item "${deleteTarget.name}" dihapus`);
       setDeleteTarget(null);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Gagal menghapus item",
+      );
+    }
+  };
+
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const selectedCount = selectedRows.length;
+
+  const handleBulkDelete = async () => {
+    const ids = selectedRows.map((row) => row.original.id);
+    if (ids.length === 0) return;
+    try {
+      await deleteMutation.mutateAsync(ids);
+      toast.success(`${ids.length} item dihapus`);
+      table.resetRowSelection();
+      setBulkDeleteOpen(false);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Gagal menghapus item",
@@ -485,6 +536,15 @@ function RoutineDataTable({
         </div>
 
         <div className="flex items-center gap-2">
+          {selectedCount > 0 && (
+            <Button
+              variant="destructive"
+              onClick={() => setBulkDeleteOpen(true)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Hapus {selectedCount} Item
+            </Button>
+          )}
           <Button variant="outline" onClick={() => setBulkOpen(true)}>
             <Sparkles className="mr-2 h-4 w-4" />
             Generate Bulanan
@@ -532,7 +592,10 @@ function RoutineDataTable({
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -581,9 +644,12 @@ function RoutineDataTable({
       </div>
 
       {/* ── Pagination ── */}
-      <div className="flex items-center justify-between space-x-2">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {filteredRows.length} dari {rows.length} baris ditampilkan.
+      <div className="flex items-center justify-between space-x-2 flex-wrap gap-y-2">
+        <div className="flex-1 flex items-center gap-3 text-sm text-muted-foreground">
+          <span>
+            {filteredRows.length} dari {rows.length} baris ditampilkan.
+          </span>
+          <DataTablePageSize table={table} />
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">
@@ -665,6 +731,31 @@ function RoutineDataTable({
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteMutation.isPending ? "Menghapus..." : "Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* ── Bulk Delete Confirmation ── */}
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus {selectedCount} item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedCount} item tagihan rutin yang dipilih akan dihapus
+              permanen. Tindakan ini tidak bisa dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
               disabled={deleteMutation.isPending}
               className="bg-red-600 hover:bg-red-700"
             >
@@ -941,19 +1032,33 @@ function BulkGenerateDialog({
   const [month, setMonth] = React.useState(MONTHS[new Date().getMonth()]);
   const [year, setYear] = React.useState(String(currentYear));
   const [classScope, setClassScope] = React.useState("all");
-  const [typeIds, setTypeIds] = React.useState<string[]>([]);
+  const [typeId, setTypeId] = React.useState("");
+  const [quantity, setQuantity] = React.useState(1);
+  const [amount, setAmount] = React.useState(0);
 
-  const toggleType = (id: string) =>
-    setTypeIds((prev) =>
-      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id],
-    );
+  // Single-select: picking another type replaces the current one, so the
+  // quantity/amount inputs describe exactly one generated item per student.
+  const toggleType = (pt: (typeof paymentTypes)[number]) => {
+    if (typeId === pt.id) {
+      setTypeId("");
+      return;
+    }
+    setTypeId(pt.id);
+    const qty = pt.isFixedQuantity ? Number(pt.quantity) || 1 : 1;
+    setQuantity(qty);
+    // `amount` is the per-unit price; subtotal is derived as qty × amount.
+    setAmount(Number(pt.amount) || (qty > 0 ? Number(pt.subtotal) / qty : 0));
+  };
 
   const { rows, skipped, studentCount } = React.useMemo(() => {
     const scoped =
       classScope === "all"
         ? students
         : students.filter((s) => s.class?.name === classScope);
-    const types = paymentTypes.filter((pt) => typeIds.includes(pt.id));
+    const type = paymentTypes.find((pt) => pt.id === typeId);
+    const qty = Number(quantity) || 0;
+    const price = Number(amount) || 0;
+    const subtotal = qty * price;
     // Skip items that already exist for the same student + name so re-running a
     // month doesn't duplicate the whole branch.
     const taken = new Set(
@@ -961,31 +1066,39 @@ function BulkGenerateDialog({
     );
     const generated: PaymentItemRoutineBulkPayload[] = [];
     let skippedCount = 0;
-    scoped.forEach((student) => {
-      types.forEach((pt) => {
-        const name = `${pt.name} ${month} ${year}`;
+    if (type && qty > 0 && price > 0) {
+      scoped.forEach((student) => {
+        const name = `${type.name} ${month} ${year}`;
         if (taken.has(`${student.id}::${name}`)) {
           skippedCount++;
           return;
         }
-        const quantity = pt.isFixedQuantity ? Number(pt.quantity) || 1 : 1;
-        const amount = Number(pt.amount) || 0;
         generated.push({
           studentId: student.id,
-          paymentTypeId: pt.id,
-          quantity,
-          amount,
-          subtotal: quantity * amount,
+          paymentTypeId: type.id,
+          quantity: qty,
+          amount: price,
+          subtotal,
           name,
         });
       });
-    });
+    }
     return {
       rows: generated,
       skipped: skippedCount,
       studentCount: scoped.length,
     };
-  }, [students, paymentTypes, classScope, typeIds, month, year, existing]);
+  }, [
+    students,
+    paymentTypes,
+    classScope,
+    typeId,
+    quantity,
+    amount,
+    month,
+    year,
+    existing,
+  ]);
 
   const studentNameById = React.useMemo(() => {
     const map = new Map<string, string>();
@@ -1085,7 +1198,7 @@ function BulkGenerateDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>Jenis Tagihan</Label>
+            <Label>Jenis Tagihan (pilih satu)</Label>
             <div className="max-h-44 overflow-y-auto rounded-md border p-2 space-y-1">
               {paymentTypes.length === 0 && (
                 <p className="text-sm text-muted-foreground p-1">
@@ -1099,8 +1212,8 @@ function BulkGenerateDialog({
                 >
                   <Checkbox
                     id={`bulk-type-${pt.id}`}
-                    checked={typeIds.includes(pt.id)}
-                    onCheckedChange={() => toggleType(pt.id)}
+                    checked={typeId === pt.id}
+                    onCheckedChange={() => toggleType(pt)}
                   />
                   <label
                     htmlFor={`bulk-type-${pt.id}`}
@@ -1116,6 +1229,29 @@ function BulkGenerateDialog({
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="bulk-qty">Quantity</Label>
+              <Input
+                id="bulk-qty"
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bulk-amount">Harga Satuan</Label>
+              <Input
+                id="bulk-amount"
+                type="number"
+                min={0}
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+              />
+            </div>
+          </div>
+
           <div className="rounded-md border p-3 text-sm space-y-1">
             <div className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-muted-foreground" />
@@ -1127,7 +1263,7 @@ function BulkGenerateDialog({
               </span>
             </div>
             <p className="text-muted-foreground">
-              {studentCount} siswa × {typeIds.length} jenis ={" "}
+              {studentCount} siswa × {typeId ? 1 : 0} jenis ={" "}
               <strong>{rows.length}</strong> item baru
               {skipped > 0 && (
                 <span className="text-yellow-600 dark:text-yellow-500">
@@ -1151,6 +1287,7 @@ function BulkGenerateDialog({
                       <th className="text-left p-2 font-medium">Jenis</th>
                       <th className="text-left p-2 font-medium">Nama Item</th>
                       <th className="text-right p-2 font-medium">Qty</th>
+                      <th className="text-right p-2 font-medium">Harga Satuan</th>
                       <th className="text-right p-2 font-medium">Subtotal</th>
                     </tr>
                   </thead>
@@ -1170,6 +1307,9 @@ function BulkGenerateDialog({
                           {row.name}
                         </td>
                         <td className="p-2 text-right">{row.quantity}</td>
+                        <td className="p-2 text-right tabular-nums">
+                          {formatRupiah(row.amount)}
+                        </td>
                         <td className="p-2 text-right tabular-nums">
                           {formatRupiah(row.subtotal)}
                         </td>

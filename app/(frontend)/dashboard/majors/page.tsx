@@ -9,6 +9,7 @@ import {
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { getErrorMessage, majorTypes } from "@/app/(types)";
 import Loading from "@/components/loading";
+import { DataTablePageSize } from "@/components/ui/data-table-page-size";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -1153,9 +1154,12 @@ function MajorDataTable() {
       </div>
 
       <div className="flex items-center justify-between py-4">
-        <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} dari{" "}
-          {table.getFilteredRowModel().rows.length} baris dipilih.
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <span>
+            {table.getFilteredSelectedRowModel().rows.length} dari{" "}
+            {table.getFilteredRowModel().rows.length} baris dipilih.
+          </span>
+          <DataTablePageSize table={table} />
         </div>
         <div className="space-x-2">
           <Button

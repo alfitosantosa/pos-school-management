@@ -9,6 +9,7 @@ import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersById
 import { UserDataTypes } from "@/app/(types)";
 import { DatePickerWithRange } from "@/components/date/datePicker";
 import Loading from "@/components/loading";
+import { DataTablePageSize } from "@/components/ui/data-table-page-size";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -1197,9 +1198,10 @@ function BillingDataTable({ majorData }: { majorData: { id: string; name: string
 
       {/* Pagination */}
       <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} dari {filteredRows.length} baris dipilih.
+        <div className="flex flex-1 items-center gap-3 text-sm text-muted-foreground">
+          <span>{table.getFilteredSelectedRowModel().rows.length} dari {filteredRows.length} baris dipilih.</span>
           {filteredRows.length !== totalItems && <span className="ml-2">(difilter dari {totalItems} total)</span>}
+          <DataTablePageSize table={table} />
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">

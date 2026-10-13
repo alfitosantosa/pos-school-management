@@ -23,6 +23,7 @@ import {
 import { DatePickerWithRange } from "@/components/date/datePicker";
 import { DatePickerTime } from "@/components/date/datePickerTime";
 import Loading from "@/components/loading";
+import { DataTablePageSize } from "@/components/ui/data-table-page-size";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -1981,12 +1982,15 @@ function PaymentDataTable({
 
       {/* Pagination */}
       <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} dari{" "}
-          {filteredRows.length} baris dipilih.
+        <div className="flex flex-1 items-center gap-3 text-sm text-muted-foreground">
+          <span>
+            {table.getFilteredSelectedRowModel().rows.length} dari{" "}
+            {filteredRows.length} baris dipilih.
+          </span>
           {filteredRows.length !== totalPayments && (
             <span className="ml-2">(difilter dari {totalPayments} total)</span>
           )}
+          <DataTablePageSize table={table} />
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">

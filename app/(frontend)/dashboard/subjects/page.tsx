@@ -5,6 +5,7 @@ import { useCreateSubject, useDeleteSubject, useGetSubjects, useUpdateSubject } 
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Loading from "@/components/loading";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { DataTablePageSize } from "@/components/ui/data-table-page-size";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -658,9 +659,12 @@ function SubjectDataTable() {
         </div>
 
         <div className="flex items-center justify-between space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} dari {table.getFilteredRowModel().rows.length} baris dipilih.
-            {table.getFilteredRowModel().rows.length !== subjects.length && <span className="ml-2">(difilter dari {subjects.length} total)</span>}
+          <div className="flex-1 flex items-center gap-3 text-sm text-muted-foreground">
+            <span>
+              {table.getFilteredSelectedRowModel().rows.length} dari {table.getFilteredRowModel().rows.length} baris dipilih.
+              {table.getFilteredRowModel().rows.length !== subjects.length && <span className="ml-2">(difilter dari {subjects.length} total)</span>}
+            </span>
+            <DataTablePageSize table={table} />
           </div>
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">

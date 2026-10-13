@@ -83,15 +83,28 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { id } = await request.json();
+    const { id, ids } = await request.json();
+    // Accept both a single `id` and an `ids` array. Never fall through to an
+    // empty `where`, which would wipe the whole table.
+    const idList: string[] = Array.isArray(ids) ? ids : id ? [id] : [];
 
-    const deletedPaymentItems = await prisma.paymentItems.delete({
+    if (idList.length === 0) {
+      return NextResponse.json(
+        { message: "Tidak ada id yang dikirim" },
+        { status: 400 },
+      );
+    }
+
+    const result = await prisma.paymentItems.deleteMany({
       where: {
-        id,
+        id: { in: idList },
       },
     });
 
-    return NextResponse.json(deletedPaymentItems);
+    return NextResponse.json({
+      message: `Deleted ${result.count} payment items`,
+      count: result.count,
+    });
   } catch (error) {
     return handlePrismaError(error);
   }

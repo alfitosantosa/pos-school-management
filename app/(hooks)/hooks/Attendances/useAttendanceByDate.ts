@@ -1,6 +1,6 @@
 import { attendanceTypes } from "@/app/(types)/types/attendance-types";
 import { apiGet } from "@/lib/apiClients";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useAttendanceByDate = ({ fromdate, todate }: { fromdate?: Date; todate?: Date }) => {
   return useQuery({
@@ -25,5 +25,8 @@ export const useAttendanceByDate = ({ fromdate, todate }: { fromdate?: Date; tod
       return response.data;
     },
     enabled: !!fromdate && !!todate, // Hanya fetch jika ada tanggal
+    // Jangan balik ke loading saat tanggal berubah: halaman tidak unmount
+    // skeleton, jadi popover kalender tetap terbuka dan tabel tak kosong.
+    placeholderData: keepPreviousData,
   });
 };

@@ -4,6 +4,7 @@ import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcadem
 import { useCreateSpecialSchedule, useDeleteSpecialSchedule, useGetSpecialSchedules, useUpdateSpecialSchedule } from "@/app/(hooks)/hooks/SpecialSchedules/useSpecialSchedule";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import Loading from "@/components/loading";
+import { DataTablePageSize } from "@/components/ui/data-table-page-size";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -719,7 +720,10 @@ function SpecialScheduleDataTable() {
             </TableBody>
           </Table>
         </div>
-        <div className="flex mt-2 justify-end space-x-2">
+        <div className="flex mt-2 items-center justify-between space-x-2">
+          <div className="flex-1">
+            <DataTablePageSize table={table} />
+          </div>
           <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
             Sebelumnya
           </Button>

@@ -19,7 +19,7 @@ import { useMemo, useState } from "react";
 function SimpleTable({ columns, data, emptyMessage = "Tidak ada data" }: any) {
   const [currentPage, setCurrentPage] = useState(0);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   const sortedData = useMemo(() => {
     if (!sortConfig) return data;
@@ -80,10 +80,22 @@ function SimpleTable({ columns, data, emptyMessage = "Tidak ada data" }: any) {
         </table>
       </div>
 
-      {totalPages > 1 && (
+      {sortedData.length > 0 && (
         <div className="flex items-center justify-between px-2">
-          <div className="text-sm text-muted-foreground">
-            Menampilkan {startIndex + 1}-{Math.min(endIndex, sortedData.length)} dari {sortedData.length} data
+          <div className="flex flex-1 items-center gap-3 text-sm text-muted-foreground">
+            <span>Menampilkan {startIndex + 1}-{Math.min(endIndex, sortedData.length)} dari {sortedData.length} data</span>
+            <span>Baris per halaman</span>
+            <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setCurrentPage(0); }}>
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm" onClick={() => setCurrentPage((p: number) => Math.max(0, p - 1))} disabled={currentPage === 0}>

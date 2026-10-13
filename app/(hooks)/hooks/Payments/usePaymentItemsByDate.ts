@@ -1,6 +1,6 @@
 import { apiGet } from "@/lib/apiClients";
 import { PaymentItemsTypes } from "@/app/(types)";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPaid, skuType }: { fromdate?: Date; todate?: Date; majorId?: string; status?: string; isPaid?: boolean; skuType?: string }) => {
   // Format tanggal ke YYYY-MM-DD menggunakan timezone lokal
@@ -53,8 +53,13 @@ export const usePaymentsItemsByDate = ({ fromdate, todate, majorId, status, isPa
       const response = await apiGet<PaymentItemsTypes[]>("/api/payment/items/filterdate", { params });
       return response.data;
     },
-    // Selalu enabled
-    enabled: true,
+    // API menolak (400) kalau salah satu tanggal kosong — mis. saat user baru
+    // klik tanggal awal di picker. Jangan fetch dulu supaya data lama tetap
+    // tampil daripada tabel jadi kosong.
+    enabled: !!fromdate && !!todate,
+    // Tanggal berubah → tetap tampilkan data lama supaya halaman tidak
+    // unmount skeleton (yang menutup popover kalender saat memilih tanggal).
+    placeholderData: keepPreviousData,
   });
 };
 
@@ -111,5 +116,8 @@ export const usePaymentsItemsDashboardByDate = ({ fromdate, todate, majorId, sta
     },
     // Selalu enabled
     enabled: true,
+    // Tanggal berubah → tetap tampilkan data lama supaya halaman tidak
+    // unmount skeleton (yang menutup popover kalender saat memilih tanggal).
+    placeholderData: keepPreviousData,
   });
 };
