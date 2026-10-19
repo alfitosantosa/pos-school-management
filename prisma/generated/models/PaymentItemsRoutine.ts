@@ -46,6 +46,7 @@ export type PaymentItemsRoutineMinAggregateOutputType = {
   amount: runtime.Decimal | null
   subtotal: runtime.Decimal | null
   name: string | null
+  description: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +59,7 @@ export type PaymentItemsRoutineMaxAggregateOutputType = {
   amount: runtime.Decimal | null
   subtotal: runtime.Decimal | null
   name: string | null
+  description: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -70,6 +72,7 @@ export type PaymentItemsRoutineCountAggregateOutputType = {
   amount: number
   subtotal: number
   name: number
+  description: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -96,6 +99,7 @@ export type PaymentItemsRoutineMinAggregateInputType = {
   amount?: true
   subtotal?: true
   name?: true
+  description?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -108,6 +112,7 @@ export type PaymentItemsRoutineMaxAggregateInputType = {
   amount?: true
   subtotal?: true
   name?: true
+  description?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -120,6 +125,7 @@ export type PaymentItemsRoutineCountAggregateInputType = {
   amount?: true
   subtotal?: true
   name?: true
+  description?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -219,6 +225,7 @@ export type PaymentItemsRoutineGroupByOutputType = {
   amount: runtime.Decimal
   subtotal: runtime.Decimal
   name: string
+  description: string | null
   createdAt: Date
   updatedAt: Date
   _count: PaymentItemsRoutineCountAggregateOutputType | null
@@ -254,6 +261,7 @@ export type PaymentItemsRoutineWhereInput = {
   amount?: Prisma.DecimalFilter<"PaymentItemsRoutine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFilter<"PaymentItemsRoutine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFilter<"PaymentItemsRoutine"> | string
+  description?: Prisma.StringNullableFilter<"PaymentItemsRoutine"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PaymentItemsRoutine"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentItemsRoutine"> | Date | string
   PaymentType?: Prisma.XOR<Prisma.PaymentTypeScalarRelationFilter, Prisma.PaymentTypeWhereInput>
@@ -268,6 +276,7 @@ export type PaymentItemsRoutineOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   PaymentType?: Prisma.PaymentTypeOrderByWithRelationInput
@@ -285,6 +294,7 @@ export type PaymentItemsRoutineWhereUniqueInput = Prisma.AtLeast<{
   amount?: Prisma.DecimalFilter<"PaymentItemsRoutine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFilter<"PaymentItemsRoutine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFilter<"PaymentItemsRoutine"> | string
+  description?: Prisma.StringNullableFilter<"PaymentItemsRoutine"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PaymentItemsRoutine"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentItemsRoutine"> | Date | string
   PaymentType?: Prisma.XOR<Prisma.PaymentTypeScalarRelationFilter, Prisma.PaymentTypeWhereInput>
@@ -299,6 +309,7 @@ export type PaymentItemsRoutineOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PaymentItemsRoutineCountOrderByAggregateInput
@@ -319,6 +330,7 @@ export type PaymentItemsRoutineScalarWhereWithAggregatesInput = {
   amount?: Prisma.DecimalWithAggregatesFilter<"PaymentItemsRoutine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalWithAggregatesFilter<"PaymentItemsRoutine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringWithAggregatesFilter<"PaymentItemsRoutine"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"PaymentItemsRoutine"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentItemsRoutine"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentItemsRoutine"> | Date | string
 }
@@ -329,6 +341,7 @@ export type PaymentItemsRoutineCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   PaymentType: Prisma.PaymentTypeCreateNestedOneWithoutPaymentItemsRoutineInput
@@ -343,6 +356,7 @@ export type PaymentItemsRoutineUncheckedCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -353,6 +367,7 @@ export type PaymentItemsRoutineUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   PaymentType?: Prisma.PaymentTypeUpdateOneRequiredWithoutPaymentItemsRoutineNestedInput
@@ -367,6 +382,7 @@ export type PaymentItemsRoutineUncheckedUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -379,6 +395,7 @@ export type PaymentItemsRoutineCreateManyInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -389,6 +406,7 @@ export type PaymentItemsRoutineUpdateManyMutationInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -401,6 +419,7 @@ export type PaymentItemsRoutineUncheckedUpdateManyInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -423,6 +442,7 @@ export type PaymentItemsRoutineCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -441,6 +461,7 @@ export type PaymentItemsRoutineMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -453,6 +474,7 @@ export type PaymentItemsRoutineMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -553,6 +575,7 @@ export type PaymentItemsRoutineCreateWithoutStudentInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   PaymentType: Prisma.PaymentTypeCreateNestedOneWithoutPaymentItemsRoutineInput
@@ -565,6 +588,7 @@ export type PaymentItemsRoutineUncheckedCreateWithoutStudentInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -606,6 +630,7 @@ export type PaymentItemsRoutineScalarWhereInput = {
   amount?: Prisma.DecimalFilter<"PaymentItemsRoutine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFilter<"PaymentItemsRoutine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFilter<"PaymentItemsRoutine"> | string
+  description?: Prisma.StringNullableFilter<"PaymentItemsRoutine"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PaymentItemsRoutine"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentItemsRoutine"> | Date | string
 }
@@ -616,6 +641,7 @@ export type PaymentItemsRoutineCreateWithoutPaymentTypeInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   student: Prisma.UserDataCreateNestedOneWithoutPaymentItemsRoutineInput
@@ -628,6 +654,7 @@ export type PaymentItemsRoutineUncheckedCreateWithoutPaymentTypeInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -665,6 +692,7 @@ export type PaymentItemsRoutineCreateManyStudentInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -675,6 +703,7 @@ export type PaymentItemsRoutineUpdateWithoutStudentInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   PaymentType?: Prisma.PaymentTypeUpdateOneRequiredWithoutPaymentItemsRoutineNestedInput
@@ -687,6 +716,7 @@ export type PaymentItemsRoutineUncheckedUpdateWithoutStudentInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -698,6 +728,7 @@ export type PaymentItemsRoutineUncheckedUpdateManyWithoutStudentInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -709,6 +740,7 @@ export type PaymentItemsRoutineCreateManyPaymentTypeInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -719,6 +751,7 @@ export type PaymentItemsRoutineUpdateWithoutPaymentTypeInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.UserDataUpdateOneRequiredWithoutPaymentItemsRoutineNestedInput
@@ -731,6 +764,7 @@ export type PaymentItemsRoutineUncheckedUpdateWithoutPaymentTypeInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -742,6 +776,7 @@ export type PaymentItemsRoutineUncheckedUpdateManyWithoutPaymentTypeInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -756,6 +791,7 @@ export type PaymentItemsRoutineSelect<ExtArgs extends runtime.Types.Extensions.I
   amount?: boolean
   subtotal?: boolean
   name?: boolean
+  description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
@@ -770,6 +806,7 @@ export type PaymentItemsRoutineSelectCreateManyAndReturn<ExtArgs extends runtime
   amount?: boolean
   subtotal?: boolean
   name?: boolean
+  description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
@@ -784,6 +821,7 @@ export type PaymentItemsRoutineSelectUpdateManyAndReturn<ExtArgs extends runtime
   amount?: boolean
   subtotal?: boolean
   name?: boolean
+  description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
@@ -798,11 +836,12 @@ export type PaymentItemsRoutineSelectScalar = {
   amount?: boolean
   subtotal?: boolean
   name?: boolean
+  description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PaymentItemsRoutineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "paymentTypeId" | "quantity" | "amount" | "subtotal" | "name" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentItemsRoutine"]>
+export type PaymentItemsRoutineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "paymentTypeId" | "quantity" | "amount" | "subtotal" | "name" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentItemsRoutine"]>
 export type PaymentItemsRoutineInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   PaymentType?: boolean | Prisma.PaymentTypeDefaultArgs<ExtArgs>
   student?: boolean | Prisma.UserDataDefaultArgs<ExtArgs>
@@ -830,6 +869,7 @@ export type $PaymentItemsRoutinePayload<ExtArgs extends runtime.Types.Extensions
     amount: runtime.Decimal
     subtotal: runtime.Decimal
     name: string
+    description: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["paymentItemsRoutine"]>
@@ -1264,6 +1304,7 @@ export interface PaymentItemsRoutineFieldRefs {
   readonly amount: Prisma.FieldRef<"PaymentItemsRoutine", 'Decimal'>
   readonly subtotal: Prisma.FieldRef<"PaymentItemsRoutine", 'Decimal'>
   readonly name: Prisma.FieldRef<"PaymentItemsRoutine", 'String'>
+  readonly description: Prisma.FieldRef<"PaymentItemsRoutine", 'String'>
   readonly createdAt: Prisma.FieldRef<"PaymentItemsRoutine", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PaymentItemsRoutine", 'DateTime'>
 }

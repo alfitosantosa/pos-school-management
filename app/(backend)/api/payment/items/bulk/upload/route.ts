@@ -35,6 +35,7 @@ interface PaymentItemsInput {
   name: string;
   year: string;
   skuType: string;
+  description?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -110,7 +111,7 @@ export async function POST(request: NextRequest) {
     // Validate all students exist
     const existingStudents = await prisma.userData.findMany({
       where: { id: { in: studentIds } },
-      select: { id: true },
+      select: { id: true, name: true },
     });
     const existingStudentIds = new Set(existingStudents.map((s) => s.id));
 
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
     // Validate all payment types exist
     const existingPaymentTypes = await prisma.paymentType.findMany({
       where: { id: { in: paymentTypeIds } },
-      select: { id: true },
+      select: { id: true, majorId: true },
     });
     const existingPaymentTypeIds = new Set(existingPaymentTypes.map((pt) => pt.id));
 
@@ -136,21 +137,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create payment items
-    const result = await prisma.paymentItems.createMany({
-      data: body.map((item) => ({
-        studentId: item.studentId,
-        paymentTypeId: item.paymentTypeId,
-        quantity: Number(item.quantity),
-        amount: Number(item.amount),
-        subtotal: Number(item.subtotal),
-        isPaid: item.isPaid ?? false,
-        month: item.month,
-        name: item.name,
-        year: item.year,
-        skuType: item.skuType,
-      })),
-      skipDuplicates: true,
+    // A description marks the batch as a submission worth logging. The
+    // snapshot keeps names/subtotals readable even if items change later.
+    const description = (body[0]?.description ?? "").trim();
+    const studentNameById: Record<string, string> = Object.fromEntries(
+      existingStudents.map((s) => [s.id, s.name]),
+    );
+    const majorId =
+      existingPaymentTypes.find((pt) => pt.id === body[0]?.paymentTypeId)
+        ?.majorId ?? "";
+
+    const result = await prisma.$transaction(async (tx) => {
+      const created = await tx.paymentItems.createMany({
+        data: body.map((item) => ({
+          studentId: item.studentId,
+          paymentTypeId: item.paymentTypeId,
+          quantity: Number(item.quantity),
+          amount: Number(item.amount),
+          subtotal: Number(item.subtotal),
+          isPaid: item.isPaid ?? false,
+          month: item.month,
+          name: item.name,
+          year: item.year,
+          skuType: item.skuType,
+        })),
+        skipDuplicates: true,
+      });
+
+      if (description) {
+        await tx.paymentSubmission.create({
+          data: {
+            description,
+            majorId,
+            totalItems: created.count,
+            totalSubtotal: body.reduce(
+              (sum, item) => sum + Number(item.subtotal),
+              0,
+            ),
+            items: body.map((item) => ({
+              name: item.name,
+              studentName:
+                studentNameById[item.studentId] ?? item.studentId,
+              quantity: Number(item.quantity),
+              amount: Number(item.amount),
+              subtotal: Number(item.subtotal),
+            })),
+          },
+        });
+      }
+
+      return created;
     });
 
     return NextResponse.json(

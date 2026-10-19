@@ -140,6 +140,7 @@ export const BulkUploadPaymentItems = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paymentItems"] });
       queryClient.invalidateQueries({ queryKey: ["unpaid-students"] });
+      queryClient.invalidateQueries({ queryKey: ["paymentSubmissions"] });
     },
   });
 };

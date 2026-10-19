@@ -377,6 +377,7 @@ model PaymentItemsRoutine {
   amount        Decimal
   subtotal      Decimal
   name          String
+  description   String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   PaymentType   PaymentType @relation(fields: [paymentTypeId], references: [id])
@@ -386,6 +387,21 @@ model PaymentItemsRoutine {
   @@index([paymentTypeId])
   @@map("payment_items_routine")
 }
+
+model PaymentSubmission {
+  id            String   @id @default(uuid())
+  description   String
+  majorId       String
+  totalItems    Int
+  totalSubtotal Decimal
+  items         Json
+  createdAt     DateTime @default(now())
+
+  @@index([majorId])
+  @@index([createdAt])
+  @@map("payment_submissions")
+}
+
 
 model Payment {
   id                 String              @id @default(cuid())

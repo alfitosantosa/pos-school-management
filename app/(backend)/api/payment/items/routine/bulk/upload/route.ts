@@ -22,6 +22,7 @@ interface PaymentItemsRoutineInput {
   amount: number;
   subtotal: number;
   name: string;
+  description?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
         amount: Number(item.amount),
         subtotal: Number(item.subtotal),
         name: item.name,
+        description: item.description?.trim() || null,
       })),
       skipDuplicates: true,
     });

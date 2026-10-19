@@ -71,6 +71,7 @@ export interface PaymentItemsInput {
   name: string;
   year: string;
   skuType?: string;
+  description?: string;
 }
 
 // ─── Filter types ─────────────────────────────────────────────────────────────

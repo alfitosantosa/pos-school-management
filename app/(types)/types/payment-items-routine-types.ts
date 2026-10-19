@@ -13,6 +13,7 @@ export interface PaymentItemRoutineData {
   amount: number | string;
   subtotal: number | string;
   name: string;
+  description?: string | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   // Relations — API returns capital `PaymentType`, lowercase alias kept for parity
@@ -39,6 +40,7 @@ export interface PaymentItemRoutineInput {
   amount?: number | string;
   subtotal?: number | string;
   name: string;
+  description?: string;
 }
 
 // ─── Bulk upload (Excel) ──────────────────────────────────────────────────────
@@ -49,6 +51,7 @@ export interface PaymentItemRoutineBulkPayload {
   amount: number;
   subtotal: number;
   name: string;
+  description?: string;
 }
 
 export interface PaymentItemRoutineBulkResult {
@@ -56,4 +59,23 @@ export interface PaymentItemRoutineBulkResult {
   count: number;
   skipped: number;
   total: number;
+}
+
+// ─── Submission log ───────────────────────────────────────────────────────────
+export interface PaymentSubmissionItem {
+  name: string;
+  studentName: string;
+  quantity: number;
+  amount: number;
+  subtotal: number;
+}
+
+export interface PaymentSubmissionData {
+  id: string;
+  description: string;
+  majorId: string;
+  totalItems: number;
+  totalSubtotal: number | string;
+  items: PaymentSubmissionItem[];
+  createdAt: string;
 }

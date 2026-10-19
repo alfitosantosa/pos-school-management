@@ -414,6 +414,7 @@ export const ModelName = {
   PaymentType: 'PaymentType',
   PaymentItems: 'PaymentItems',
   PaymentItemsRoutine: 'PaymentItemsRoutine',
+  PaymentSubmission: 'PaymentSubmission',
   Payment: 'Payment',
   PaymentTransaction: 'PaymentTransaction',
   AccountBank: 'AccountBank',
@@ -447,7 +448,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "userData" | "role" | "academicYear" | "major" | "class" | "subject" | "schedule" | "attendance" | "violationType" | "violation" | "paymentType" | "paymentItems" | "paymentItemsRoutine" | "payment" | "paymentTransaction" | "accountBank" | "calendarEvent" | "gradeType" | "gradeConfiguration" | "grade" | "reportCard" | "gradeScale" | "assignment" | "assignmentSubmission" | "notification" | "dashboardContent" | "announcement" | "tahfidzRecord" | "surahQuran" | "teacherAttendance" | "tahfidzGroup"
+    modelProps: "user" | "session" | "account" | "verification" | "userData" | "role" | "academicYear" | "major" | "class" | "subject" | "schedule" | "attendance" | "violationType" | "violation" | "paymentType" | "paymentItems" | "paymentItemsRoutine" | "paymentSubmission" | "payment" | "paymentTransaction" | "accountBank" | "calendarEvent" | "gradeType" | "gradeConfiguration" | "grade" | "reportCard" | "gradeScale" | "assignment" | "assignmentSubmission" | "notification" | "dashboardContent" | "announcement" | "tahfidzRecord" | "surahQuran" | "teacherAttendance" | "tahfidzGroup"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1706,6 +1707,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PaymentItemsRoutineCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PaymentItemsRoutineCountAggregateOutputType> | number
+        }
+      }
+    }
+    PaymentSubmission: {
+      payload: Prisma.$PaymentSubmissionPayload<ExtArgs>
+      fields: Prisma.PaymentSubmissionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaymentSubmissionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaymentSubmissionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload>
+        }
+        findFirst: {
+          args: Prisma.PaymentSubmissionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaymentSubmissionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload>
+        }
+        findMany: {
+          args: Prisma.PaymentSubmissionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload>[]
+        }
+        create: {
+          args: Prisma.PaymentSubmissionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload>
+        }
+        createMany: {
+          args: Prisma.PaymentSubmissionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaymentSubmissionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload>[]
+        }
+        delete: {
+          args: Prisma.PaymentSubmissionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload>
+        }
+        update: {
+          args: Prisma.PaymentSubmissionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaymentSubmissionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaymentSubmissionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaymentSubmissionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaymentSubmissionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentSubmissionPayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentSubmissionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaymentSubmission>
+        }
+        groupBy: {
+          args: Prisma.PaymentSubmissionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentSubmissionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaymentSubmissionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentSubmissionCountAggregateOutputType> | number
         }
       }
     }
@@ -3350,11 +3425,25 @@ export const PaymentItemsRoutineScalarFieldEnum = {
   amount: 'amount',
   subtotal: 'subtotal',
   name: 'name',
+  description: 'description',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type PaymentItemsRoutineScalarFieldEnum = (typeof PaymentItemsRoutineScalarFieldEnum)[keyof typeof PaymentItemsRoutineScalarFieldEnum]
+
+
+export const PaymentSubmissionScalarFieldEnum = {
+  id: 'id',
+  description: 'description',
+  majorId: 'majorId',
+  totalItems: 'totalItems',
+  totalSubtotal: 'totalSubtotal',
+  items: 'items',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentSubmissionScalarFieldEnum = (typeof PaymentSubmissionScalarFieldEnum)[keyof typeof PaymentSubmissionScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -3675,6 +3764,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
@@ -3972,6 +4068,7 @@ export type GlobalOmitConfig = {
   paymentType?: Prisma.PaymentTypeOmit
   paymentItems?: Prisma.PaymentItemsOmit
   paymentItemsRoutine?: Prisma.PaymentItemsRoutineOmit
+  paymentSubmission?: Prisma.PaymentSubmissionOmit
   payment?: Prisma.PaymentOmit
   paymentTransaction?: Prisma.PaymentTransactionOmit
   accountBank?: Prisma.AccountBankOmit

@@ -68,6 +68,7 @@ export const ModelName = {
   PaymentType: 'PaymentType',
   PaymentItems: 'PaymentItems',
   PaymentItemsRoutine: 'PaymentItemsRoutine',
+  PaymentSubmission: 'PaymentSubmission',
   Payment: 'Payment',
   PaymentTransaction: 'PaymentTransaction',
   AccountBank: 'AccountBank',
@@ -374,11 +375,25 @@ export const PaymentItemsRoutineScalarFieldEnum = {
   amount: 'amount',
   subtotal: 'subtotal',
   name: 'name',
+  description: 'description',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type PaymentItemsRoutineScalarFieldEnum = (typeof PaymentItemsRoutineScalarFieldEnum)[keyof typeof PaymentItemsRoutineScalarFieldEnum]
+
+
+export const PaymentSubmissionScalarFieldEnum = {
+  id: 'id',
+  description: 'description',
+  majorId: 'majorId',
+  totalItems: 'totalItems',
+  totalSubtotal: 'totalSubtotal',
+  items: 'items',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentSubmissionScalarFieldEnum = (typeof PaymentSubmissionScalarFieldEnum)[keyof typeof PaymentSubmissionScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -697,6 +712,13 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const NullableJsonNullValueInput = {

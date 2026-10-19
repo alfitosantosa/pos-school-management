@@ -7,6 +7,7 @@ import {
   useCreatePaymentItemsRoutines,
   useDeletePaymentItemsRoutines,
   useGetPaymentsItemsRoutineByMajorId,
+  useGetPaymentSubmissions,
   useUpdatePaymentItemsRoutines,
 } from "@/app/(hooks)/hooks/Payments/usePaymentItemsRoutine";
 import { useGetPaymentTypeByIdMajor } from "@/app/(hooks)/hooks/Payments/usePaymentType";
@@ -17,6 +18,7 @@ import type {
   PaymentItemRoutineBulkResult,
   PaymentItemRoutineData,
   PaymentItemsInput,
+  PaymentSubmissionData,
 } from "@/app/(types)";
 import Loading from "@/components/loading";
 import { DataTablePageSize } from "@/components/ui/data-table-page-size";
@@ -67,6 +69,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/lib/authClients";
 import {
   flexRender,
@@ -87,8 +90,11 @@ import {
   ArrowUpDown,
   Building,
   CalendarDays,
+  ChevronDown,
+  ChevronRight,
   CreditCard,
   FileText,
+  History,
   MoreHorizontal,
   Package,
   Pencil,
@@ -166,6 +172,7 @@ function RoutineDataTable({
   const [addOpen, setAddOpen] = React.useState(false);
   const [bulkOpen, setBulkOpen] = React.useState(false);
   const [sendOpen, setSendOpen] = React.useState(false);
+  const [logOpen, setLogOpen] = React.useState(false);
   const [editOpen, setEditOpen] = React.useState(false);
   const [editTargetId, setEditTargetId] = React.useState<string | null>(null);
 
@@ -545,6 +552,10 @@ function RoutineDataTable({
               Hapus {selectedCount} Item
             </Button>
           )}
+          <Button variant="outline" onClick={() => setLogOpen(true)}>
+            <History className="mr-2 h-4 w-4" />
+            Log Submission
+          </Button>
           <Button variant="outline" onClick={() => setBulkOpen(true)}>
             <Sparkles className="mr-2 h-4 w-4" />
             Generate Bulanan
@@ -792,6 +803,12 @@ function RoutineDataTable({
         items={rows}
         majorName={majorData?.name}
       />
+      <SubmissionLogDialog
+        open={logOpen}
+        onOpenChange={setLogOpen}
+        majorId={majorId}
+        majorName={majorData?.name}
+      />
     </div>
   );
 }
@@ -878,16 +895,12 @@ function RoutineItemDialog({
         toast.success("Item tagihan rutin berhasil diperbarui");
       } else {
         await createMutation.mutateAsync({
-          PaymentItemsRoutines: [
-            {
-              studentId,
-              paymentTypeId,
-              quantity,
-              amount,
-              subtotal,
-              name: name.trim(),
-            },
-          ],
+          studentId,
+          paymentTypeId,
+          quantity,
+          amount,
+          subtotal,
+          name: name.trim(),
         });
         toast.success("Item tagihan rutin berhasil dibuat");
         setStudentId("");
@@ -1035,6 +1048,8 @@ function BulkGenerateDialog({
   const [typeId, setTypeId] = React.useState("");
   const [quantity, setQuantity] = React.useState(1);
   const [amount, setAmount] = React.useState(0);
+  const [includePeriod, setIncludePeriod] = React.useState(false);
+  const [description, setDescription] = React.useState("");
 
   // Single-select: picking another type replaces the current one, so the
   // quantity/amount inputs describe exactly one generated item per student.
@@ -1068,7 +1083,9 @@ function BulkGenerateDialog({
     let skippedCount = 0;
     if (type && qty > 0 && price > 0) {
       scoped.forEach((student) => {
-        const name = `${type.name} ${month} ${year}`;
+        const name = includePeriod
+          ? `${type.name} ${month} ${year}`
+          : type.name;
         if (taken.has(`${student.id}::${name}`)) {
           skippedCount++;
           return;
@@ -1080,6 +1097,7 @@ function BulkGenerateDialog({
           amount: price,
           subtotal,
           name,
+          description: description.trim() || undefined,
         });
       });
     }
@@ -1097,6 +1115,8 @@ function BulkGenerateDialog({
     amount,
     month,
     year,
+    includePeriod,
+    description,
     existing,
   ]);
 
@@ -1135,7 +1155,7 @@ function BulkGenerateDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Generate Tagihan Rutin per Bulan</DialogTitle>
           <DialogDescription>
@@ -1176,6 +1196,20 @@ function BulkGenerateDialog({
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bulk-description">Deskripsi Tagihan</Label>
+            <Textarea
+              id="bulk-description"
+              placeholder="Contoh: SPP bulan Oktober 2026 kelas 7A"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Dipakai sebagai keterangan di Log Submission saat item dikirim ke
+              Data Tagihan.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -1252,13 +1286,31 @@ function BulkGenerateDialog({
             </div>
           </div>
 
+          <div className="flex items-start gap-2">
+            <Checkbox
+              id="bulk-include-period"
+              checked={includePeriod}
+              onCheckedChange={(checked) => setIncludePeriod(checked === true)}
+            />
+            <div className="space-y-0.5">
+              <Label htmlFor="bulk-include-period">
+                Sertakan bulan & tahun di nama item
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Nonaktif: nama item hanya jenis tagihan.
+              </p>
+            </div>
+          </div>
+
           <div className="rounded-md border p-3 text-sm space-y-1">
             <div className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-muted-foreground" />
               <span>
                 Nama item:{" "}
                 <strong className="font-mono">
-                  {"<Jenis Tagihan>"} {month} {year}
+                  {includePeriod
+                    ? `\u003cJenis Tagihan\u003e ${month} ${year}`
+                    : "\u003cJenis Tagihan\u003e"}
                 </strong>
               </span>
             </div>
@@ -1388,6 +1440,12 @@ function SendToPaymentItemsDialog({
   }, [open, nameFilter, items]);
 
   const selected = items.filter((i) => selectedIds.includes(i.id));
+  // Routine items generated together share one description; keep every distinct
+  // non-empty value so the submission log stays readable.
+  const submitDescription =
+    Array.from(
+      new Set(selected.map((i) => i.description?.trim()).filter(Boolean)),
+    ).join("; ") || "Tanpa deskripsi";
   const totalSubtotal = selected.reduce(
     (sum, i) => sum + Number(i.subtotal ?? 0),
     0,
@@ -1431,6 +1489,7 @@ function SendToPaymentItemsDialog({
       year,
       name: item.name,
       skuType: item.PaymentType?.skuType || "default",
+      description: submitDescription,
     }));
 
     try {
@@ -1629,6 +1688,152 @@ function SendToPaymentItemsDialog({
             </Button>
           </DialogFooter>
         </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Dialog: Log Submission ───────────────────────────────────────────────────
+function SubmissionLogDialog({
+  open,
+  onOpenChange,
+  majorId,
+  majorName,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  majorId: string;
+  majorName?: string;
+}) {
+  const { data: submissions = [], isLoading } =
+    useGetPaymentSubmissions(majorId);
+  const [expandedId, setExpandedId] = React.useState<string | null>(null);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Log Submission</DialogTitle>
+          <DialogDescription>
+            Riwayat item tagihan rutin yang sudah dikirim ke Data Tagihan
+            {majorName ? ` — ${majorName}` : ""}.
+          </DialogDescription>
+        </DialogHeader>
+
+        {isLoading ? (
+          <Loading />
+        ) : submissions.length === 0 ? (
+          <div className="py-10 text-center text-sm text-muted-foreground">
+            Belum ada submission.
+          </div>
+        ) : (
+          <div className="rounded-md border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-8" />
+                  <TableHead>Tanggal</TableHead>
+                  <TableHead>Deskripsi</TableHead>
+                  <TableHead className="text-right">Item</TableHead>
+                  <TableHead className="text-right">Subtotal</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {submissions.map((submission: PaymentSubmissionData) => {
+                  const expanded = expandedId === submission.id;
+                  const items = submission.items ?? [];
+                  return (
+                    <React.Fragment key={submission.id}>
+                      <TableRow
+                        className="cursor-pointer"
+                        onClick={() =>
+                          setExpandedId(expanded ? null : submission.id)
+                        }
+                      >
+                        <TableCell className="w-8">
+                          {expanded ? (
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-sm">
+                          {new Date(submission.createdAt).toLocaleString(
+                            "id-ID",
+                            { dateStyle: "medium", timeStyle: "short" },
+                          )}
+                        </TableCell>
+                        <TableCell
+                          className="text-sm max-w-[320px] truncate"
+                          title={submission.description}
+                        >
+                          {submission.description}
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {submission.totalItems}
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {formatRupiah(submission.totalSubtotal)}
+                        </TableCell>
+                      </TableRow>
+                      {expanded && (
+                        <TableRow>
+                          <TableCell colSpan={5} className="p-0 bg-muted/30">
+                            <div className="max-h-72 overflow-y-auto">
+                              <table className="w-full text-xs">
+                                <thead className="sticky top-0 bg-background border-b">
+                                  <tr>
+                                    <th className="text-left p-2 font-medium">
+                                      Siswa
+                                    </th>
+                                    <th className="text-left p-2 font-medium">
+                                      Nama Item
+                                    </th>
+                                    <th className="text-right p-2 font-medium">
+                                      Qty
+                                    </th>
+                                    <th className="text-right p-2 font-medium">
+                                      Harga
+                                    </th>
+                                    <th className="text-right p-2 font-medium">
+                                      Subtotal
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {items.map((item, index) => (
+                                    <tr
+                                      key={`${submission.id}-${index}`}
+                                      className="border-b last:border-0"
+                                    >
+                                      <td className="p-2">
+                                        {item.studentName}
+                                      </td>
+                                      <td className="p-2">{item.name}</td>
+                                      <td className="p-2 text-right tabular-nums">
+                                        {item.quantity}
+                                      </td>
+                                      <td className="p-2 text-right tabular-nums">
+                                        {formatRupiah(item.amount)}
+                                      </td>
+                                      <td className="p-2 text-right tabular-nums">
+                                        {formatRupiah(item.subtotal)}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

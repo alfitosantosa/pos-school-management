@@ -1,5 +1,9 @@
 "use client";
-// import { PaymentItemData, PaymentItemsInput } from "@/app/(types)";
+import type {
+  PaymentItemRoutineBulkPayload,
+  PaymentItemRoutineInput,
+  PaymentSubmissionData,
+} from "@/app/(types)";
 import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/apiClients";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -29,7 +33,7 @@ export const useGetPaymentsItemsRoutineByMajorId = (
 export const useCreatePaymentItemsRoutines = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: PaymentItemRoutineInput) => {
       const res = await apiPost("/api/payment/items/routine", data);
       return res.data;
     },
@@ -43,7 +47,7 @@ export const useCreatePaymentItemsRoutines = () => {
 export const useUpdatePaymentItemsRoutines = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: PaymentItemRoutineInput) => {
       const res = await apiPut("/api/payment/items/routine", data);
       return res.data;
     },
@@ -72,7 +76,7 @@ export const useDeletePaymentItemsRoutines = () => {
 export const BulkUploadPaymentItemsRoutines = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: PaymentItemRoutineBulkPayload[]) => {
       const res = await apiPost("/api/payment/items/routine/bulk/upload", data);
       return res.data;
     },
@@ -80,5 +84,18 @@ export const BulkUploadPaymentItemsRoutines = () => {
       queryClient.invalidateQueries({ queryKey: ["paymentItemsRotine"] });
       queryClient.invalidateQueries({ queryKey: ["unpaid-students"] });
     },
+  });
+};
+
+export const useGetPaymentSubmissions = (majorId: string | undefined) => {
+  return useQuery({
+    queryKey: ["paymentSubmissions", majorId],
+    queryFn: async () => {
+      const res = await apiGet<PaymentSubmissionData[]>(
+        `/api/payment/items/submissions?majorId=${majorId}`,
+      );
+      return res.data;
+    },
+    enabled: !!majorId,
   });
 };
