@@ -156,6 +156,34 @@ export const usePaymentItemsByStudentId = (id: string) => {
   });
 };
 
+export type PaymentRecapRow = {
+  studentId: string;
+  name: string;
+  nisn: string | null;
+  classId: string | null;
+  className: string | null;
+  itemCount: number;
+  paidCount: number;
+  unpaidCount: number;
+  total: number;
+  paid: number;
+  unpaid: number;
+  paidMonths: Record<string, number>;
+};
+
+export const usePaymentRecap = (classId: string, year: string) => {
+  return useQuery({
+    queryKey: ["payment-recap", classId, year],
+    queryFn: async () => {
+      const params = new URLSearchParams({ classId });
+      if (year) params.set("year", year);
+      const res = await apiGet<PaymentRecapRow[]>(`/api/payment/items/recap?${params.toString()}`);
+      return res.data;
+    },
+    enabled: !!classId && !!year,
+  });
+};
+
 export const usePaymentItemsByFilterDate = (startDate: string, endDate: string) => {
   return useQuery({
     queryKey: ["payment-items-filter-date", startDate, endDate],

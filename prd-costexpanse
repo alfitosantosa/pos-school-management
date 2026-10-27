@@ -1,0 +1,529 @@
+# PRD — Sistem Cost Expense Sekolah
+
+Versi 1.0 · Status: Draft · 22 Oktober 2026
+
+## 1. Ringkasan
+
+Sistem Cost Expense Sekolah adalah aplikasi web untuk mencatat, menyetujui, mencairkan, dan mempertanggungjawabkan seluruh pengeluaran sekolah. Bendahara mengajukan permintaan dana, Direktur atau Admin Bendahara menyetujui, dana ditransfer, lalu bendahara mengisi penggunaan dana lengkap dengan bon dan LPJ sampai kembalian atau kekurangan dana selesai (settle). Seluruh tahapan terlihat dalam satu tempat sehingga siapa pun yang berwenang bisa melacak posisi uang dari pengajuan sampai pertanggungjawaban.
+
+## 2. Latar Belakang dan Masalah
+
+Pengeluaran sekolah umumnya diajukan lewat chat, kertas, atau spreadsheet terpisah. Akibatnya:
+
+- Sulit melacak status pengajuan: sudah disetujui atau belum, sudah ditransfer atau belum.
+- Bon dan LPJ tercecer atau terlambat dikumpulkan, dan sulit dicocokkan dengan dana yang dicairkan.
+- Sisa dana (kembalian) tidak tercatat jelas, sehingga selisih baru ketahuan di akhir periode.
+- Direktur dan admin tidak punya satu tampilan ringkas untuk melihat total yang diajukan, dicairkan, dipakai, dan belum dipertanggungjawabkan.
+
+## 3. Tujuan dan Metrik Keberhasilan
+
+**Tujuan**
+
+1. Semua pengajuan, persetujuan, pencairan, bon, dan LPJ tercatat dalam satu sistem.
+2. Alur persetujuan jelas dan bisa dilacak statusnya secara real-time.
+3. Setiap rupiah yang dicairkan bisa ditelusuri: dipakai untuk apa (bon), berapa kembaliannya, dan apakah LPJ sudah lengkap.
+
+**Metrik**
+
+| Metrik | Target awal |
+| --- | --- |
+| Pengajuan yang tercatat di sistem | 100% pengeluaran yang melalui bendahara |
+| Rata-rata waktu dari pengajuan sampai keputusan approve/tolak | ≤ 2 hari kerja |
+| LPJ dikumpulkan tepat waktu | ≥ 90% |
+| Pencairan tanpa LPJ lewat batas waktu | 0 |
+| Selisih dana cair vs (bon + kembalian) saat settle | Rp 0 |
+
+## 4. Peran Pengguna
+
+| Peran | Tanggung jawab utama |
+| --- | --- |
+| **Bendahara** | Membuat pengajuan dana, mengisi penggunaan dana, mengunggah bon, menyusun LPJ, mencatat kembalian. Hanya melihat pengajuan miliknya (atau unitnya). |
+| **Admin Bendahara** | Meninjau dan menyetujui/menolak pengajuan (sesuai batas kewenangan), mencatat pencairan (transfer), memverifikasi bon dan LPJ, memantau seluruh pengajuan sampai settle. |
+| **Direktur** | Menyetujui pengajuan (wajib untuk nominal di atas batas yang ditetapkan, atau semua pengajuan jika sekolah menghendaki), melihat dashboard dan laporan. |
+| **Super Admin** (teknis) | Mengelola pengguna, unit/bendahara, kategori biaya, dan pengaturan batas persetujuan. |
+
+## 5. Alur Utama (End-to-End)
+
+1. **Pengajuan** — Bendahara membuat pengajuan: nama request, tujuan, tanggal dibutuhkan, rincian biaya, total, dan lampiran pendukung (RAB, penawaran, dsb.).
+2. **Persetujuan** — Pengajuan masuk ke Admin Bendahara dan/atau Direktur. Penyetuju bisa *Approve*, *Tolak* (wajib alasan), atau *Minta Revisi*.
+3. **Pencairan** — Setelah disetujui, Admin Bendahara mentransfer dana ke bendahara/rekening tujuan, lalu mencatat tanggal, nominal, dan bukti transfer. Status berubah menjadi *Dana Cair*.
+4. **Penggunaan** — Bendahara memakai dana dan mencatat setiap pengeluaran sebagai item bon: tanggal, deskripsi, kategori, nominal, dan foto/file bon.
+5. **LPJ dan Settlement** — Bendahara menyusun LPJ dari bon yang sudah dicatat, mencatat kembalian (jika ada sisa) beserta bukti setor, lalu mengajukan LPJ.
+6. **Verifikasi** — Admin Bendahara memeriksa kecocokan bon, kembalian, dan dana cair. Jika cocok, LPJ *Disetujui* dan pengajuan berstatus *Selesai*. Jika tidak, dikembalikan untuk revisi.
+
+### Siklus Status
+
+`Draft` → `Diajukan` → `Disetujui` / `Ditolak` / `Perlu Revisi` → `Dana Cair` → `Dalam Penggunaan` → `LPJ Diajukan` → `LPJ Revisi` (opsional) → `Selesai`
+
+Jika biaya aktual melebihi dana cair, selisih diproses sebagai **kekurangan (reimbursement)** dan dicatat sebagai pencairan tambahan sebelum pengajuan ditutup.
+
+## 6. Kebutuhan Fungsional
+
+Prioritas: **P0** = wajib untuk rilis pertama (MVP), **P1** = segera setelah MVP, **P2** = pengembangan lanjutan.
+
+### 6.1 Pengajuan Dana (Request)
+
+| ID | Kebutuhan | Prioritas |
+| --- | --- | --- |
+| FR-01 | Bendahara dapat membuat pengajuan dengan field: nama request, tujuan/keterangan, kategori, unit/jenjang, tanggal dibutuhkan, dan total nominal. | P0 |
+| FR-02 | Pengajuan memiliki rincian item (nama item, qty, harga satuan, subtotal); total dihitung otomatis. | P0 |
+| FR-03 | Bendahara dapat melampirkan dokumen pendukung (PDF/gambar). | P0 |
+| FR-04 | Pengajuan dapat disimpan sebagai Draft dan diedit sebelum diajukan. | P0 |
+| FR-05 | Nomor pengajuan dibuat otomatis dan unik (contoh: EXP/2026/10/0001). | P0 |
+| FR-06 | Pengajuan yang ditolak atau perlu revisi dapat diperbaiki dan diajukan ulang dengan riwayat tetap tersimpan. | P0 |
+| FR-07 | Template pengajuan untuk pengeluaran rutin. | P2 |
+
+### 6.2 Persetujuan (Approval)
+
+| ID | Kebutuhan | Prioritas |
+| --- | --- | --- |
+| FR-08 | Admin Bendahara dan Direktur melihat daftar pengajuan yang menunggu keputusan, dengan filter status, unit, tanggal, dan nominal. | P0 |
+| FR-09 | Penyetuju dapat Approve, Tolak (alasan wajib), atau Minta Revisi (catatan wajib). | P0 |
+| FR-10 | Aturan persetujuan berdasarkan nominal: di bawah batas → Admin Bendahara cukup; di atas batas → wajib Direktur. Batas dapat diatur oleh Super Admin. | P0 |
+| FR-11 | Penyetuju dapat menyetujui sebagian nominal; nominal yang disetujui tercatat terpisah dari nominal yang diajukan. | P1 |
+| FR-12 | Persetujuan bertingkat (Admin Bendahara lalu Direktur) dapat diaktifkan per kategori. | P1 |
+| FR-13 | Setelah disetujui, nominal dan rincian tidak dapat diubah. | P0 |
+
+### 6.3 Pencairan Dana (Disbursement)
+
+| ID | Kebutuhan | Prioritas |
+| --- | --- | --- |
+| FR-14 | Admin Bendahara mencatat pencairan: tanggal transfer, nominal, rekening tujuan, dan bukti transfer. | P0 |
+| FR-15 | Pencairan dapat dilakukan bertahap (termin) selama total tidak melebihi nominal yang disetujui. | P1 |
+| FR-16 | Bendahara menerima notifikasi saat dana dicairkan. | P0 |
+| FR-17 | Integrasi data rekening bendahara agar tidak input ulang. | P1 |
+
+### 6.4 Penggunaan Dana dan Bon
+
+| ID | Kebutuhan | Prioritas |
+| --- | --- | --- |
+| FR-18 | Bendahara dapat menambahkan item pengeluaran (bon) ke pengajuan yang sudah berstatus Dana Cair: tanggal, deskripsi, kategori, nominal, nama toko/penerima. | P0 |
+| FR-19 | Setiap bon wajib dilampiri foto atau file bon/nota. | P0 |
+| FR-20 | Sistem menampilkan saldo berjalan: dana cair − total bon = sisa dana. | P0 |
+| FR-21 | Sistem mencegah total bon melebihi dana cair tanpa menandainya sebagai kekurangan. | P0 |
+| FR-22 | Admin Bendahara dapat menandai tiap bon sebagai Valid atau Perlu Perbaikan beserta catatannya. | P1 |
+
+### 6.5 LPJ dan Settlement
+
+| ID | Kebutuhan | Prioritas |
+| --- | --- | --- |
+| FR-23 | Bendahara menyusun LPJ dari bon yang sudah tercatat; sistem menghasilkan ringkasan: dana cair, total bon, kembalian, dan selisih. | P0 |
+| FR-24 | Bendahara mencatat kembalian (nominal, tanggal setor, bukti setor) jika ada sisa dana. | P0 |
+| FR-25 | LPJ hanya bisa diajukan jika dana cair = total bon + kembalian (selisih Rp 0), atau selisihnya dijelaskan sebagai kekurangan. | P0 |
+| FR-26 | Admin Bendahara memverifikasi LPJ: Setujui atau Kembalikan untuk revisi dengan catatan. | P0 |
+| FR-27 | Kekurangan dana (reimbursement) diproses melalui pencairan tambahan oleh Admin Bendahara. | P1 |
+| FR-28 | Batas waktu LPJ (contoh: 7 hari setelah dana cair) dapat diatur; sistem memberi pengingat dan menandai LPJ terlambat. | P0 |
+| FR-29 | LPJ dapat diekspor ke PDF dengan daftar bon dan lampiran. | P1 |
+
+### 6.6 Dashboard dan Pelaporan
+
+| ID | Kebutuhan | Prioritas |
+| --- | --- | --- |
+| FR-30 | Satu tampilan daftar pengajuan dengan kolom: nomor, nama request, bendahara, nominal diajukan, disetujui, dicairkan, dipakai (total bon), kembalian, status LPJ, dan status. | P0 |
+| FR-31 | Halaman detail pengajuan menampilkan timeline lengkap: diajukan, disetujui, transfer, tiap bon, kembalian, LPJ, selesai. | P0 |
+| FR-32 | Dashboard ringkasan untuk Direktur dan Admin Bendahara: total diajukan, dicairkan, dipakai, sisa belum dipertanggungjawabkan, dan LPJ terlambat. | P0 |
+| FR-33 | Laporan per bendahara, unit, kategori, dan periode; dapat diekspor ke Excel dan PDF. | P1 |
+| FR-34 | Perbandingan anggaran vs realisasi per kategori. | P2 |
+
+### 6.7 Notifikasi
+
+| ID | Kebutuhan | Prioritas |
+| --- | --- | --- |
+| FR-35 | Notifikasi in-app untuk: pengajuan baru, keputusan approval, dana cair, LPJ diajukan, LPJ perlu revisi, dan LPJ hampir jatuh tempo. | P0 |
+| FR-36 | Notifikasi lewat WhatsApp atau email. | P1 |
+
+### 6.8 Administrasi dan Audit
+
+| ID | Kebutuhan | Prioritas |
+| --- | --- | --- |
+| FR-37 | Manajemen pengguna, peran, unit, dan kategori biaya oleh Super Admin. | P0 |
+| FR-38 | Audit log untuk setiap perubahan status, nominal, dan unggahan: siapa, kapan, apa yang berubah. | P0 |
+| FR-39 | Pengajuan yang sudah Selesai bersifat terkunci (read-only). | P0 |
+
+## 7. Aturan Bisnis
+
+1. Hanya Bendahara yang dapat membuat pengajuan, mengisi bon, dan menyusun LPJ.
+2. Penyetuju tidak boleh menyetujui pengajuan yang ia buat sendiri.
+3. Dana hanya dapat dicairkan untuk pengajuan berstatus Disetujui, maksimal sebesar nominal yang disetujui.
+4. Bon hanya dapat dicatat setelah dana cair, dan setiap bon wajib memiliki lampiran.
+5. Pengajuan baru dari bendahara yang memiliki LPJ melewati batas waktu dapat diblokir (aturan ini dapat dinyalakan atau dimatikan).
+6. Pengajuan dinyatakan Selesai hanya jika: dana cair = total bon + kembalian, semua bon valid, dan LPJ disetujui.
+7. Tidak ada penghapusan data permanen; pembatalan dilakukan lewat status Dibatalkan dengan alasan.
+
+## 8. Layar Utama
+
+- **Login** dan pemilihan peran (jika satu akun punya lebih dari satu peran).
+- **Dashboard** — ringkasan angka dan daftar yang perlu tindakan.
+- **Daftar Pengajuan** — tabel dengan filter dan pencarian.
+- **Form Pengajuan** — informasi umum, rincian item, lampiran.
+- **Detail Pengajuan** — ringkasan angka, timeline, tab Rincian, Pencairan, Bon, LPJ, dan Riwayat.
+- **Inbox Persetujuan** — antrean untuk Admin Bendahara dan Direktur.
+- **Form Pencairan** — input transfer dan bukti.
+- **Form Bon dan LPJ** — tambah bon, hitung sisa, input kembalian, ajukan LPJ.
+- **Laporan** — filter, tabel, dan ekspor.
+- **Pengaturan** — pengguna, unit, kategori, batas persetujuan, batas waktu LPJ.
+
+## 9. Model Data (Garis Besar)
+
+| Entitas | Field utama |
+| --- | --- |
+| Pengajuan (Request) | id, nomor, nama request, bendahara, unit, kategori, tujuan, tanggal dibutuhkan, total diajukan, total disetujui, status |
+| Item Pengajuan | id, pengajuan\_id, nama item, qty, harga satuan, subtotal |
+| Persetujuan (Approval) | id, pengajuan\_id, penyetuju, keputusan, catatan, waktu |
+| Pencairan (Disbursement) | id, pengajuan\_id, nominal, tanggal transfer, rekening tujuan, bukti, dicatat oleh |
+| Bon (Expense Item) | id, pengajuan\_id, tanggal, deskripsi, kategori, nominal, toko/penerima, lampiran, status verifikasi |
+| LPJ | id, pengajuan\_id, total dana cair, total bon, kembalian, selisih, status, diverifikasi oleh, waktu |
+| Kembalian / Kekurangan | id, pengajuan\_id, jenis, nominal, tanggal, bukti |
+| Audit Log | id, pengguna, aksi, entitas, nilai sebelum/sesudah, waktu |
+
+## 10. Kebutuhan Non-Fungsional
+
+- **Akses berbasis peran** — setiap peran hanya melihat dan mengubah data sesuai kewenangannya.
+- **Keamanan** — autentikasi, koneksi HTTPS, dan penyimpanan lampiran yang tidak bisa diakses publik.
+- **Responsif** — nyaman dipakai di HP, terutama untuk foto bon dan persetujuan cepat oleh Direktur.
+- **Performa** — daftar 10.000 pengajuan tetap termuat < 3 detik dengan paginasi.
+- **Lampiran** — format JPG, PNG, PDF; maksimal 10 MB per file.
+- **Lokalisasi** — Bahasa Indonesia, format Rupiah (Rp 1.250.000), zona waktu WIB.
+- **Ketersediaan data** — backup harian dan data dapat diekspor.
+
+## 11. Cakupan
+
+**Masuk MVP (P0):** pengajuan, persetujuan berbasis nominal, pencairan, bon dengan lampiran, LPJ dan settlement, dashboard dan daftar status, notifikasi in-app, manajemen pengguna, audit log.
+
+**Tahap berikutnya (P1/P2):** persetujuan sebagian dan bertingkat, pencairan bertahap, notifikasi WhatsApp/email, ekspor laporan lanjutan, anggaran vs realisasi, template pengajuan.
+
+**Di luar cakupan:** transfer bank otomatis (pencairan tetap dilakukan manual lalu dicatat), pembukuan akuntansi lengkap, pembayaran SPP atau pemasukan sekolah, dan penggajian.
+
+## 12. Asumsi dan Pertanyaan Terbuka
+
+1. Berapa batas nominal agar pengajuan wajib disetujui Direktur, dan apakah batasnya berbeda per kategori?
+2. Apakah Direktur menyetujui semua pengajuan, atau hanya yang di atas batas tertentu?
+3. Apakah bendahara dibagi per unit/jenjang (TK, SD, SMP, SMA) sehingga perlu pembatasan data per unit?
+4. Berapa hari batas waktu LPJ setelah dana cair, dan apa sanksinya jika terlambat?
+5. Apakah pencairan bisa bertahap, dan apakah ada kasus reimbursement (bendahara menalangi dulu)?
+6. Apakah LPJ perlu format cetak tertentu yang sudah dipakai sekolah?
+7. Apakah ada kategori biaya baku atau kode akun yang harus dipakai?
+8. Apakah notifikasi WhatsApp dibutuhkan sejak awal?
+
+## 13. Rencana Rilis (Usulan)
+
+| Fase | Isi | Perkiraan |
+| --- | --- | --- |
+| 1 | Desain alur dan prototipe, validasi dengan bendahara, admin, dan Direktur | 1–2 minggu |
+| 2 | MVP: pengajuan, approval, pencairan | 3–4 minggu |
+| 3 | MVP: bon, LPJ, settlement, dashboard | 3–4 minggu |
+| 4 | Uji coba dengan 1–2 bendahara, perbaikan, lalu rilis penuh | 2–3 minggu |
+| 5 | P1: notifikasi WhatsApp, laporan, persetujuan lanjutan | menyesuaikan |
+
+## 14. Arsitektur Teknis (Next.js + Prisma)
+
+Bagian ini menerjemahkan PRD ke implementasi dengan Next.js dan Prisma. Pilihan di luar keduanya (database, autentikasi, penyimpanan file) adalah usulan dan bisa diganti.
+
+### 14.1 Tech Stack
+
+| Lapisan | Pilihan | Catatan |
+| --- | --- | --- |
+| Framework | Next.js (App Router) + TypeScript | Server Components untuk halaman daftar dan detail, Server Actions untuk aksi (ajukan, approve, cairkan, submit LPJ). |
+| ORM | Prisma | Satu skema di `prisma/schema.prisma`, migrasi dengan `prisma migrate`. |
+| Database | PostgreSQL | Cocok untuk tipe Decimal dan transaksi. MySQL juga didukung Prisma. |
+| Autentikasi | Auth.js (NextAuth) dengan Credentials | Role disimpan di session, dicek di middleware dan di setiap Server Action. |
+| Validasi | Zod | Skema yang sama dipakai di form dan di server. |
+| UI | Tailwind CSS, shadcn/ui, TanStack Table, React Hook Form | Tabel daftar pengajuan dengan filter dan paginasi. |
+| Penyimpanan file | S3-compatible (mis. Cloudflare R2 atau MinIO) lewat presigned URL | Database hanya menyimpan key file. |
+| Ekspor | exceljs (Excel), @react-pdf/renderer (PDF LPJ) |  |
+| Pengingat LPJ | Cron harian (Vercel Cron atau node-cron di VPS) | Menandai LPJ terlambat dan membuat notifikasi. |
+
+### 14.2 Skema Prisma (Draft)
+
+```prisma
+enum Role {
+  BENDAHARA
+  ADMIN_BENDAHARA
+  DIREKTUR
+  SUPER_ADMIN
+}
+
+enum RequestStatus {
+  DRAFT
+  SUBMITTED
+  NEED_REVISION
+  APPROVED
+  REJECTED
+  DISBURSED
+  IN_USE
+  LPJ_SUBMITTED
+  LPJ_REVISION
+  COMPLETED
+  CANCELLED
+}
+
+enum ApprovalDecision {
+  APPROVED
+  REJECTED
+  REVISION
+}
+
+enum ReceiptStatus {
+  PENDING
+  VALID
+  NEED_FIX
+}
+
+enum LpjStatus {
+  DRAFT
+  SUBMITTED
+  REVISION
+  APPROVED
+}
+
+enum SettlementType {
+  RETURN_CHANGE
+  SHORTFALL
+}
+
+model Unit {
+  id       String           @id @default(cuid())
+  name     String           @unique
+  users    User[]
+  requests ExpenseRequest[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  unitId       String?
+  unit         Unit?    @relation(fields: [unitId], references: [id])
+  bankName     String?
+  bankAccount  String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  requests      ExpenseRequest[] @relation("RequestOwner")
+  approvals     Approval[]
+  disbursements Disbursement[]
+  lpjVerified   Lpj[]            @relation("LpjVerifier")
+  auditLogs     AuditLog[]
+  notifications Notification[]
+}
+
+model Category {
+  id       String           @id @default(cuid())
+  name     String           @unique
+  requests ExpenseRequest[]
+  receipts Receipt[]
+}
+
+model ExpenseRequest {
+  id             String        @id @default(cuid())
+  number         String        @unique // contoh: EXP/2026/10/0001
+  name           String
+  purpose        String?
+  neededDate     DateTime
+  totalRequested Decimal       @db.Decimal(15, 2)
+  totalApproved  Decimal?      @db.Decimal(15, 2)
+  status         RequestStatus @default(DRAFT)
+  lpjDueDate     DateTime?
+  treasurerId    String
+  treasurer      User          @relation("RequestOwner", fields: [treasurerId], references: [id])
+  unitId         String
+  unit           Unit          @relation(fields: [unitId], references: [id])
+  categoryId     String
+  category       Category      @relation(fields: [categoryId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  items         RequestItem[]
+  approvals     Approval[]
+  disbursements Disbursement[]
+  receipts      Receipt[]
+  settlements   Settlement[]
+  lpj           Lpj?
+  attachments   Attachment[]
+
+  @@index([status])
+  @@index([treasurerId])
+}
+
+model RequestItem {
+  id        String         @id @default(cuid())
+  requestId String
+  request   ExpenseRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  name      String
+  qty       Int
+  unitPrice Decimal        @db.Decimal(15, 2)
+}
+
+model Approval {
+  id         String           @id @default(cuid())
+  requestId  String
+  request    ExpenseRequest   @relation(fields: [requestId], references: [id])
+  approverId String
+  approver   User             @relation(fields: [approverId], references: [id])
+  decision   ApprovalDecision
+  note       String?
+  createdAt  DateTime         @default(now())
+}
+
+model Disbursement {
+  id                 String         @id @default(cuid())
+  requestId          String
+  request            ExpenseRequest @relation(fields: [requestId], references: [id])
+  amount             Decimal        @db.Decimal(15, 2)
+  transferDate       DateTime
+  destinationAccount String
+  recordedById       String
+  recordedBy         User           @relation(fields: [recordedById], references: [id])
+  attachments        Attachment[]
+  createdAt          DateTime       @default(now())
+}
+
+model Receipt {
+  id          String         @id @default(cuid())
+  requestId   String
+  request     ExpenseRequest @relation(fields: [requestId], references: [id])
+  date        DateTime
+  description String
+  categoryId  String
+  category    Category       @relation(fields: [categoryId], references: [id])
+  amount      Decimal        @db.Decimal(15, 2)
+  vendor      String?
+  status      ReceiptStatus  @default(PENDING)
+  note        String?
+  attachments Attachment[]
+  createdAt   DateTime       @default(now())
+}
+
+model Settlement {
+  id          String         @id @default(cuid())
+  requestId   String
+  request     ExpenseRequest @relation(fields: [requestId], references: [id])
+  type        SettlementType
+  amount      Decimal        @db.Decimal(15, 2)
+  date        DateTime
+  attachments Attachment[]
+  createdAt   DateTime       @default(now())
+}
+
+model Lpj {
+  id             String         @id @default(cuid())
+  requestId      String         @unique
+  request        ExpenseRequest @relation(fields: [requestId], references: [id])
+  status         LpjStatus      @default(DRAFT)
+  totalDisbursed Decimal        @db.Decimal(15, 2)
+  totalReceipts  Decimal        @db.Decimal(15, 2)
+  totalChange    Decimal        @db.Decimal(15, 2)
+  difference     Decimal        @db.Decimal(15, 2)
+  submittedAt    DateTime?
+  verifiedById   String?
+  verifiedBy     User?          @relation("LpjVerifier", fields: [verifiedById], references: [id])
+  verifiedAt     DateTime?
+  note           String?
+}
+
+model Attachment {
+  id             String          @id @default(cuid())
+  key            String // path di storage
+  fileName       String
+  mimeType       String
+  size           Int
+  requestId      String?
+  request        ExpenseRequest? @relation(fields: [requestId], references: [id])
+  disbursementId String?
+  disbursement   Disbursement?   @relation(fields: [disbursementId], references: [id])
+  receiptId      String?
+  receipt        Receipt?        @relation(fields: [receiptId], references: [id])
+  settlementId   String?
+  settlement     Settlement?     @relation(fields: [settlementId], references: [id])
+  createdAt      DateTime        @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String
+  before    Json?
+  after     Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  message   String
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model AppSetting {
+  key   String @id // approvalThreshold, lpjDueDays, blockOnOverdueLpj
+  value String
+}
+
+model RequestCounter {
+  period String @id // contoh: 2026-10
+  last   Int    @default(0)
+}
+```
+
+Catatan skema: total dicairkan, total bon, dan kembalian untuk pengajuan yang masih berjalan dihitung lewat aggregate (`sum`) dari tabel Disbursement, Receipt, dan Settlement, bukan disimpan di ExpenseRequest, agar tidak bisa tidak sinkron. Tabel Lpj menyimpan snapshot angka tersebut saat LPJ diajukan.
+
+### 14.3 Aturan Implementasi
+
+1. Setiap perubahan status dijalankan di service layer di dalam `prisma.$transaction`, dengan pengecekan status asal (contoh: pencairan hanya dari APPROVED) dan penulisan AuditLog dalam transaksi yang sama.
+2. Otorisasi dilakukan di server pada setiap Server Action: cek role dan kepemilikan (bendahara hanya mengakses pengajuan miliknya atau unitnya). Menyembunyikan tombol di UI saja tidak cukup.
+3. Batas persetujuan dibaca dari AppSetting. Pengajuan di atas batas hanya bisa diputuskan oleh DIREKTUR; penyetuju tidak boleh sama dengan `treasurerId`.
+4. Nomor pengajuan dibuat dalam transaksi memakai RequestCounter per bulan untuk mencegah nomor ganda.
+5. Perhitungan uang memakai `Prisma.Decimal`, tidak memakai `number`. Tampilan memakai `Intl.NumberFormat` locale id-ID.
+6. Lampiran: klien meminta presigned URL dari route handler, mengunggah langsung ke storage, lalu menyimpan record Attachment. Tipe file (JPG, PNG, PDF) dan ukuran maksimal 10 MB divalidasi di server.
+7. Semua query daftar difilter menurut role: bendahara hanya melihat datanya sendiri, Admin Bendahara dan Direktur melihat semua.
+8. Pengajuan berstatus COMPLETED atau CANCELLED ditolak oleh service layer untuk semua operasi tulis.
+
+### 14.4 Server Action dan Perubahan Status
+
+| Aksi | Peran | Perubahan status | Kebutuhan |
+| --- | --- | --- | --- |
+| createRequest, submitRequest | BENDAHARA | DRAFT ke SUBMITTED | FR-01 sampai FR-06 |
+| decideRequest | ADMIN\_BENDAHARA atau DIREKTUR | SUBMITTED ke APPROVED, REJECTED, atau NEED\_REVISION | FR-08 sampai FR-10, FR-13 |
+| recordDisbursement | ADMIN\_BENDAHARA | APPROVED ke DISBURSED | FR-14 sampai FR-16 |
+| addReceipt | BENDAHARA | DISBURSED ke IN\_USE (saat bon pertama) | FR-18 sampai FR-21 |
+| verifyReceipt | ADMIN\_BENDAHARA | tidak berubah | FR-22 |
+| recordSettlement | BENDAHARA | tidak berubah | FR-24, FR-27 |
+| submitLpj | BENDAHARA | IN\_USE atau LPJ\_REVISION ke LPJ\_SUBMITTED | FR-23, FR-25 |
+| decideLpj | ADMIN\_BENDAHARA | LPJ\_SUBMITTED ke COMPLETED atau LPJ\_REVISION | FR-26 |
+
+### 14.5 Struktur Folder (Usulan)
+
+```
+src/
+  app/
+    (auth)/login/
+    (app)/
+      dashboard/
+      requests/          # daftar, baru, [id] dengan tab rincian, pencairan, bon, LPJ, riwayat
+      approvals/         # inbox persetujuan
+      reports/
+      settings/          # pengguna, unit, kategori, batas persetujuan
+    api/
+      uploads/           # presigned URL
+      cron/lpj-reminder/
+  server/
+    services/            # request, approval, disbursement, receipt, lpj, settlement
+    auth.ts
+    db.ts
+    permissions.ts
+  lib/                   # skema zod, format rupiah, generator nomor
+prisma/
+  schema.prisma
+  seed.ts
+```
+

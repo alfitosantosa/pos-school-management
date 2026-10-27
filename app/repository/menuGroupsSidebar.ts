@@ -120,9 +120,14 @@ export const menuGroups: Record<string, MenuGroup[]> = {
           icon: "file",
         },
         {
-          title: "Transaksi",
+          title: "Pembayaran",
           url: "/dashboard/payments",
           icon: "payment",
+        },
+        {
+          title: "Rekap Pembayaran",
+          url: "/dashboard/recappayment",
+          icon: "file",
         },
         {
           title: "Account Bank",
@@ -141,7 +146,7 @@ export const menuGroups: Record<string, MenuGroup[]> = {
       title: "Dashboard",
       items: [
         {
-          title: "Dashboard Transaksi",
+          title: "Dashboard Pembayaran",
           url: "/dashboard/payments/chart",
           icon: "chart",
         },
@@ -194,7 +199,7 @@ export const menuGroups: Record<string, MenuGroup[]> = {
           icon: "chart",
         },
         {
-          title: "Dashboard Transaksi",
+          title: "Dashboard Pembayaran",
           url: "/dashboard/payments/chart",
           icon: "chart",
         },
@@ -375,7 +380,7 @@ export const menuGroups: Record<string, MenuGroup[]> = {
       title: "Dashboard",
       items: [
         {
-          title: "Dashboard Transaksi",
+          title: "Dashboard Pembayaran",
           url: "/dashboard/payments/chart",
           icon: "chart",
         },
@@ -411,9 +416,14 @@ export const menuGroups: Record<string, MenuGroup[]> = {
           icon: "file",
         },
         {
-          title: "Data Transaksi",
+          title: "Data Pembayaran",
           url: "/dashboard/bendahara/payment",
           icon: "payment",
+        },
+        {
+          title: "Rekap Pembayaran",
+          url: "/dashboard/recappayment",
+          icon: "file",
         },
         {
           title: "Data Kelas",

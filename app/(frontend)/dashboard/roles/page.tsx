@@ -1,24 +1,78 @@
 "use client";
 
-import { useCreateRole, useDeleteRole, useGetRoles, useUpdateRole } from "@/app/(hooks)/hooks/Roles/useRoles";
+import {
+  useCreateRole,
+  useDeleteRole,
+  useGetRoles,
+  useUpdateRole,
+} from "@/app/(hooks)/hooks/Roles/useRoles";
 import { useGetUserByIdBetterAuth } from "@/app/(hooks)/hooks/Users/useUsersByIdBetterAuth";
 import { RoleDataTypes, RolesInputData } from "@/app/(types)";
 import Loading from "@/components/loading";
 import { DataTablePageSize } from "@/components/ui/data-table-page-size";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/lib/authClients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Pencil, Plus, Shield, Trash2, Users } from "lucide-react";
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from "@tanstack/react-table";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Shield,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { unauthorized } from "next/navigation";
 import * as React from "react";
 import { useForm } from "react-hook-form";
@@ -32,7 +86,10 @@ type RoleData = RoleDataTypes;
 // Form schema
 const roleSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(1, "Nama role wajib diisi").max(50, "Nama role maksimal 50 karakter"),
+  name: z
+    .string()
+    .min(1, "Nama role wajib diisi")
+    .max(50, "Nama role maksimal 50 karakter"),
   description: z.string().optional(),
   isActive: z.boolean(),
   permissions: z.array(z.string()).optional(),
@@ -73,8 +130,14 @@ const availablePermissions = [
   { id: "/dashboard/attendance/teacher", label: "Attendance for Principal" },
   { id: "/dashboard/admin/attendance", label: "Attendance for Admin Backup" },
   { id: "/dashboard/recapattendance", label: "Recap Attendance Student" },
-  { id: "/dashboard/calender/list/teacher", label: "Calendar List for Teacher" },
-  { id: "/dashboard/calender/list/student", label: "Calendar List for Student" },
+  {
+    id: "/dashboard/calender/list/teacher",
+    label: "Calendar List for Teacher",
+  },
+  {
+    id: "/dashboard/calender/list/student",
+    label: "Calendar List for Student",
+  },
   { id: "/dashboard/classes/tahfidz", label: "Tahfidz Group Management" },
   {
     id: "/dashboard/upload/schedules",
@@ -148,8 +211,12 @@ const availablePermissions = [
     label: "Student Information (Bendahara)",
   },
   {
+    id: "/dashboard/recappayment",
+    label: "Rekap Pembayaran",
+  },
+  {
     id: "/dashboard/payments/chart",
-    label: "Dashboard Transaksi",
+    label: "Dashboard Pembayaran",
   },
   {
     id: "/dashboard/billing/chart",
@@ -162,10 +229,22 @@ const availablePermissions = [
 ];
 
 // Create/Edit Dialog Component
-function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; editData?: RoleDataTypes | null; onSuccess: () => void }) {
+function RoleFormDialog({
+  open,
+  onOpenChange,
+  editData,
+  onSuccess,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  editData?: RoleDataTypes | null;
+  onSuccess: () => void;
+}) {
   const createRole = useCreateRole();
   const updateRole = useUpdateRole();
-  const [selectedPermissions, setSelectedPermissions] = React.useState<string[]>([]);
+  const [selectedPermissions, setSelectedPermissions] = React.useState<
+    string[]
+  >([]);
 
   const {
     register,
@@ -201,7 +280,9 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
   }, [editData, setValue, reset]);
 
   const handlePermissionToggle = (permissionId: string) => {
-    const newPermissions = selectedPermissions.includes(permissionId) ? selectedPermissions.filter((p) => p !== permissionId) : [...selectedPermissions, permissionId];
+    const newPermissions = selectedPermissions.includes(permissionId)
+      ? selectedPermissions.filter((p) => p !== permissionId)
+      : [...selectedPermissions, permissionId];
 
     setSelectedPermissions(newPermissions);
     setValue("permissions", newPermissions);
@@ -242,24 +323,44 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editData ? "Edit Role" : "Tambah Role Baru"}</DialogTitle>
+          <DialogTitle>
+            {editData ? "Edit Role" : "Tambah Role Baru"}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="name">Nama Role</Label>
-            <Input id="name" placeholder="Contoh: Admin, User, Manager" {...register("name")} />
-            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+            <Input
+              id="name"
+              placeholder="Contoh: Admin, User, Manager"
+              {...register("name")}
+            />
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Deskripsi (Opsional)</Label>
-            <Textarea id="description" placeholder="Deskripsi role dan tanggung jawabnya..." {...register("description")} />
-            {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
+            <Textarea
+              id="description"
+              placeholder="Deskripsi role dan tanggung jawabnya..."
+              {...register("description")}
+            />
+            {errors.description && (
+              <p className="text-sm text-red-500">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center space-x-2">
-            <Checkbox id="isActive" checked={isActive} onCheckedChange={(checked) => setValue("isActive", !!checked)} />
+            <Checkbox
+              id="isActive"
+              checked={isActive}
+              onCheckedChange={(checked) => setValue("isActive", !!checked)}
+            />
             <Label htmlFor="isActive">Role Aktif</Label>
           </div>
 
@@ -267,8 +368,17 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
             <Label>Permissions</Label>
             <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto border rounded-lg p-3">
               {availablePermissions.map((permission) => (
-                <div key={permission.id} className="flex items-center space-x-2">
-                  <Checkbox id={permission.id} checked={selectedPermissions.includes(permission.id)} onCheckedChange={() => handlePermissionToggle(permission.id)} />
+                <div
+                  key={permission.id}
+                  className="flex items-center space-x-2"
+                >
+                  <Checkbox
+                    id={permission.id}
+                    checked={selectedPermissions.includes(permission.id)}
+                    onCheckedChange={() =>
+                      handlePermissionToggle(permission.id)
+                    }
+                  />
                   <Label htmlFor={permission.id} className="text-sm">
                     {permission.label}
                   </Label>
@@ -278,15 +388,22 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Batal
             </Button>
-            <Button type="submit" disabled={createRole.isPending || updateRole.isPending}>
-              {createRole.isPending || updateRole.isPending ?
-                "Menyimpan..."
-              : editData ?
-                "Perbarui"
-              : "Simpan"}
+            <Button
+              type="submit"
+              disabled={createRole.isPending || updateRole.isPending}
+            >
+              {createRole.isPending || updateRole.isPending
+                ? "Menyimpan..."
+                : editData
+                  ? "Perbarui"
+                  : "Simpan"}
             </Button>
           </div>
         </form>
@@ -296,7 +413,17 @@ function RoleFormDialog({ open, onOpenChange, editData, onSuccess }: { open: boo
 }
 
 // Delete Confirmation Dialog
-function DeleteRoleDialog({ open, onOpenChange, roleData, onSuccess }: { open: boolean; onOpenChange: (open: boolean) => void; roleData: RoleData | null; onSuccess: () => void }) {
+function DeleteRoleDialog({
+  open,
+  onOpenChange,
+  roleData,
+  onSuccess,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  roleData: RoleData | null;
+  onSuccess: () => void;
+}) {
   const deleteRole = useDeleteRole();
 
   const handleDelete = async () => {
@@ -313,14 +440,24 @@ function DeleteRoleDialog({ open, onOpenChange, roleData, onSuccess }: { open: b
         <AlertDialogHeader>
           <AlertDialogTitle>Hapus Role</AlertDialogTitle>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus role <strong>{roleData?.name}</strong>?
-            {roleData?._count?.userData && roleData._count.userData > 0 && <span className="block mt-2 text-amber-600">Peringatan: Role ini sedang digunakan oleh {roleData._count.userData} user.</span>}
+            Apakah Anda yakin ingin menghapus role{" "}
+            <strong>{roleData?.name}</strong>?
+            {roleData?._count?.userData && roleData._count.userData > 0 && (
+              <span className="block mt-2 text-amber-600">
+                Peringatan: Role ini sedang digunakan oleh{" "}
+                {roleData._count.userData} user.
+              </span>
+            )}
             Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={deleteRole.isPending} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={deleteRole.isPending}
+            className="bg-red-600 hover:bg-red-700"
+          >
             {deleteRole.isPending ? "Menghapus..." : "Hapus"}
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -332,8 +469,11 @@ function DeleteRoleDialog({ open, onOpenChange, roleData, onSuccess }: { open: b
 // Main DataTable Component
 function RoleDataTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   // Dialog states
@@ -351,8 +491,23 @@ function RoleDataTable() {
   const columns: ColumnDef<RoleData>[] = [
     {
       id: "select",
-      header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
-      cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
       enableSorting: false,
       enableHiding: false,
     },
@@ -360,14 +515,19 @@ function RoleDataTable() {
       accessorKey: "name",
       header: ({ column }) => {
         return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
             <Shield className="mr-2 h-4 w-4" />
             Nama Role
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
-      cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("name")}</div>
+      ),
     },
     {
       accessorKey: "description",
@@ -386,7 +546,11 @@ function RoleDataTable() {
       header: "Status",
       cell: ({ row }) => {
         const isActive = row.getValue("isActive") as boolean;
-        return <Badge variant={isActive ? "default" : "secondary"}>{isActive ? "Aktif" : "Tidak Aktif"}</Badge>;
+        return (
+          <Badge variant={isActive ? "default" : "secondary"}>
+            {isActive ? "Aktif" : "Tidak Aktif"}
+          </Badge>
+        );
       },
     },
     {
@@ -396,13 +560,16 @@ function RoleDataTable() {
         const permissions = (row.getValue("permissions") as string[]) || [];
         return (
           <div className="flex flex-wrap gap-1">
-            {permissions.length > 0 ?
+            {permissions.length > 0 ? (
               permissions.slice(0, 3).map((permission) => (
                 <Badge key={permission} variant="outline" className="text-xs">
-                  {availablePermissions.find((p) => p.id === permission)?.label || permission}
+                  {availablePermissions.find((p) => p.id === permission)
+                    ?.label || permission}
                 </Badge>
               ))
-            : <span className="text-muted-foreground text-sm">Tidak ada</span>}
+            ) : (
+              <span className="text-muted-foreground text-sm">Tidak ada</span>
+            )}
             {permissions.length > 3 && (
               <Badge variant="outline" className="text-xs">
                 +{permissions.length - 3} lainnya
@@ -416,7 +583,10 @@ function RoleDataTable() {
       accessorKey: "_count",
       header: ({ column }) => {
         return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
             <Users className="mr-2 h-4 w-4" />
             Users
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -450,7 +620,11 @@ function RoleDataTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(roleData.id)}>Copy ID Role</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(roleData.id)}
+              >
+                Copy ID Role
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
@@ -507,7 +681,16 @@ function RoleDataTable() {
         <div className="font-bold text-3xl">Roles Menu</div>
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-2">
-            <Input placeholder="Cari nama role..." value={(table.getColumn("name")?.getFilterValue() as string) ?? ""} onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)} className="max-w-sm" />
+            <Input
+              placeholder="Cari nama role..."
+              value={
+                (table.getColumn("name")?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn("name")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
           </div>
 
           <div className="flex items-center space-x-2">
@@ -523,7 +706,14 @@ function RoleDataTable() {
                   .filter((column) => column.getCanHide())
                   .map((column) => {
                     return (
-                      <DropdownMenuCheckboxItem key={column.id} className="capitalize" checked={column.getIsVisible()} onCheckedChange={(value) => column.toggleVisibility(!!value)}>
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
                         {column.id}
                       </DropdownMenuCheckboxItem>
                     );
@@ -544,51 +734,99 @@ function RoleDataTable() {
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
-                    return <TableHead key={header.id}>{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}</TableHead>;
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    );
                   })}
                 </TableRow>
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ?
+              {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
                     ))}
                   </TableRow>
                 ))
-              : <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
                     Tidak ada data role.
                   </TableCell>
                 </TableRow>
-              }
+              )}
             </TableBody>
           </Table>
         </div>
 
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 flex items-center gap-3 text-sm text-muted-foreground">
-            <span>{table.getFilteredSelectedRowModel().rows.length} dari {table.getFilteredRowModel().rows.length} baris dipilih.</span>
+            <span>
+              {table.getFilteredSelectedRowModel().rows.length} dari{" "}
+              {table.getFilteredRowModel().rows.length} baris dipilih.
+            </span>
             <DataTablePageSize table={table} />
           </div>
           <div className="space-x-2">
-            <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
               Sebelumnya
             </Button>
-            <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
               Selanjutnya
             </Button>
           </div>
         </div>
 
         {/* Dialogs */}
-        <RoleFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onSuccess={handleSuccess} />
+        <RoleFormDialog
+          open={createDialogOpen}
+          onOpenChange={setCreateDialogOpen}
+          onSuccess={handleSuccess}
+        />
 
-        <RoleFormDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} editData={selectedRole} onSuccess={handleSuccess} />
+        <RoleFormDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          editData={selectedRole}
+          onSuccess={handleSuccess}
+        />
 
-        <DeleteRoleDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} roleData={selectedRole} onSuccess={handleSuccess} />
+        <DeleteRoleDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          roleData={selectedRole}
+          onSuccess={handleSuccess}
+        />
       </div>
     </>
   );
@@ -598,7 +836,8 @@ export default function UserDataTable() {
   const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
 
-  const { data: userData, isLoading: isLoadingUserData } = useGetUserByIdBetterAuth(userId as string);
+  const { data: userData, isLoading: isLoadingUserData } =
+    useGetUserByIdBetterAuth(userId as string);
   const userRole = userData?.role?.name;
 
   // Show loading while checking authorization
