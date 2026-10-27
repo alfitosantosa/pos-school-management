@@ -1,6 +1,6 @@
 "use client";
 
-import { createPDFClassRecap } from "@/app/(action)/createPDF/recap/classRecap";
+import { exportClassRecapToExcel } from "@/app/(action)/createExcel/recap/exportClassRecap";
 import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
 import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
 import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
@@ -203,12 +203,12 @@ function PaymentRecapContent({ lockedMajorId }: { lockedMajorId?: string }) {
     setYear(value);
   };
 
-  const handleExportPdf = async () => {
+  const handleExportExcel = async () => {
     if (!selectedClass || !year || filteredRows.length === 0) return;
 
     setIsExporting(true);
     try {
-      await createPDFClassRecap({
+      await exportClassRecapToExcel({
         className: selectedClass.name,
         academicYear: year,
         majorName: selectedClass.major?.name,
@@ -296,9 +296,9 @@ function PaymentRecapContent({ lockedMajorId }: { lockedMajorId?: string }) {
               <GraduationCap className="h-4 w-4" />
               {selectedClass?.name} • {year || "-"} • {filteredRows.length} siswa
             </div>
-            <Button onClick={handleExportPdf} disabled={isExporting || filteredRows.length === 0} className="bg-green-600 hover:bg-green-700 text-white">
+            <Button onClick={handleExportExcel} disabled={isExporting || filteredRows.length === 0} className="bg-green-600 hover:bg-green-700 text-white">
               <Download className="mr-2 h-4 w-4" />
-              {isExporting ? "Menyiapkan..." : "Export PDF"}
+              {isExporting ? "Menyiapkan..." : "Export Excel"}
             </Button>
           </div>
         )}
