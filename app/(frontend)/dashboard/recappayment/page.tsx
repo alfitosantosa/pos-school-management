@@ -1,6 +1,7 @@
 "use client";
 
 import { exportClassRecapToExcel } from "@/app/(action)/createExcel/recap/exportClassRecap";
+import { createPDFClassRecap } from "@/app/(action)/createPDF/recap/classRecap";
 import { useGetAcademicYears } from "@/app/(hooks)/hooks/AcademicYears/useAcademicYear";
 import { useGetClasses } from "@/app/(hooks)/hooks/Classes/useClass";
 import { useGetMajors } from "@/app/(hooks)/hooks/Majors/useMajors";
@@ -203,25 +204,43 @@ function PaymentRecapContent({ lockedMajorId }: { lockedMajorId?: string }) {
     setYear(value);
   };
 
+  const buildRecapPayload = () => {
+    if (!selectedClass || !year || filteredRows.length === 0) return null;
+    return {
+      className: selectedClass.name,
+      academicYear: year,
+      majorName: selectedClass.major?.name,
+      monthLabels: MONTHS.map((month) => month.label),
+      rows: filteredRows.map((row, index) => ({
+        no: index + 1,
+        name: row.name,
+        months: MONTHS.map((month) => row.paidMonths[String(month.value)] ?? 0),
+        total: row.paid,
+      })),
+      monthTotals: MONTHS.map((month) => totals.months[month.value] ?? 0),
+      total: totals.paid,
+    };
+  };
+
   const handleExportExcel = async () => {
-    if (!selectedClass || !year || filteredRows.length === 0) return;
+    const payload = buildRecapPayload();
+    if (!payload) return;
 
     setIsExporting(true);
     try {
-      await exportClassRecapToExcel({
-        className: selectedClass.name,
-        academicYear: year,
-        majorName: selectedClass.major?.name,
-        monthLabels: MONTHS.map((month) => month.label),
-        rows: filteredRows.map((row, index) => ({
-          no: index + 1,
-          name: row.name,
-          months: MONTHS.map((month) => row.paidMonths[String(month.value)] ?? 0),
-          total: row.paid,
-        })),
-        monthTotals: MONTHS.map((month) => totals.months[month.value] ?? 0),
-        total: totals.paid,
-      });
+      await exportClassRecapToExcel(payload);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    const payload = buildRecapPayload();
+    if (!payload) return;
+
+    setIsExporting(true);
+    try {
+      await createPDFClassRecap(payload);
     } finally {
       setIsExporting(false);
     }
@@ -296,6 +315,10 @@ function PaymentRecapContent({ lockedMajorId }: { lockedMajorId?: string }) {
               <GraduationCap className="h-4 w-4" />
               {selectedClass?.name} • {year || "-"} • {filteredRows.length} siswa
             </div>
+            <Button onClick={handleExportPdf} disabled={isExporting || filteredRows.length === 0} className="bg-red-600 hover:bg-red-700 text-white">
+              <Download className="mr-2 h-4 w-4" />
+              {isExporting ? "Menyiapkan..." : "Export PDF"}
+            </Button>
             <Button onClick={handleExportExcel} disabled={isExporting || filteredRows.length === 0} className="bg-green-600 hover:bg-green-700 text-white">
               <Download className="mr-2 h-4 w-4" />
               {isExporting ? "Menyiapkan..." : "Export Excel"}
