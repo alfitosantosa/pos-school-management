@@ -77,19 +77,6 @@ services:
     profiles:
       - cleanup
 
-networks:
-  ${COMPOSE_PROJECT_NAME}-app-network:
-    driver: bridge
-
-# PENTING: Batasi volume size (jika didukung driver)
-volumes:
-  node_modules:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind,size=500m
-  next_cache:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind,size=300m
+# ponytail: tidak ada top-level networks/volumes — tidak dipakai service mana pun.
+# Key `networks:` tidak boleh berisi interpolasi (${COMPOSE_PROJECT_NAME}-app-network)
+# → schema compose menolak. Default network compose sudah cukup.
